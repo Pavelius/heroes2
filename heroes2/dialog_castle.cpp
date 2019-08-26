@@ -3,8 +3,10 @@
 
 using namespace draw;
 
+static castlei* current_castle;
+
 static void statelack(const costi& c1, const costi& c2) {
-	char temp[260]; stringbuilder sb(temp);
+	char temp[260]; stringbuilder sb(temp); temp[0] = 0;
 	for(auto i = FirstResource; i <= Gems; i = (resource_s)(i + 1)) {
 		auto d = c2.data[i - FirstResource] - c1.data[i - FirstResource];
 		if(d <= 0)
@@ -46,8 +48,6 @@ static bool isallow(castlei& castle, cflags<building_s>& req) {
 	}
 	return true;
 }
-
-static castlei* current_castle;
 
 bool castlei::build(building_s building, bool confirm) {
 	auto kind = current_castle->getkind();
@@ -186,8 +186,35 @@ static void captain(int x, int y, castlei* castle) {
 	}
 }
 
+static void information_hero() {
+	auto hero = (heroi*)hot::param;
+	hero->show(false);
+}
+
+static void hire_hero() {
+
+}
+
 static void hireling(int x, int y, playeri* player, heroi* hero) {
+	rect rc = {x, y, x + getwidth(PORT0000, 0), y + getheight(PORT0000, 0)};
+	auto hilite = mousein(rc);
+	auto& c1 = player->getresources();
+	auto& c2 = hero->cost;
+	auto lack_resources = !(c1>=c2);
 	image(x, y, hero->getid());
+	if(lack_resources) {
+		image(rc.x2 - 20, rc.y2 - 20, TOWNWIND, 13);
+		if(hilite)
+			statelack(c1, c2);
+	} else {
+		if(hilite) {
+			status("Нанять героя");
+			if(hilite && hot::key == MouseLeft && hot::pressed)
+				execute(hire_hero, (int)hero);
+		}
+	}
+	if(hilite && hot::key == MouseRight && hot::pressed)
+		execute(information_hero, (int)hero);
 }
 
 void castlei::build() {

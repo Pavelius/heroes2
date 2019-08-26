@@ -274,6 +274,7 @@ static void buildings_information() {
 }
 
 static void buildings_tips() {
+	hot::key = 0;
 	auto kind = current_castle->getkind();
 	auto building = (building_s)hot::param;
 	current_castle->information(building, kind);
@@ -367,7 +368,7 @@ void castlei::paint_panorama(int x, int y) const {
 		if(rbd == Tent && is(Castle))
 			rbd = Castle;
 		if(hot::mouse.in(buildings_rect[rbd][kind])) {
-			rectb(buildings_rect[rbd][kind], 0x10);
+			//rectb(buildings_rect[rbd][kind], 0x10);
 			char temp[260]; stringbuilder sb(temp);
 			sb.add(getstr(building, kind));
 			auto monster = getmonster(building, getkind());

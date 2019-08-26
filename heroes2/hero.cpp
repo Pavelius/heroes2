@@ -79,6 +79,8 @@ static struct heroin {
 };
 heroi bsmeta<heroi>::elements[CaptainWizard + 1];
 
+const costi	heroi::cost = {{2500}};
+
 void heroi::initialize() {
 	for(auto i = 0; i <= CaptainWizard; i++)
 		bsmeta<heroi>::elements[i].clear();

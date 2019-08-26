@@ -3,7 +3,7 @@
 #include "point.h"
 
 enum kind_s : unsigned char {
-	Barbarian, Knight, Necromancer, Sorcerer, Warlock, Wizard, Hirelings,
+	Barbarian, Knight, Necromancer, Sorcerer, Warlock, Wizard,
 	RandomKind,
 };
 enum ability_s : unsigned char {
@@ -136,7 +136,7 @@ enum map_object_s : unsigned char {
 	WindMill, ArtifactObject, Map0xAA, Boat, // 0xA8-0xAB
 	RndUltimateArtifact, RndArtifact, RndResource, RndMonster, // 0xAC-0xAF
 	RndTown, RndCastle, Map0xB2, RndMonster1, // 0xB0-0xB3
-	RndMonster2, RndMonster3, RndMonster4, Hero, // 0xB4-0xB7
+	RndMonster2, RndMonster3, RndMonster4, HeroObject, // 0xB4-0xB7
 	Map0xB8, Map0xB9, WatchTower, SpriteHouse, // 0xB8-0xBB
 	SpriteHouseCity, Ruins, Fort, TradingPost, // 0xBC-0xBF
 	AbandoneMine, ThatchedHut, StandingStones, Idol, // 0xC0-xC3
@@ -172,7 +172,7 @@ enum spell_type_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Ability, Artifact, Resource, Monster, Skill, Spell, Stat, Tag,
+	Ability, Artifact, Hero,  Monster, Resource, Skill, Spell, Stat, Tag,
 };
 enum activity_s : unsigned char {
 	NotAllowed,
@@ -193,6 +193,7 @@ struct variant {
 	union {
 		ability_s			ability;
 		artifact_s			artifact;
+		hero_s				hero;
 		skill_s				skill;
 		spell_s				spell;
 		resource_s			resource;
@@ -203,12 +204,14 @@ struct variant {
 	constexpr variant() : type(NoVariant), value(0) {}
 	constexpr variant(ability_s v) : type(Ability), ability(v) {}
 	constexpr variant(artifact_s v) : type(Artifact), artifact(v) {}
+	constexpr variant(hero_s v) : type(Hero), hero(v) {}
 	constexpr variant(monster_s v) : type(Monster), monster(v) {}
 	constexpr variant(resource_s v) : type(Resource), resource(v) {}
 	constexpr variant(skill_s v) : type(Skill), skill(v) {}
 	constexpr variant(spell_s v) : type(Spell), spell(v) {}
 	constexpr variant(tag_s v) : type(Tag), tag(v) {}
 	constexpr bool operator==(const variant& e) const { return type == e.type && value == e.value; }
+	constexpr explicit operator bool() const { return type != NoVariant; }
 };
 struct resourcei {
 	const char*				name;
@@ -256,7 +259,7 @@ struct squadi {
 	monster_s				getupgrade() const;
 	bool					is(tag_s v) const;
 	void					information(const heroi* hero) { show(hero, true, false, false); }
-	void					paint(int x, int y, const heroi* hero = 0) const;
+	void					paint(int x, int y, const heroi* hero = 0, bool allow_change = true) const;
 	void					show(const heroi* hero, bool info_mode, bool allow_dismiss, bool allow_upgrade);
 };
 struct armyi {
@@ -265,7 +268,7 @@ struct armyi {
 	const squadi*			find(monster_s v) const;
 	bool					is(monster_s v) const { return find(v) != 0; }
 	bool					is(tag_s v) const;
-	void					paint(int x, int y, const heroi* hero = 0) const;
+	void					paint(int x, int y, const heroi* hero = 0, bool allow_change = true) const;
 };
 class playeri : public namei {
 	kind_s					kind;
@@ -345,6 +348,7 @@ public:
 	void					add(artifact_s id);
 	void					add(monster_s id, short unsigned count) { armyi::add(id, count); }
 	void					clear();
+	static const costi		cost;
 	playeri*				getplayer() const;
 	int						get(ability_s v) const;
 	int						get(skill_s v) const { return skills[v]; }
@@ -356,7 +360,7 @@ public:
 	static unsigned			select(heroi** result, heroi** result_maximum, const playeri* player, kind_s kind, kind_s kind_exclude, bool include_special = false);
 	void					set(skill_s id, int v) { skills[id] = v; }
 	void					set(spell_s id) { spellbook.set(id); }
-	void					show() const;
+	void					show(bool allow_change = true) const;
 	void					showbook(spell_type_s mode);
 };
 class castlei : public namei, public armyi {

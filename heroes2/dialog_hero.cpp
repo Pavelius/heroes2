@@ -21,7 +21,7 @@ void heroi::open_artifact() {
 		current_hero->showbook(AnySpell);
 }
 
-void heroi::show() const {
+void heroi::show(bool allow_change) const {
 	char temp[260];
 	while(ismodal()) {
 		status({22, height - 17, 22 + getwidth(HSBTNS, 8), height - 1});
@@ -81,7 +81,7 @@ void heroi::show() const {
 					image(x, y, ARTIFACT, n);
 					if(mousein({x, y, x + dx, y + dy})) {
 						status("Артефакт %1", getstr(n));
-						if(hot::key == MouseLeft && hot::pressed) {
+						if(hot::key == MouseLeft && hot::pressed && allow_change) {
 							current_hero = (heroi*)this;
 							execute(open_artifact, i);
 						}
@@ -97,7 +97,7 @@ void heroi::show() const {
 			}
 		}
 		image(49, 130, CREST, player);
-		armyi::paint(156, 130, this);
+		armyi::paint(156, 130, this, allow_change);
 		button(5, 318, HSBTNS, dismiss_hero, {0, 0, 1}, Alpha + 'A', "Уволить героя");
 		button(603, 318, HSBTNS, buttoncancel, {2, 2, 3}, KeyEscape, "Закрыть окно");
 		cursor(ADVMCO, 0);

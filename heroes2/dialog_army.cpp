@@ -67,7 +67,7 @@ static void dismiss_unit() {
 	}
 }
 
-void squadi::paint(int x, int y, const heroi* hero) const {
+void squadi::paint(int x, int y, const heroi* hero, bool allow_change) const {
 	auto key = hot::key;
 	auto pressed = hot::pressed;
 	auto w = getwidth(STRIP, 2);
@@ -88,38 +88,40 @@ void squadi::paint(int x, int y, const heroi* hero) const {
 	if(current_unit == this)
 		image(x, y, STRIP, 1);
 	if(mousein({x, y, x + w, y + h})) {
-		switch(key) {
-		case MouseRight:
-			if(hot::pressed) {
-				current_hero = hero;
-				execute(unit_info, (int)this);
-			}
-			break;
-		case MouseLeftDBL:
-			current_unit = (squadi*)this;
-			current_hero = hero;
-			execute(unit_edit);
-			break;
-		case MouseLeft:
-			if(pressed) {
-				if(current_hero != hero) {
+		if(allow_change) {
+			switch(key) {
+			case MouseRight:
+				if(hot::pressed) {
 					current_hero = hero;
-					execute(choose_unit, (int)this);
-				} else
-					execute(swap_unit, (int)this);
+					execute(unit_info, (int)this);
+				}
+				break;
+			case MouseLeftDBL:
+				current_unit = (squadi*)this;
+				current_hero = hero;
+				execute(unit_edit);
+				break;
+			case MouseLeft:
+				if(pressed) {
+					if(current_hero != hero) {
+						current_hero = hero;
+						execute(choose_unit, (int)this);
+					} else
+						execute(swap_unit, (int)this);
+				}
+				break;
 			}
-			break;
 		}
 		if(*this)
 			status("%1i %2", count, bsmeta<monsteri>::elements[unit].multiname);
 	}
 }
 
-void armyi::paint(int x, int y, const heroi* hero) const {
+void armyi::paint(int x, int y, const heroi* hero, bool allow_change) const {
 	int w = getwidth(STRIP, 2);
 	int h = getwidth(STRIP, 2);
 	for(int i = 0; i < 5; i++) {
-		units[i].paint(x, y, hero);
+		units[i].paint(x, y, hero, allow_change);
 		x += 88;
 	}
 }

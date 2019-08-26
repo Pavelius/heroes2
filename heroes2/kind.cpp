@@ -6,6 +6,6 @@ kindi bsmeta<kindi>::elements[] = {{"Варвар", {3, 1, 1, 1}, {Pathfinding, Pathfi
 {"Волшебница", {0, 0, 3, 4}, {Navigation, WisdomSkill}, {Sprite, Dwarf}, Bless},
 {"Колдун", {0, 0, 4, 3}, {WisdomSkill, WisdomSkill}, {Centaur, Gargoyle}, Curse},
 {"Чародей", {0, 1, 3, 3}, {Scounting, WisdomSkill}, {Halfling, Boar}, StoneSkin},
-{"Наемник", {2, 2, 0, 0}, {Leadership, Ballistics}, {Rogue, Nomand}},
+{"Случайно", {}, {}, {}},
 };
-assert_enum(kind, Hirelings);
+assert_enum(kind, RandomKind);

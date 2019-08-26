@@ -1130,6 +1130,9 @@ void picture::set(const variant e) {
 		size.y += getheight(SMALFONT, 'I' - 0x20) + 4;
 		format = "%1i";
 		break;
+	case Hero:
+		res = res_s(PORT0000 + e.hero); frame = resources_frame[e.resource];
+		break;
 	default:
 		res = NoRes; frame = 0;
 		size.x = 0;
@@ -1260,13 +1263,13 @@ int draw::message(const char* format, kind_s kind, building_s building, const va
 		h1 += getheight(ic1, 1) + 8;
 	if(footer)
 		h1 += getsize(footer, footer_count, dialog_width) + 8;
-	if(building != NoBuilding)
+	if(building!=NoBuilding)
 		h1 += bld_h + 8;
 	while(ismodal()) {
 		surface.restore();
 		auto y2 = 0;
 		auto y1 = dialog(h1, &y2);
-		if(building != NoBuilding) {
+		if(building!=NoBuilding) {
 			auto bld_res = getbuildings(kind);
 			auto bld_index = castlei::getframe(building);
 			auto x = (width - bld_w) / 2;

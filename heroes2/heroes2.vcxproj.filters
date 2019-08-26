@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="main.h">
+      <Filter>Логика</Filter>
+    </ClInclude>
+    <ClInclude Include="collection.h">
+      <Filter>Утилиты</Filter>
+    </ClInclude>
+    <ClInclude Include="win.h">
+      <Filter>Платформа</Filter>
+    </ClInclude>
+    <ClInclude Include="view.h">
+      <Filter>Графика</Filter>
+    </ClInclude>
+    <ClInclude Include="point.h">
+      <Filter>Утилиты</Filter>
+    </ClInclude>
+    <ClInclude Include="pointc.h">
+      <Filter>Утилиты</Filter>
+    </ClInclude>
+    <ClInclude Include="rect.h">
+      <Filter>Утилиты</Filter>
+    </ClInclude>
+    <ClInclude Include="resources.h">
+      <Filter>Графика</Filter>
+    </ClInclude>
+    <ClInclude Include="io.h">
+      <Filter>Утилиты</Filter>
+    </ClInclude>
+    <ClInclude Include="crt.h">
+      <Filter>Утилиты</Filter>
+    </ClInclude>
+    <ClInclude Include="stringbuilder.h">
+      <Filter>Утилиты</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Логика">
+      <UniqueIdentifier>{bf932380-8e8d-4310-bad9-859cfa68b1de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Утилиты">
+      <UniqueIdentifier>{93afcb0b-0206-45a6-bea5-bc93442da37f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Платформа">
+      <UniqueIdentifier>{323083cc-c1ba-4849-a7a5-e24f591f0f95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Графика">
+      <UniqueIdentifier>{2e0707ed-db66-45f6-9cc5-6993cee523f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Диалоги">
+      <UniqueIdentifier>{3fe5af91-10cf-435f-9f94-a104b750bd5a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="spells.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="win.cpp">
+      <Filter>Платформа</Filter>
+    </ClCompile>
+    <ClCompile Include="point.cpp">
+      <Filter>Утилиты</Filter>
+    </ClCompile>
+    <ClCompile Include="view.cpp">
+      <Filter>Графика</Filter>
+    </ClCompile>
+    <ClCompile Include="pallette.cpp">
+      <Filter>Графика</Filter>
+    </ClCompile>
+    <ClCompile Include="resources.cpp">
+      <Filter>Графика</Filter>
+    </ClCompile>
+    <ClCompile Include="win_io.cpp">
+      <Filter>Платформа</Filter>
+    </ClCompile>
+    <ClCompile Include="stringbuilder.cpp">
+      <Filter>Утилиты</Filter>
+    </ClCompile>
+    <ClCompile Include="hero.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="dialog_highscore.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
+    <ClCompile Include="dialog_main.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
+    <ClCompile Include="monster.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="resource.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="army.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="artifacts.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="dialog_hero.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
+    <ClCompile Include="kind.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="ability.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="skill.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="dialog_army.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
+    <ClCompile Include="screenshot.cpp">
+      <Filter>Графика</Filter>
+    </ClCompile>
+    <ClCompile Include="animation.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="speed.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="dialog_spellbook.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
+    <ClCompile Include="morale.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="luck.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="castle.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="indexes.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="dialog_city.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
+    <ClCompile Include="dialog_resource.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
+    <ClCompile Include="difficult.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="dialog_market.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
+    <ClCompile Include="dialog_well.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
+    <ClCompile Include="dialog_tavern.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
+    <ClCompile Include="dialog_theives.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
+    <ClCompile Include="dialog_castle.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

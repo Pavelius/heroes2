@@ -1,0 +1,181 @@
+#include "main.h"
+
+static const char* random_names[] = {"Синий", "Зеленый", "Красный", "Желтый", "Оранжевый", "Фиолетовый"};
+
+playeri bsmeta<playeri>::elements[LastPlayer + 1];
+
+void playeri::clear() {
+	memset(this, 0, sizeof(*this));
+}
+
+void playeri::initialize() {
+	for(auto& e : bsmeta<playeri>::elements) {
+		e.clear();
+		if(e.getid() == RandomPlayer)
+			continue;
+		e.setname(random_names[e.getid()]);
+	}
+}
+
+void playeri::setup(difficult_s id) {
+	resources = bsmeta<difficulti>::elements[id].resources;
+	sethire(0);
+	sethire(1);
+}
+
+int playeri::getmarket() const {
+	return getbuildings(MarketPlace);
+}
+
+int playeri::getcastles() const {
+	return getbuildings(Castle);
+}
+
+int playeri::gettowns() const {
+	return getbuildings(Tent);
+}
+
+int playeri::getspies() const {
+	return getbuildings(ThievesGuild);
+}
+
+int playeri::getadventurers() const {
+	return getbuildings(Tavern);
+}
+
+int playeri::getrate(resource_s resf, resource_s rest, int markets) {
+	const int max_count = 9;
+	static int sale_uncostly[max_count + 1] = {0, 25, 37, 50, 62, 74, 87, 100, 112, 124};
+	static int sale_costly[max_count + 1] = {0, 50, 74, 100, 124, 149, 175, 200, 224, 249};
+	static int costly_costly[max_count + 1] = {0, 10, 7, 5, 4, 4, 3, 3, 3, 2};
+	static int uncostly_costly[max_count + 1] = {0, 20, 14, 10, 8, 7, 6, 5, 5, 4};
+	static int costly_uncostly[max_count + 1] = {0, 5, 4, 3, 2, 2, 2, 2, 2, 1};
+	static int buy_costly[max_count + 1] = {0, 5000, 3334, 2500, 2000, 1667, 1429, 1250, 1112, 1000};
+	static int buy_uncostly[max_count + 1] = {0, 2500, 1667, 1250, 1000, 834, 715, 625, 556, 500};
+	if(!markets)
+		return 0;
+	if(resf == rest)
+		return 0;
+	if(markets > max_count)
+		markets = max_count;
+	switch(resf) {
+	case Wood:
+	case Ore:
+		switch(rest) {
+		case Gold:
+			return sale_uncostly[markets];
+		case Mercury:
+		case Sulfur:
+		case Crystal:
+		case Gems:
+			return uncostly_costly[markets];
+		case Wood:
+		case Ore:
+			return costly_costly[markets];
+		default:
+			return 0;
+		}
+		break;
+	case Mercury:
+	case Sulfur:
+	case Crystal:
+	case Gems:
+		switch(rest) {
+		case Gold:
+			return sale_costly[markets];
+		case Mercury:
+		case Sulfur:
+		case Crystal:
+		case Gems:
+			return costly_costly[markets];
+		case Wood:
+		case Ore:
+			return costly_uncostly[markets];
+		default:
+			return 0;
+		}
+	case Gold:
+		switch(rest) {
+		case Mercury:
+		case Sulfur:
+		case Crystal:
+		case Gems:
+			return buy_costly[markets];
+		case Wood:
+		case Ore:
+			return buy_uncostly[markets];
+		default:
+			return 0;
+		}
+	default:
+		return 0;
+	}
+}
+
+void playeri::trade(resource_s rs, resource_s rt, int count, int market_count) {
+	int rate = getrate(rs, rt, market_count);
+	if(!rate)
+		return;
+	int cs = 0;
+	int ct = 0;
+	if(rt == Gold) {
+		cs = count;
+		ct = rate * count;
+	} else {
+		cs = rate * count;
+		ct = count;
+	}
+	if(resources.data[rs] < cs)
+		return;
+	resources.data[rt] += ct;
+	resources.data[rs] -= cs;
+}
+
+heroi* playeri::gethire(int index) const {
+	if(heroes[index] == RandomHero)
+		return 0;
+	return bsmeta<heroi>::elements + heroes[index];
+}
+
+static bool already_hired(const heroi* hero) {
+	for(auto& e : bsmeta<playeri>::elements) {
+		if(!e)
+			continue;
+		if(e.gethire(0) == hero || e.gethire(1) == hero)
+			return true;
+	}
+	return false;
+}
+
+static heroi* find_hero(kind_s kind, kind_s excude_kind) {
+	heroi* heroes[LastHero - FirstHero + 1];
+	unsigned count = heroi::select(heroes, zendof(heroes), 0, kind, excude_kind);
+	if(count) {
+		auto p = heroes;
+		for(unsigned i = 0; i < count; i++) {
+			if(already_hired(heroes[i]))
+				continue;
+			*p++ = heroes[i];
+		}
+		count = p - heroes;
+	}
+	if(!count)
+		return 0;
+	return heroes[rand()%count];
+}
+
+void playeri::sethire(int index) {
+	heroi* hero = 0;
+	if(kind != MultiPlayer) {
+		if(index==0)
+			hero = find_hero(kind, RandomKind);
+		else
+			hero = find_hero(RandomKind, kind);
+	}
+	if(!hero)
+		hero = find_hero(RandomKind, RandomKind);
+	if(hero)
+		this->heroes[index] = hero->getid();
+	else
+		this->heroes[index] = RandomHero;
+}

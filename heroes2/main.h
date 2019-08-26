@@ -185,7 +185,8 @@ enum difficult_s : unsigned char {
 	EasyDifficulty, NormalDifficulty, HardDifficulty, VeryHardDifficulty, ImpossibleDifficulty
 };
 enum size_s : unsigned char {
-	SmallSize, MediumSize, LargeSize, XLargeSize
+	NoSize,
+	SmallSize, MediumSize, LargeSize, XLargeSize,
 };
 class heroi;
 struct variant {
@@ -234,6 +235,9 @@ struct namei {
 	char					name[32];
 	const char*				getname() const { return name; }
 	void					setname(const char* v) { zcpy(name, v, sizeof(name) - 1); }
+};
+struct leveli {
+	const char*				name;
 };
 struct speedi {
 	const char*				name;
@@ -452,16 +456,18 @@ struct gamei {
 	size_s					size;
 	unsigned char			wins;
 	unsigned char			lose;
-	activity_s			types[6];
+	activity_s				types[6];
 	kind_s					races[6];
-	bool					blocked[6];
 	level_s					level;
 	difficult_s				difficult;
 	bool					start_hero;
 	//
 	operator bool() const { return file[0] != 0; }
+	bool					choose();
 	void					clear();
+	int						getplayers() const;
 	bool					load(const char* filename);
+	static void				newgame();
 };
 struct hightscore {
 	char					name[32];
@@ -481,6 +487,7 @@ DECLENUM(artifact);
 DECLENUM(skill);
 DECLENUM(spell);
 DECLENUM(kind);
+DECLENUM(level);
 DECLENUM(luck);
 DECLENUM(monster);
 DECLENUM(morale);

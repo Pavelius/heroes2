@@ -250,10 +250,11 @@ bool gamei::load(const char* url) {
 	level = level_s(LevelEasy + header.level);
 	// size
 	switch(header.width) {
-	case 32: size = SmallSize; break;
+	case 36: size = SmallSize; break;
 	case 72: size = MediumSize; break;
 	case 108: size = LargeSize; break;
 	case 144: size = XLargeSize; break;
+	default: return false;
 	}
 	// start player
 	if(header.hero)
@@ -270,13 +271,21 @@ bool gamei::load(const char* url) {
 		else if(header.computers[i])
 			types[i] = ComputerOnly;
 		races[i] = index2race(header.races[i]);
-		blocked[i] = races[i] != RandomKind;
 	}
 	return true;
 }
 
 void gamei::clear() {
-	memset(this, 0, *this);
+	memset(this, 0, sizeof(*this));
 	difficult = NormalDifficulty;
 	level = LevelNormal;
+}
+
+int gamei::getplayers() const {
+	auto r = 0;
+	for(auto e : types) {
+		if(e != NotAllowed)
+			r++;
+	}
+	return r;
 }

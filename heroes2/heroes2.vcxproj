@@ -139,6 +139,7 @@
     <ClCompile Include="dialog_army.cpp" />
     <ClCompile Include="dialog_castle.cpp" />
     <ClCompile Include="dialog_city.cpp" />
+    <ClCompile Include="dialog_game.cpp" />
     <ClCompile Include="dialog_market.cpp" />
     <ClCompile Include="dialog_resource.cpp" />
     <ClCompile Include="dialog_spellbook.cpp" />
@@ -146,9 +147,11 @@
     <ClCompile Include="dialog_theives.cpp" />
     <ClCompile Include="dialog_well.cpp" />
     <ClCompile Include="difficult.cpp" />
+    <ClCompile Include="draw_list.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="indexes.cpp" />
     <ClCompile Include="kind.cpp" />
+    <ClCompile Include="level.cpp" />
     <ClCompile Include="luck.cpp" />
     <ClCompile Include="morale.cpp" />
     <ClCompile Include="player.cpp" />

@@ -146,6 +146,21 @@ struct controli {
 	unsigned char			normal, hilited, pressed;
 	explicit constexpr operator bool() const { return res != 0; }
 };
+struct list {
+	int						origin;
+	int						current;
+	int						maximum;
+	list();
+	void					area(int x, int y, int count);
+	void					box(int x, int y, int count);
+	void					boxs(int x, int y, int count);
+	void					draw(int x, int y, int sy, int sx, int count);
+	virtual void			prerender() {}
+	virtual void			row(int x, int y, int index) const = 0;
+private:
+	void					box(int x, int y, int count, res_s icn, int dy, int dx, int sbu, int sbd, int sbs, int sdbd, int sb, int bf, res_s iss);
+	void					flatbutton(int x, int y, res_s icn, int index, int command, int count);
+};
 //
 bool						ask(const char* format, const variantcol* footer = 0, unsigned count = 0);
 void						breakmodal(int result);

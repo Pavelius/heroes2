@@ -858,7 +858,7 @@ void draw::cursor(res_s id, int n, int ox, int oy) {
 }
 
 static void show_tooltips() {
-	message(tooltips_text);
+	message(tooltips_text, RandomKind, NoBuilding, 0, 0, NoButtons);
 }
 
 void draw::tooltips(const char* header, const char* format, ...) {

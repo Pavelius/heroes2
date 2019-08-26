@@ -167,5 +167,14 @@
     <ClCompile Include="dialog_castle.cpp">
       <Filter>Диалоги</Filter>
     </ClCompile>
+    <ClCompile Include="dialog_game.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
+    <ClCompile Include="draw_list.cpp">
+      <Filter>Графика</Filter>
+    </ClCompile>
+    <ClCompile Include="level.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

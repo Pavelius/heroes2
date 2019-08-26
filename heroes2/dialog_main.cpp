@@ -62,11 +62,11 @@ static void main_menu() {
 	animation latern;
 	while(ismodal()) {
 		image(0, 0, HEROES, 0, 0, 0);
-		button(0, 0, BTNSHNGL, new_game, {1, 2, 3}, 0, "Начать новую одиночную или мультиплеер игру.");
+		button(0, 0, BTNSHNGL, gamei::newgame, {1, 2, 3}, 0, "Начать новую одиночную или мультиплеер игру.");
 		button(0, 0, BTNSHNGL, load_game, {5, 6, 7}, Ctrl + Alpha + 'L', "Загрузить ранее сохраненную игру.");
 		button(0, 0, BTNSHNGL, hightscore::show, {9, 10, 11});
 		button(0, 0, BTNSHNGL, test_message, {13, 14, 15});
-		button(0, 0, BTNSHNGL, buttonok, {17, 18, 19});
+		button(0, 0, BTNSHNGL, new_game, {17, 18, 19});
 		//latern.painting({0, 0});
 		cursor(ADVMCO, 0);
 		domodal();

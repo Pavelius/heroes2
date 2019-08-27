@@ -275,15 +275,15 @@ bool gamei::setupmap() {
 		button_difficult(x + 328, y + 91, ImpossibleDifficulty, difficult);
 		//
 		auto maximum = getplayers();
-		auto current = 0;
 		auto y1 = y + 200;
 		auto w1 = getwidth(NGEXTRA, 3);
+		auto current = 0;
 		for(int i = 0; i < 6; i++) {
-			if(types[i] == NotAllowed)
+			if(!isallow(i))
 				continue;
 			auto x1 = x + (w - w1 * 6) / 2 + xpos(current, maximum, w1);
 			button_type(x1, y1, types[i], i, true);
-			button_race(x1, y1 + 78, races[i], i, true, isallow(i));
+			button_race(x1, y1 + 78, races[i], i, true, false);
 			current++;
 		}
 		// opponents

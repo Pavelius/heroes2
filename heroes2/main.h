@@ -155,6 +155,7 @@ enum map_object_s : unsigned char {
 	RndArtifact1, RndArtifact2, RndArtifact3, Barrier, // 0xF4-0xF7
 	TravellerTent, Map0xF9, Map0xFA, Jail, // 0xF8-0xFB
 	FireAltar, AirAltar, EarthAltar, WaterAltar, // 0xFC-0xFF
+	FirstObject = WaterChest, LastObject = WaterAltar,
 };
 enum tag_s : unsigned char {
 	Air, Cold, Dragon, Earth, Fire, Lighting, Water, Undead,
@@ -293,6 +294,7 @@ public:
 	int						getheroes() const;
 	heroi*					gethire(int index) const;
 	player_s				getid() const { return player_s(this - bsmeta<playeri>::elements); }
+	kind_s					getkind() const { return kind; }
 	int						getmarket() const;
 	static int				getrate(resource_s resf, resource_s rest, int markets);
 	costi&					getresources() { return resources; }
@@ -369,6 +371,7 @@ public:
 	static unsigned			select(heroi** result, heroi** result_maximum, const playeri* player, kind_s kind, kind_s kind_exclude, bool include_special = false);
 	void					set(skill_s id, int v) { skills[id] = v; }
 	void					set(spell_s id) { spellbook.set(id); }
+	void					set(playeri* v) { if(v) player = v->getid(); else player = RandomPlayer; }
 	void					show(bool allow_change = true) const;
 	void					showbook(spell_type_s mode);
 };
@@ -461,7 +464,6 @@ struct gamei {
 	size_s					size;
 	unsigned char			wins;
 	loss_s					loss;
-	unsigned short			loss_data[2];
 	activity_s				types[6];
 	kind_s					races[6];
 	level_s					level;
@@ -475,6 +477,7 @@ struct gamei {
 	bool					isallow(int index) const { return types[index] != NotAllowed; }
 	bool					load(const char* filename);
 	static void				newgame();
+	void					prepare();
 	bool					setupmap();
 };
 struct hightscore {
@@ -489,6 +492,15 @@ struct variantcol {
 	variant					element;
 	int						count;
 };
+namespace map {
+void						clear();
+extern unsigned char		flags[256 * 256];
+extern unsigned	char		height;
+extern unsigned	char		obelisc_count;
+extern unsigned short		tiles[256 * 256];
+inline unsigned short		m2i(int x, int y) { return (y << 8) + x; }
+extern unsigned char		width;
+}
 const char*					getstr(building_s id, kind_s kind);
 DECLENUM(ability);
 DECLENUM(artifact);

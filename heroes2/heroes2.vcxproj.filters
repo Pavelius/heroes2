@@ -176,5 +176,11 @@
     <ClCompile Include="level.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="dialog_adventure.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
+    <ClCompile Include="map.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

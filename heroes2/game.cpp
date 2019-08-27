@@ -183,6 +183,14 @@ enum conditions {
 	Loss = 0x2000, LoseTown = 0x2001, LoseHero = 0x2002, OutTime = 0x2003
 };
 
+inline short unsigned mp2i(short unsigned i) {
+	return map::m2i(i%map::width, i / map::width);
+}
+
+static unsigned short getLE16(unsigned short u) {
+	return (u << 8) | (u >> 8);
+}
+
 static kind_s index2race(int index) {
 	switch(index) {
 	case 0: return Knight;
@@ -217,7 +225,7 @@ static kind_s oppose_type(kind_s type) {
 	}
 }
 
-static int mini2player(int index) {
+static player_s mini2player(int index) {
 	if(index < 7) return PlayerBlue;
 	else if(index < 14) return PlayerGreen;
 	else if(index < 21) return PlayerRed;
@@ -226,15 +234,8 @@ static int mini2player(int index) {
 	else return PlayerPurple;
 }
 
-static player_s mini2type(int index) {
-	auto r = player_s((index % 7) + PlayerBlue);
-	if(r == PlayerPurple + 1)
-		r = RandomPlayer;
-	return r;
-}
-
-unsigned short getLE16(unsigned short u) {
-	return (u << 8) | (u >> 8);
+static kind_s mini2type(int index) {
+	return kind_s(index % (Wizard+2));
 }
 
 bool gamei::load(const char* url) {
@@ -290,4 +291,402 @@ int gamei::getplayers() const {
 			r++;
 	}
 	return r;
+}
+
+static unsigned get32(io::file& st) {
+	unsigned r = 0;
+	st.read(&r, sizeof(r));
+	return r;
+}
+
+static unsigned short get16(io::file& st) {
+	unsigned short r = 0;
+	st.read(&r, sizeof(r));
+	return r;
+}
+
+static int get(io::file& st) {
+	unsigned char r = 0;
+	st.read(&r, sizeof(r));
+	return r;
+}
+
+void add_object(unsigned short index, unsigned char object, unsigned char frame, unsigned char quantity) {
+}
+
+static void load_object(armyi& e, mp2::army& r) {
+	for(int i = 0; i < 5; i++) {
+		if(!r.count[i])
+			continue;
+		e.units[i].unit = monster_s(r.monster[i] + FirstMonster);
+		e.units[i].count = getLE16(r.count[i]);
+	}
+}
+
+static void load_object(castlei& e, mp2::castle& r) {
+	auto pla = index2player(r.player);
+	e.set(bsmeta<playeri>::elements + pla);
+	e.set(index2race(r.race));
+	// custom building
+	if(r.has_buildings) {
+		// building
+		auto build = getLE16(r.buildings);
+		if(0x0002 & build) e.set(ThievesGuild);
+		if(0x0004 & build) e.set(Tavern);
+		if(0x0008 & build) e.set(Shipyard);
+		if(0x0010 & build) e.set(Well);
+		if(0x0080 & build) e.set(Statue);
+		if(0x0100 & build) e.set(LeftTurret);
+		if(0x0200 & build) e.set(RightTurret);
+		if(0x0400 & build) e.set(MarketPlace);
+		if(0x1000 & build) e.set(Moat);
+		if(0x0800 & build) e.set(Well2);
+		if(0x2000 & build) e.set(SpecialBuilding);
+		// dwelling
+		auto dwell = getLE16(r.dwellings);
+		if(0x0008 & dwell) e.set(Dwelving1);
+		if(0x0010 & dwell) e.set(Dwelving2);
+		if(0x0020 & dwell) e.set(Dwelving3);
+		if(0x0040 & dwell) e.set(Dwelving4);
+		if(0x0080 & dwell) e.set(Dwelving5);
+		if(0x0100 & dwell) e.set(Dwelving6);
+		if(0x0200 & dwell) e.set(Dwelving2u);
+		if(0x0400 & dwell) e.set(Dwelving3u);
+		if(0x0800 & dwell) e.set(Dwelving4u);
+		if(0x1000 & dwell) e.set(Dwelving5u);
+		if(0x2000 & dwell) e.set(Dwelving6u);
+		// magic tower
+		if(r.magic_tower >= 1)
+			e.set(MageGuild);
+		if(r.magic_tower >= 2)
+			e.set(MageGuild2);
+		if(r.magic_tower >= 3)
+			e.set(MageGuild3);
+		if(r.magic_tower >= 4)
+			e.set(MageGuild4);
+		if(r.magic_tower >= 5)
+			e.set(MageGuild5);
+	} else
+		e.set(Dwelving1);
+	// custom troops
+	if(r.has_army)
+		load_object(e, r.army);
+	// captain
+	if(r.has_captain)
+		e.set(Captain);
+	// race
+	if(index2race(r.race) == RandomKind) {
+		//auto player = bsget(rec, Player);
+		//if(!player)
+		//	bsset(rec, Type, xrand(Barbarian, Wizard));
+		//else
+		//	bsset(rec, Type, bsget(player, Type));
+	}
+	// name
+	if(r.has_name)
+		zcpy(e.name, e.name, sizeof(e.name));
+	if(r.castle_in_town)
+		e.set(Castle);
+	// allow upgrade to castle (0 - true, 1 - false)
+	//bsset(rec, DisableCastleUpgrade, p->disable_castle_upgrade);
+}
+
+static void load_object(heroi& e, mp2::hero& r) {
+	// custom troops
+	if(r.has_army)
+		load_object(e, r.army);
+	// custom portrate
+	//if(r.has_type)
+	//	bsset(rec, Portrait, p->type);
+	// 3 artifacts
+	for(int i = 0; i < 3; i++) {
+		if(r.artifact[i] == 0xFF)
+			continue;
+		e.add(artifact_s(r.artifact[i] + FirstArtifact));
+	}
+	// experience
+	//bsset(rec, Experience, p->exerience);
+	// custom skill
+	if(r.has_skills) {
+		for(int i = 0; i < 8; i++) {
+			if(r.skill_level[i])
+				e.set(skill_s(FirstSkill + r.skill[i]), r.skill_level[i]);
+		}
+	}
+	// custom name
+	//bsset(rec, Name, p->name);
+	// patrol
+	if(r.has_patrol) {
+	}
+}
+
+void gamei::prepare() {
+	//static map_object_s decode_resource[] = {Wood, Mercury, Ore, Sulfur, Crystal, Gems, Gold, AncientLamp, Resource, TreasureChest};
+	char temp[260]; zprint(temp, "maps/%1.mp2", file);
+	io::file st(temp);
+	if(!st)
+		return;
+	// width and heigh
+	map::clear();
+	st.seek(420, SeekSet);
+	map::width = get32(st);
+	map::height = get32(st);
+	if(!map::width || !map::height)
+		return;
+	// tiles loading
+	short unsigned tiles_count = map::height * map::width;
+	mp2::tile* tiles = new mp2::tile[tiles_count];
+	st.read(tiles, tiles_count * sizeof(mp2::tile));
+	// addons loading
+	int addon_count = get32(st);
+	mp2::addon* addons = new mp2::addon[addon_count];
+	st.read(addons, addon_count * sizeof(mp2::addon));
+	// normalize addon
+	for(int i = 0; i < addon_count; i++)
+		addons[i].objectNameN1 = addons[i].objectNameN1 * 2;
+	// skip coordinates
+	st.seek(72 * 3 + 144 * 3, SeekCur);
+	// other information
+	map::obelisc_count = get(st);
+	// count final mp2 blocks
+	int countblock = 0;
+	while(1) {
+		unsigned l = get(st);
+		unsigned h = get(st);
+		if(0 == h && 0 == l)
+			break;
+		else
+			countblock = 256 * h + l - 1;
+	}
+	for(int ii = 0; ii < countblock; ++ii) {
+		unsigned char pblock[512];
+		int findobject = -1;
+		// read block
+		unsigned sizeblock = get16(st);
+		if(sizeblock > sizeof(pblock)) {
+			st.seek(sizeblock, SeekCur);
+			continue;
+		}
+		st.read(pblock, sizeblock);
+		for(int id = 0; id < tiles_count; id++) {
+			const mp2::tile& tile = tiles[id];
+			// orders(quantity2, quantity1)
+			unsigned orders = (tile.quantity2 ? tile.quantity2 : 0);
+			orders <<= 8;
+			orders |= tile.quantity1;
+			if(orders && !(orders % 0x08) && (ii + 1 == orders / 0x08)) {
+				findobject = id;
+				break;
+			}
+		}
+		if(findobject > 0) {
+			const mp2::tile& tile = tiles[findobject];
+			switch(tile.generalObject) {
+			case mp2obj(CastleOnMap):
+			case mp2obj(RndTown):
+			case mp2obj(RndCastle):
+				// add castle
+				if(sizeblock == sizeof(mp2::castle)) {
+					auto p = castlei::add();
+					load_object(*p, *((mp2::castle*)pblock));
+					//game::random::spells(rec);
+					//bsset(rec, Index, mp2i(findobject));
+				}
+				break;
+			case mp2obj(Hero):
+				// add heroes
+				if(sizeblock == sizeof(mp2::hero)) {
+					auto ple = mini2player(tiles[findobject].indexName1);
+					auto pla = bsmeta<playeri>::elements + ple;
+					auto type = mini2type(tiles[findobject].indexName1);
+					if(type == RandomPlayer)
+						type = pla->getkind();
+					if(pblock[17] && pblock[18] <= (Bax - FirstHero)) {
+						auto& e = bsmeta<heroi>::elements[pblock[18]];
+						load_object(e, *((mp2::hero*)pblock));
+						e.set(pla);
+						//bsset(rec, Index, mp2i(findobject));
+						//bsset(rec, Direction, map::Right);
+					} /*else
+						game::hire(game::random::hero(type), pla, mp2i(findobject));*/
+				}
+				break;
+			case mp2obj(Sign):
+			case mp2obj(Bottle):
+				// add sign or buttle
+				if(sizeblock > sizeof(mp2::info) - 1 && pblock[0] == 0x01) {
+					//int rec = bscreate(FirstSign);
+					//bsset(rec, Index, mp2i(findobject));
+					//bsset(rec, Name, (char*)&pblock[9]);
+				}
+				break;
+			case mp2obj(Event):
+				// add event maps
+				if(sizeblock > sizeof(mp2::eventday) - 1 && pblock[0] == 0x01) {
+					mp2::eventcoord& e = (mp2::eventcoord&)pblock;
+					//int rec = bscreate(FirstEvent);
+					//bsset(rec, Index, mp2i(findobject));
+					//bsset(rec, Name, e.text);
+					//bsset(rec, OneTime, e.cancel);
+					//bsset(rec, Computer, e.computer);
+					//bsset(rec, PlayerBlue, e.blue);
+					//bsset(rec, PlayerGreen, e.green);
+					//bsset(rec, PlayerRed, e.red);
+					//bsset(rec, PlayerYellow, e.yellow);
+					//bsset(rec, PlayerOrange, e.orange);
+					//bsset(rec, PlayerPurple, e.purple);
+					//bsset(rec, Gold, e.golds);
+					//bsset(rec, Mercury, e.mercury);
+					//bsset(rec, Sulfur, e.sulfur);
+					//bsset(rec, Crystal, e.crystal);
+					//bsset(rec, Ore, e.ore);
+					//bsset(rec, Wood, e.wood);
+					//bsset(rec, Gems, e.gems);
+					//if(e.artifact != 0xFFFF)
+					//	bsset(rec, Artifact, e.artifact);
+				}
+				break;
+			case mp2obj(Sphinx):
+				// add riddle sphinx
+				if(sizeblock > sizeof(mp2::riddle) - 1 && pblock[0] == 0x00) {
+					//mp2::riddle& e = (mp2::riddle&)pblock;
+					//int rec = bscreate(FirstEvent);
+					//bsset(rec, Index, mp2i(findobject));
+					//bsset(rec, Name, e.text);
+					//bsset(rec, Gold, e.golds);
+					//bsset(rec, Mercury, e.mercury);
+					//bsset(rec, Sulfur, e.sulfur);
+					//bsset(rec, Crystal, e.crystal);
+					//bsset(rec, Ore, e.ore);
+					//bsset(rec, Wood, e.wood);
+					//bsset(rec, Gems, e.gems);
+					//if(e.artifact != 0xFFFF)
+					//	bsset(rec, Artifact, e.artifact);
+					//ne->answers[0] = szdup(e.answer1);
+					//ne->answers[1] = szdup(e.answer2);
+					//ne->answers[2] = szdup(e.answer3);
+					//ne->answers[3] = szdup(e.answer4);
+					//ne->answers[4] = szdup(e.answer5);
+					//ne->answers[5] = szdup(e.answer6);
+					//ne->answers[6] = szdup(e.answer7);
+					//ne->answers[7] = szdup(e.answer8);
+				}
+				break;
+			}
+		} else if(pblock[0] == 0) {
+			if(sizeblock > sizeof(mp2::eventday) - 1 && pblock[42] == 1) {
+				// add event day
+			} else if(sizeblock > sizeof(mp2::rumor) - 1 && pblock[8]) {
+				//int mid = signs::add();
+				//signs::set(mid, Index, e.id);
+				//signs::set(mid, Name, e.text);
+			}
+		} else {
+			// error
+		}
+	}
+	// after load tiles
+	for(int i = 0; i < tiles_count; i++) {
+		auto i1 = mp2i(i);
+		map::tiles[i1] = tiles[i].tileIndex;
+		map::flags[i1] = tiles[i].shape % 4;
+		for(int level = 3; level >= 0; level--) {
+			// level 1.0
+			if(tiles[i].indexName1 != 0xFF && (tiles[i].quantity1 % 4) == level)
+				add_object(i1, tiles[i].objectName1, tiles[i].indexName1, tiles[i].quantity1);
+			// level 1.N
+			if(tiles[i].indexAddon) {
+				auto ai = tiles[i].indexAddon;
+				while(ai) {
+					auto& a = addons[ai];
+					if(a.objectNameN1 && a.indexNameN1 != 0xFF && (a.quantityN % 4) == level)
+						add_object(i1, a.objectNameN1, a.indexNameN1, a.quantityN);
+					ai = a.indexAddon;
+				}
+			}
+			// level 2.0
+			if(tiles[i].indexName2 != 0xFF && (tiles[i].quantity2 % 4) == level)
+				add_object(i1, tiles[i].objectName2, tiles[i].indexName2, tiles[i].quantity2);
+			// level 2.N
+			if(tiles[i].indexAddon) {
+				auto ai = tiles[i].indexAddon;
+				while(ai) {
+					auto& a = addons[ai];
+					if(a.objectNameN2 && a.indexNameN2 != 0xFF && (a.quantityN % 4) == level)
+						add_object(i1, a.objectNameN2, a.indexNameN2, a.quantityN);
+					ai = a.indexAddon;
+				}
+			}
+		}
+	}
+	// Prepare monster/artifact/resource
+	for(short unsigned i = 0; i < tiles_count; i++) {
+		auto i1 = mp2i(i);
+		auto m = tiles[i].generalObject;
+		switch(m) {
+		case mp2obj(RndMonster):
+			//add_moveable(i1, game::random::monster(0), 0);
+			break;
+		case mp2obj(RndMonster1):
+		case mp2obj(RndMonster2):
+		case mp2obj(RndMonster3):
+		case mp2obj(RndMonster4):
+			//add_moveable(i1, game::random::monster(tiles[i].generalObject - mp2obj(RndMonster1) + 1), 0);
+			break;
+		case mp2obj(ArtifactObject):
+			//add_moveable(i1, FirstArtifact + (tiles[i].indexName1 - 1) / 2, 0);
+			break;
+		case mp2obj(RndArtifact):
+			//add_moveable(i1, game::random::artifact(0), 0);
+			break;
+		case mp2obj(RndArtifact1):
+		case mp2obj(RndArtifact2):
+		case mp2obj(RndArtifact3):
+			//add_moveable(i1, game::random::artifact(m - mp2obj(RndArtifact1) + 1), 0);
+			break;
+		case mp2obj(RndUltimateArtifact):
+			//add_moveable(i1, game::random::artifact(4), 0);
+			break;
+		case mp2obj(MonsterObject):
+			//add_moveable(i1, FirstMonster + tiles[i].indexName1, 0);
+			break;
+		case mp2obj(Resource):
+			//add_moveable(i1, decode_resource[tiles[i].indexName1 / 2], 0);
+			break;
+		case mp2obj(RndResource):
+			//add_moveable(i1, xrand(FirstResource, LastResource), 0);
+			break;
+		case mp2obj(TreasureChest):
+			//if(res::map(tiles[i].objectName1) == res::OBJNRSRC) {
+			//	int quantity = tiles[i].quantity1;
+			//	if(!quantity) {
+			//		int percent = d100();
+			//		if(percent < 75) // Золото
+			//			quantity = rand() % 4;
+			//		else if(percent < 95)
+			//			quantity = game::random::artifact(1);
+			//		else {
+			//			static tokens bad_artifacts[] = {TaxLien, FizbinMesfortune, HideousMask};
+			//			quantity = bad_artifacts[rand() % sizeof(bad_artifacts) / sizeof(bad_artifacts[0])];
+			//		}
+			//	}
+			//	add_moveable(i1, TreasureChest, quantity);
+			//}
+			break;
+		}
+	}
+	// Create start heroes if need
+	// Heroes must be valid race
+	if(start_hero) {
+		for(auto i = FirstPlayer; i <= LastPlayer; i = (player_s)(i+1)) {
+			auto& e = bsmeta<playeri>::elements[i];
+			if(!e)
+				continue;
+			//auto castle = bsfind(FirstCastle, Player, player);
+			//if(castle)
+			//	game::hire(0, player, bsget(castle, Index));
+		}
+	}
+	delete tiles;
+	delete addons;
 }

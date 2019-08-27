@@ -136,6 +136,7 @@
     <ClCompile Include="army.cpp" />
     <ClCompile Include="artifacts.cpp" />
     <ClCompile Include="castle.cpp" />
+    <ClCompile Include="dialog_adventure.cpp" />
     <ClCompile Include="dialog_army.cpp" />
     <ClCompile Include="dialog_castle.cpp" />
     <ClCompile Include="dialog_city.cpp" />
@@ -153,6 +154,7 @@
     <ClCompile Include="kind.cpp" />
     <ClCompile Include="level.cpp" />
     <ClCompile Include="luck.cpp" />
+    <ClCompile Include="map.cpp" />
     <ClCompile Include="morale.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="resource.cpp" />

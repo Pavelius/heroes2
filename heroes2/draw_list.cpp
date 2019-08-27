@@ -11,24 +11,24 @@ static void execute_list() {
 
 list::list() : origin(0), current(0), maximum(0) {}
 
-//static void input_edit() {
-//}
-//
-//void list::draw(int x, int y, int sy, int sx, int count) {
-//	int ib = origin;
-//	int ie = origin + count;
-//	int y1 = y;
-//	while(ib < ie) {
-//		row(x, y1, ib);
-//		y1 += sy;
-//		ib++;
-//	}
-//	// scroll
-//	res_s icn = isevil(SCROLLE, SCROLLCN);
-//	button(x + 56, y + 1, icn, input_edit, {0, 0, 1});
-//	button(x + 56, y + 113, icn, input_edit, {2, 2, 3});
-//	button(x + 59, y + 19, icn, input_edit, {4, 4, 4});
-//}
+static void input_edit() {
+}
+
+void list::draw(int x, int y, int sy, int sx) {
+	int ib = origin;
+	int ie = origin + row_per_screen;
+	int y1 = y;
+	while(ib < ie) {
+		row(x, y1, ib);
+		y1 += sy;
+		ib++;
+	}
+	// scroll
+	res_s icn = isevil(SCROLLE, SCROLLCN);
+	button(x + 56, y + 1, icn, input_edit, {0, 0, 1});
+	button(x + 56, y + 113, icn, input_edit, {2, 2, 3});
+	button(x + 59, y + 19, icn, input_edit, {4, 4, 4});
+}
 
 void list::flatbutton(int x, int y, res_s icn, int index, int command) const {
 	int w1 = getwidth(icn, index);

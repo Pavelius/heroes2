@@ -192,6 +192,9 @@ enum size_s : unsigned char {
 enum loss_s : unsigned char {
 	LossNone, LossHero, LossTown, LossTime
 };
+enum direction_s : unsigned char {
+	Left, LeftUp, Up, RightUp, Right, RightDown, Down, LeftDown,
+};
 class heroi;
 struct variant {
 	variant_s				type;
@@ -286,6 +289,7 @@ class playeri : public namei {
 	hero_s					heroes[2];
 public:
 	constexpr explicit operator bool() const { return activity == Human || activity == Computer; }
+	void					adventure();
 	void					clear();
 	static void				initialize();
 	int						getadventurers() const;
@@ -346,7 +350,6 @@ class heroi : public namei, public armyi {
 	short unsigned			move_points;
 	short unsigned			index;
 	short unsigned			index_move;
-	unsigned char			direction;
 	unsigned char			portrait;
 	player_s				player;
 	unsigned				experience;
@@ -354,6 +357,7 @@ class heroi : public namei, public armyi {
 	unsigned char			abilities[Knowledge + 1];
 	unsigned char			skills[LastSkill + 1];
 	spellbooki				spellbook;
+	direction_s				direction;
 	static void				open_artifact();
 public:
 	void					add(artifact_s id);
@@ -366,12 +370,16 @@ public:
 	int						getcost(spell_s v) const;
 	hero_s					getid() const { return hero_s(this - bsmeta<heroi>::elements); }
 	kind_s					getkind() const;
+	short unsigned			getpos() const { return index; }
 	static void				initialize();
 	bool					is(spell_s v) const { return spellbook.is(v); }
 	static unsigned			select(heroi** result, heroi** result_maximum, const playeri* player, kind_s kind, kind_s kind_exclude, bool include_special = false);
+	void					set(direction_s v) { direction = v; }
 	void					set(skill_s id, int v) { skills[id] = v; }
 	void					set(spell_s id) { spellbook.set(id); }
 	void					set(playeri* v) { if(v) player = v->getid(); else player = RandomPlayer; }
+	void					setportrait(unsigned char i) { portrait = i; }
+	void					setpos(short unsigned i) { index = i; }
 	void					show(bool allow_change = true) const;
 	void					showbook(spell_type_s mode);
 };
@@ -493,13 +501,17 @@ struct variantcol {
 	int						count;
 };
 namespace map {
-void						clear();
+extern point				camera;
 extern unsigned char		flags[256 * 256];
 extern unsigned	char		height;
 extern unsigned	char		obelisc_count;
 extern unsigned short		tiles[256 * 256];
-inline unsigned short		m2i(int x, int y) { return (y << 8) + x; }
 extern unsigned char		width;
+//
+void						clear();
+inline int					i2x(short unsigned i) { return i % 256; }
+inline int					i2y(short unsigned i) { return i >> 8; }
+inline unsigned short		m2i(int x, int y) { return (y << 8) + x; }
 }
 const char*					getstr(building_s id, kind_s kind);
 DECLENUM(ability);

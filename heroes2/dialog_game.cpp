@@ -326,8 +326,9 @@ void gamei::newgame() {
 	if(n == 1) {
 		gamei game;
 		game.load("maps/beltway.mp2");
-		if(!game.setupmap())
-			return;
+		//if(!game.setupmap())
+		//	return;
 		game.prepare();
+		bsmeta<playeri>::elements[0].adventure();
 	}
 }

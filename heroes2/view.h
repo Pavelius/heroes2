@@ -156,7 +156,7 @@ struct list {
 	void					correct();
 	void					box(int x, int y, int count);
 	void					boxs(int x, int y, int count);
-	void					draw(int x, int y, int sy, int sx, int count);
+	void					draw(int x, int y, int sy, int sx);
 	void					ensurevisible();
 	void					execute(list::proc proc, int param = 0) const;
 	virtual void			row(int x, int y, int index) const = 0;

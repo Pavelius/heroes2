@@ -177,12 +177,6 @@ struct riddle {
 }
 #pragma pack(pop)
 
-enum conditions {
-	Wins = 0x1000, CaptureTown = 0x1001, DefeatHero = 0x1002, FindArtifact = 0x1003, SideWins = 0x1004, AccumulateGold = 0x1005,
-	CompAlsoWins = 0x0100, AllowNormalVictory = 0x0200,
-	Loss = 0x2000, LoseTown = 0x2001, LoseHero = 0x2002, OutTime = 0x2003
-};
-
 inline short unsigned mp2i(short unsigned i) {
 	return map::m2i(i%map::width, i / map::width);
 }
@@ -505,8 +499,8 @@ void gamei::prepare() {
 						auto& e = bsmeta<heroi>::elements[pblock[18]];
 						load_object(e, *((mp2::hero*)pblock));
 						e.set(pla);
-						//bsset(rec, Index, mp2i(findobject));
-						//bsset(rec, Direction, map::Right);
+						e.set(Right);
+						e.setpos(mp2i(findobject));
 					} /*else
 						game::hire(game::random::hero(type), pla, mp2i(findobject));*/
 				}

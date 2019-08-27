@@ -179,6 +179,79 @@ static void button_difficult(int x, int y, difficult_s id, difficult_s& id_selec
 	text(x + (rc.width() - textw(p)) / 2, y + rc.height() + 2, p);
 }
 
+static int xpos(int current, int count, int width) {
+	return current * width * 6 / count + (width * (6 - count) / (2 * count));
+}
+
+static int race2index(int race, bool class_color) {
+	switch(race) {
+	case Knight: return class_color ? 51 : 70; break;
+	case Barbarian: return class_color ? 52 : 71; break;
+	case Sorcerer: return class_color ? 53 : 72; break;
+	case Warlock: return class_color ? 54 : 73; break;
+	case Wizard: return class_color ? 55 : 74; break;
+	case Necromancer: return class_color ? 56 : 75; break;
+	//case MultiPlayers: return 76; break;
+	default: return 58;
+	}
+}
+
+static void button_type(int x, int y, activity_s type, int i, bool show_name = true) {
+	int index = 0;
+	switch(type) {
+	case Computer: index = 3 + i; break;
+	case ComputerOnly: index = 3 + 12 + i; break;
+	case Human: index = 9 + i; break;
+	default: break;
+	}
+	if(show_name)
+		index += 24;
+	draw::image(x, y, NGEXTRA, index, AFNoOffset);
+	rect rc = {x, y, x + getwidth(NGEXTRA, 3), y + getheight(NGEXTRA, 3)};
+	if(show_name) {
+		state push;
+		font = SMALFONT;
+		int id = player_s(FirstPlayer + i);
+		const char* p = bsmeta<playeri>::elements[id].getname();
+		switch(id) {
+		case PlayerPurple:
+			p = "Фиол.";
+			break;
+		case PlayerOrange:
+			p = "Оранж.";
+			break;
+		}
+		text(x + (rc.width() - textw(p)) / 2, y + rc.height(), p);
+	}
+	if(hot::mouse.in(rc)) {
+		//if(hot::key == MouseLeft && hot::pressed) {
+		//	if(type == ComputerOnly)
+		//		return;
+		//	draw::execute(Human);
+		//}
+	}
+}
+
+static void button_race(int x, int y, kind_s race, int i, bool show_name, bool disabled) {
+	int index = race2index(race, true);
+	if(disabled)
+		index += 19;
+	draw::image(x, y, NGEXTRA, index, AFNoOffset);
+	int w = getwidth(NGEXTRA, index);
+	int h = getheight(NGEXTRA, index);
+	if(show_name) {
+		state push;
+		font = SMALFONT;
+		auto p = bsmeta<kindi>::elements[race].name_abbr;
+		text(x + (w - textw(p)) / 2, y + h + 2, p);
+	}
+	rect rc = {x, y, x + w, y + h};
+	if(hot::mouse.in(rc) && !disabled) {
+		//if(hot::key == MouseLeft && hot::pressed)
+		//	draw::execute(Type);
+	}
+}
+
 bool gamei::setupmap() {
 	const int x = draw::width - getwidth(NGHSBKG, 0) - 8;
 	const int y = (draw::height - getheight(NGHSBKG, 0)) / 2;
@@ -200,6 +273,32 @@ bool gamei::setupmap() {
 		button_difficult(x + 174, y + 91, HardDifficulty, difficult);
 		button_difficult(x + 251, y + 91, VeryHardDifficulty, difficult);
 		button_difficult(x + 328, y + 91, ImpossibleDifficulty, difficult);
+		//
+		auto maximum = getplayers();
+		auto current = 0;
+		auto y1 = y + 200;
+		auto w1 = getwidth(NGEXTRA, 3);
+		for(int i = 0; i < 6; i++) {
+			if(types[i] == NotAllowed)
+				continue;
+			auto x1 = x + (w - w1 * 6) / 2 + xpos(current, maximum, w1);
+			button_type(x1, y1, types[i], i, true);
+			button_race(x1, y1 + 78, races[i], i, true, isallow(i));
+			current++;
+		}
+		// opponents
+		p = "Оппоненты:";
+		text(x + (w - textw(p)) / 2, y + 182, p);
+		// class
+		p = "Класс:";
+		text(x + (w - textw(p)) / 2, y + 262, p);
+		// rating
+		char temp[260];
+		zprint(temp, "%1 %2i%%", "Рейтинг", bsmeta<difficulti>::elements[difficult].rating);
+		text(x + (w - textw(temp)) / 2, y + 383, temp);
+		// buttons
+		button(x + 31, y + 380, NGEXTRA, buttonok, {66, 66, 67}, KeyEnter, "Начать сценарий с выбранными настройками.");
+		button(x + 287, y + 380, NGEXTRA, buttoncancel, {68, 68, 69}, KeyEscape, "Отменить текущий выбор.");
 		cursor(ADVMCO, 0);
 		domodal();
 	}
@@ -207,6 +306,7 @@ bool gamei::setupmap() {
 }
 
 void gamei::newgame() {
+	playeri::initialize();
 	auto n = new_game();
 	if(!n)
 		return;

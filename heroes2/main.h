@@ -251,6 +251,7 @@ struct lucki {
 struct difficulti {
 	const char*				name;
 	costi					resources;
+	int						rating;
 };
 struct squadi {
 	monster_s				unit;
@@ -308,6 +309,7 @@ struct abilityi {
 };
 struct kindi {
 	const char*				name;
+	const char*				name_abbr;
 	unsigned char			abilities[4];
 	skill_s					skills[2];
 	monster_s				units[2];
@@ -466,6 +468,7 @@ struct gamei {
 	bool					choose();
 	void					clear();
 	int						getplayers() const;
+	bool					isallow(int index) const { return types[index] != NotAllowed; }
 	bool					load(const char* filename);
 	static void				newgame();
 	bool					setupmap();

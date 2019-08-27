@@ -143,10 +143,17 @@ void list::box(int x, int y, res_s icn, int n1, int dx, int sbu, int sbd, int sb
 		else
 			execute(&list::select, (current + row_per_screen - 1));
 		break;
-	case MouseLeft:
-		if(hot::mouse.in(rc))
-			execute(&list::select, origin + (hot::mouse.y - rc.y1 - 2) / n1);
-		break;
+	}
+	// Mouse input handle
+	if(hot::mouse.in(rc)) {
+		switch(hot::key) {
+		case MouseWheelUp: execute(&list::scroll, origin - 1); break;
+		case MouseWheelDown: execute(&list::scroll, origin + 1); break;
+		case MouseLeft:
+			if(hot::pressed)
+				execute(&list::select, origin + (hot::mouse.y - rc.y1 - 2) / n1);
+			break;
+		}
 	}
 	// show
 	if(bf != -1) {
@@ -185,7 +192,7 @@ void list::box(int x, int y, res_s icn, int n1, int dx, int sbu, int sbd, int sb
 		image(scroll.x1 + 5 - sbds * 2, s1 + p, iss, sbs);
 		// mouse click
 		rect rc = {scroll.x1, s1, scroll.x2, s2};
-		if(hot::mouse.in(rc) && hot::key == MouseLeft) {
+		if(hot::mouse.in(rc) && hot::key == MouseLeft && hot::pressed) {
 			if(hot::mouse.y < s1 + p)
 				execute(&list::scroll, origin - row_per_screen);
 			else if(hot::mouse.y > s1 + p + n10)

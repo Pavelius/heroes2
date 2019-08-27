@@ -14,78 +14,42 @@ extern "C" int			atexit(void(*func)(void));
 
 static int tokey(int vk) {
 	switch(vk) {
-	case VK_CONTROL:
-		return Ctrl;
-	case VK_MENU:
-		return Alt;
-	case VK_SHIFT:
-		return Shift;
-	case VK_LEFT:
-		return KeyLeft;
-	case VK_RIGHT:
-		return KeyRight;
-	case VK_UP:
-		return KeyUp;
-	case VK_DOWN:
-		return KeyDown;
-	case VK_PRIOR:
-		return KeyPageUp;
-	case VK_NEXT:
-		return KeyPageDown;
-	case VK_HOME:
-		return KeyHome;
-	case VK_END:
-		return KeyEnd;
-	case VK_BACK:
-		return KeyBackspace;
-	case VK_DELETE:
-		return KeyDelete;
-	case VK_RETURN:
-		return KeyEnter;
-	case VK_ESCAPE:
-		return KeyEscape;
-	case VK_SPACE:
-		return KeySpace;
-	case VK_TAB:
-		return KeyTab;
-	case VK_F1:
-		return F1;
-	case VK_F2:
-		return F2;
-	case VK_F3:
-		return F3;
-	case VK_F4:
-		return F4;
-	case VK_F5:
-		return F5;
-	case VK_F6:
-		return F6;
-	case VK_F7:
-		return F7;
-	case VK_F8:
-		return F8;
-	case VK_F9:
-		return F9;
-	case VK_F10:
-		return F10;
-	case VK_F11:
-		return F11;
-	case VK_F12:
-		return F12;
-	case VK_MULTIPLY:
-		return Alpha + (unsigned)'*';
-	case VK_DIVIDE:
-		return Alpha + (unsigned)'/';
-	case VK_ADD:
-		return Alpha + (unsigned)'+';
-	case VK_SUBTRACT:
-		return Alpha + (unsigned)'-';
-	case VK_OEM_COMMA:
-		return Alpha + (unsigned)',';
-	case VK_OEM_PERIOD:
-		return Alpha + (unsigned)'.';
-	default:
-		return Alpha + vk;
+	case VK_CONTROL: return Ctrl;
+	case VK_MENU: return Alt;
+	case VK_SHIFT: return Shift;
+	case VK_LEFT: return KeyLeft;
+	case VK_RIGHT: return KeyRight;
+	case VK_UP: return KeyUp;
+	case VK_DOWN: return KeyDown;
+	case VK_PRIOR: return KeyPageUp;
+	case VK_NEXT: return KeyPageDown;
+	case VK_HOME: return KeyHome;
+	case VK_END: return KeyEnd;
+	case VK_BACK: return KeyBackspace;
+	case VK_DELETE: return KeyDelete;
+	case VK_RETURN: return KeyEnter;
+	case VK_ESCAPE: return KeyEscape;
+	case VK_SPACE: return KeySpace;
+	case VK_TAB: return KeyTab;
+	case VK_F1: return F1;
+	case VK_F2: return F2;
+	case VK_F3: return F3;
+	case VK_F4: return F4;
+	case VK_F5: return F5;
+	case VK_F6: return F6;
+	case VK_F7: return F7;
+	case VK_F8: return F8;
+	case VK_F9: return F9;
+	case VK_F10: return F10;
+	case VK_F11: return F11;
+	case VK_F12: return F12;
+	case VK_MULTIPLY: return Alpha + (unsigned)'*';
+	case VK_DIVIDE: return Alpha + (unsigned)'/';
+	case VK_ADD: return Alpha + (unsigned)'+';
+	case VK_SUBTRACT: return Alpha + (unsigned)'-';
+	case VK_OEM_COMMA: return Alpha + (unsigned)',';
+	case VK_OEM_PERIOD: return Alpha + (unsigned)'.';
+	default: return Alpha + vk;
 	}
 }
 

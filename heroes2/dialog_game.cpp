@@ -46,6 +46,12 @@ static struct scenarioc : list {
 	size_s			filter;
 	scenarioc() : source(0), source_count(0), filter(NoSize) { row_per_screen = 9; }
 	void row(int x, int y, int index) const override {
+		const auto width = 264;
+		draw::image(x, y + 1, REQUESTS, 19 + data[index]->getplayers()); // flags
+		draw::image(x + 18, y + 1, REQUESTS, size_index(data[index]->size));
+		draw::image(x + width - 18, y + 1, REQUESTS, 30 + data[index]->wins);
+		draw::image(x + width - 18 * 2, y + 1, REQUESTS, 36 + data[index]->lose);
+		draw::textm(x + 40, y + 3, width - 36 - 36, AlignCenter, data[index]->name);
 	}
 	const gamei& getcurrent() {
 		return *data[current];
@@ -84,8 +90,8 @@ static struct scenarioc : list {
 			*pb++ = &source[i];
 		}
 		maximum = pb - data;
-		if(current > maximum)
-			current = maximum - 1;
+		correct();
+		ensurevisible();
 	}
 	void release() {
 		if(source) {
@@ -96,7 +102,7 @@ static struct scenarioc : list {
 	}
 } scenario_list;
 
-static buttoni check(int v, int f, unsigned char pressed) {
+static buttoni check(size_s v, size_s f, unsigned char pressed) {
 	auto normal = (unsigned char)(pressed - 1);
 	if(v != f)
 		return {normal, normal, pressed};

@@ -39,14 +39,8 @@ void list::flatbutton(int x, int y, res_s icn, int index, int command) const {
 			index++;
 		if(hot::key == MouseLeft && hot::pressed) {
 			switch(command) {
-			case KeyUp:
-				if(origin)
-					execute(&list::scroll, origin - 1);
-				break;
-			case KeyDown:
-				if(origin + row_per_screen < maximum)
-					execute(&list::scroll, origin + 1);
-				break;
+			case KeyUp: execute(&list::scroll, origin - 1); break;
+			case KeyDown: execute(&list::scroll, origin + 1); break;
 			}
 		}
 	}

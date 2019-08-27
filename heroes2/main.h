@@ -468,6 +468,7 @@ struct gamei {
 	int						getplayers() const;
 	bool					load(const char* filename);
 	static void				newgame();
+	bool					setupmap();
 };
 struct hightscore {
 	char					name[32];
@@ -484,6 +485,7 @@ struct variantcol {
 const char*					getstr(building_s id, kind_s kind);
 DECLENUM(ability);
 DECLENUM(artifact);
+DECLENUM(difficult);
 DECLENUM(skill);
 DECLENUM(spell);
 DECLENUM(kind);

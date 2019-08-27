@@ -1,7 +1,9 @@
-#include "io.h"
+п»ї#include "io.h"
 #include "view.h"
 
 using namespace draw;
+
+static void* current_value;
 
 static void button2() {
 	breakmodal(2);
@@ -119,7 +121,7 @@ bool gamei::choose() {
 	scenario_list.set(NoSize);
 	if(!scenario_list.source_count) {
 		scenario_list.release();
-		message("У вас нету ни одной карты. Попробуйте загрузить несколько из интернета.");
+		message("РЈ РІР°СЃ РЅРµС‚Сѓ РЅРё РѕРґРЅРѕР№ РєР°СЂС‚С‹. РџРѕРїСЂРѕР±СѓР№С‚Рµ Р·Р°РіСЂСѓР·РёС‚СЊ РЅРµСЃРєРѕР»СЊРєРѕ РёР· РёРЅС‚РµСЂРЅРµС‚Р°.");
 		return false;
 	}
 	while(ismodal()) {
@@ -132,21 +134,76 @@ bool gamei::choose() {
 		textm(x + 120 + 1, y + 265 + 2, 160, AlignCenter, e.name);
 		image(x + 288, y + 265, REQUESTS, 30 + e.wins);
 		image(x + 288 + 18, y + 265, REQUESTS, 36 + e.lose);
-		text(x + 66, y + 294, "Сложность карты:", -1);
+		text(x + 66, y + 294, "РЎР»РѕР¶РЅРѕСЃС‚СЊ РєР°СЂС‚С‹:", -1);
 		textm(x + 236, y + 294, 114, AlignCenter, getstr(e.level));
-		textm(x + 58, y + 324, 294, AlignCenter, e.description);
+		textm(x + 66, y + 324, 278, AlignCenter, e.description);
 		button(x + 140 + 16, y + 410, REQUESTS, buttonok, {1, 1, 2}, KeyEnter);
 		// maps
-		button(x + 37 + 16, y + 22, REQUESTS, cmd(set_filter, SmallSize), check(scenario_list.filter, SmallSize, 10), 0, "Отобрать только карты маленького рамера");
-		button(x + 99 + 16, y + 22, REQUESTS, cmd(set_filter, MediumSize), check(scenario_list.filter, MediumSize, 12), 0, "Отобрать только карты среднего рамера");
-		button(x + 161 + 16, y + 22, REQUESTS, cmd(set_filter, LargeSize), check(scenario_list.filter, LargeSize, 14), 0, "Отобрать только карты большого рамера");
-		button(x + 223 + 16, y + 22, REQUESTS, cmd(set_filter, XLargeSize), check(scenario_list.filter, XLargeSize, 16), 0, "Отобрать только карты огромного рамера");
-		button(x + 285 + 16, y + 22, REQUESTS, cmd(set_filter, NoSize), check(scenario_list.filter, NoSize, 18), 0, "Показать все карты");
+		button(x + 37 + 16, y + 22, REQUESTS, cmd(set_filter, SmallSize), check(scenario_list.filter, SmallSize, 10), 0, "РћС‚РѕР±СЂР°С‚СЊ С‚РѕР»СЊРєРѕ РєР°СЂС‚С‹ РјР°Р»РµРЅСЊРєРѕРіРѕ СЂР°РјРµСЂР°");
+		button(x + 99 + 16, y + 22, REQUESTS, cmd(set_filter, MediumSize), check(scenario_list.filter, MediumSize, 12), 0, "РћС‚РѕР±СЂР°С‚СЊ С‚РѕР»СЊРєРѕ РєР°СЂС‚С‹ СЃСЂРµРґРЅРµРіРѕ СЂР°РјРµСЂР°");
+		button(x + 161 + 16, y + 22, REQUESTS, cmd(set_filter, LargeSize), check(scenario_list.filter, LargeSize, 14), 0, "РћС‚РѕР±СЂР°С‚СЊ С‚РѕР»СЊРєРѕ РєР°СЂС‚С‹ Р±РѕР»СЊС€РѕРіРѕ СЂР°РјРµСЂР°");
+		button(x + 223 + 16, y + 22, REQUESTS, cmd(set_filter, XLargeSize), check(scenario_list.filter, XLargeSize, 16), 0, "РћС‚РѕР±СЂР°С‚СЊ С‚РѕР»СЊРєРѕ РєР°СЂС‚С‹ РѕРіСЂРѕРјРЅРѕРіРѕ СЂР°РјРµСЂР°");
+		button(x + 285 + 16, y + 22, REQUESTS, cmd(set_filter, NoSize), check(scenario_list.filter, NoSize, 18), 0, "РџРѕРєР°Р·Р°С‚СЊ РІСЃРµ РєР°СЂС‚С‹");
 		cursor(ADVMCO, 0);
 		domodal();
 	}
 	scenario_list.release();
 	return true;
+}
+
+static void choose_game() {
+	auto p = (gamei*)hot::param;
+	auto e = *p;
+	if(e.choose()) {
+		*p = e;
+	}
+}
+
+static void set_unsigned_char() {
+	*((unsigned char*)current_value) = (unsigned char)hot::param;
+}
+
+static void button_difficult(int x, int y, difficult_s id, difficult_s& id_select) {
+	rect rc = {x, y, x + getwidth(NGEXTRA, 62), y + getheight(NGEXTRA, 62)};
+	if(id_select == id)
+		draw::image(x, y, NGEXTRA, 62);
+	if(hot::mouse.in(rc)) {
+		if(hot::key == MouseLeft && hot::pressed) {
+			current_value = &id_select;
+			execute(set_unsigned_char, id);
+		}
+	}
+	state push;
+	font = SMALFONT;
+	auto p = getstr(id);
+	text(x + (rc.width() - textw(p)) / 2, y + rc.height() + 2, p);
+}
+
+bool gamei::setupmap() {
+	const int x = draw::width - getwidth(NGHSBKG, 0) - 8;
+	const int y = (draw::height - getheight(NGHSBKG, 0)) / 2;
+	const int w = getwidth(NGHSBKG, 0);
+	const char* p;
+	while(ismodal()) {
+		image(0, 0, HEROES, 0);
+		image(x, y, NGHSBKG, 0, AFNoOffset);
+		// map
+		p = "РЎС†РµРЅР°СЂРёР№";
+		text(x + (w - draw::textw(p)) / 2, y + 24, p);
+		button(x + 309, y + 45, NGEXTRA, cmd(choose_game, (int)this), {64, 64, 65}, F4);
+		text(x + (w - draw::textw(name)) / 2, y + 48, name);
+		// difficult
+		p = "РЎР»РѕР¶РЅРѕСЃС‚СЊ:";
+		text(x + (w - draw::textw(p)) / 2, y + 76, p);
+		button_difficult(x + 21, y + 91, EasyDifficulty, difficult);
+		button_difficult(x + 98, y + 91, NormalDifficulty, difficult);
+		button_difficult(x + 174, y + 91, HardDifficulty, difficult);
+		button_difficult(x + 251, y + 91, VeryHardDifficulty, difficult);
+		button_difficult(x + 328, y + 91, ImpossibleDifficulty, difficult);
+		cursor(ADVMCO, 0);
+		domodal();
+	}
+	return getresult() != 0;
 }
 
 void gamei::newgame() {
@@ -155,6 +212,7 @@ void gamei::newgame() {
 		return;
 	if(n == 1) {
 		gamei game;
-		game.choose();
+		game.load("maps/beltway.mp2");
+		game.setupmap();
 	}
 }

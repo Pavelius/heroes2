@@ -147,19 +147,25 @@ struct controli {
 	explicit constexpr operator bool() const { return res != 0; }
 };
 struct list {
+	typedef void (list::*proc)(int param);
 	int						origin;
 	int						current;
 	int						maximum;
+	int						row_per_screen;
 	list();
-	void					area(int x, int y, int count);
+	void					correct();
 	void					box(int x, int y, int count);
 	void					boxs(int x, int y, int count);
 	void					draw(int x, int y, int sy, int sx, int count);
-	virtual void			prerender() {}
+	void					ensurevisible();
+	void					execute(list::proc proc, int param = 0) const;
 	virtual void			row(int x, int y, int index) const = 0;
+	void					select(int value);
+	void					scroll(int value);
+	void					view(int x, int y) const;
 private:
-	void					box(int x, int y, int count, res_s icn, int dy, int dx, int sbu, int sbd, int sbs, int sdbd, int sb, int bf, res_s iss);
-	void					flatbutton(int x, int y, res_s icn, int index, int command, int count);
+	void					box(int x, int y, res_s icn, int dy, int dx, int sbu, int sbd, int sbs, int sdbd, int sb, int bf, res_s iss) const;
+	void					flatbutton(int x, int y, res_s icn, int index, int command) const;
 };
 //
 bool						ask(const char* format, const variantcol* footer = 0, unsigned count = 0);

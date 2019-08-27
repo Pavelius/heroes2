@@ -44,7 +44,7 @@ static struct scenarioc : list {
 	unsigned		source_count;
 	const gamei*	data[512];
 	size_s			filter;
-	scenarioc() : source(0), source_count(0), filter(NoSize) {}
+	scenarioc() : source(0), source_count(0), filter(NoSize) { row_per_screen = 9; }
 	void row(int x, int y, int index) const override {
 	}
 	const gamei& getcurrent() {
@@ -112,13 +112,14 @@ bool gamei::choose() {
 	const int y = (height - getheight(REQSBKG, 0)) / 2;
 	scenario_list.set(NoSize);
 	if(!scenario_list.source_count) {
+		scenario_list.release();
 		message("У вас нету ни одной карты. Попробуйте загрузить несколько из интернета.");
 		return false;
 	}
 	while(ismodal()) {
 		image(0, 0, HEROES, 0);
 		image(x, y, REQSBKG, 0);
-		scenario_list.area(x + 57, y + 55, 9);
+		scenario_list.view(x + 57, y + 55);
 		auto& e = scenario_list.getcurrent();
 		image(x + 85, y + 265, REQUESTS, 19 + e.getplayers()); // flags
 		image(x + 103, y + 265, REQUESTS, size_index(e.size));

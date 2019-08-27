@@ -188,6 +188,9 @@ enum size_s : unsigned char {
 	NoSize,
 	SmallSize, MediumSize, LargeSize, XLargeSize,
 };
+enum loss_s : unsigned char {
+	LossNone, LossHero, LossTown, LossTime
+};
 class heroi;
 struct variant {
 	variant_s				type;
@@ -457,7 +460,8 @@ struct gamei {
 	char					description[143];
 	size_s					size;
 	unsigned char			wins;
-	unsigned char			lose;
+	loss_s					loss;
+	unsigned short			loss_data[2];
 	activity_s				types[6];
 	kind_s					races[6];
 	level_s					level;

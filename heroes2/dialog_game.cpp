@@ -51,8 +51,8 @@ static struct scenarioc : list {
 		const auto width = 264;
 		draw::image(x, y + 1, REQUESTS, 19 + data[index]->getplayers()); // flags
 		draw::image(x + 18, y + 1, REQUESTS, size_index(data[index]->size));
-		draw::image(x + width - 18, y + 1, REQUESTS, 30 + data[index]->wins);
-		draw::image(x + width - 18 * 2, y + 1, REQUESTS, 36 + data[index]->lose);
+		draw::image(x + width - 18 * 2, y + 1, REQUESTS, 30 + data[index]->wins);
+		draw::image(x + width - 18, y + 1, REQUESTS, 36 + data[index]->loss);
 		draw::textm(x + 40, y + 3, width - 36 - 36, AlignCenter, data[index]->name);
 	}
 	const gamei& getcurrent() {
@@ -133,7 +133,7 @@ bool gamei::choose() {
 		image(x + 103, y + 265, REQUESTS, size_index(e.size));
 		textm(x + 120 + 1, y + 265 + 2, 160, AlignCenter, e.name);
 		image(x + 288, y + 265, REQUESTS, 30 + e.wins);
-		image(x + 288 + 18, y + 265, REQUESTS, 36 + e.lose);
+		image(x + 288 + 18, y + 265, REQUESTS, 36 + e.loss);
 		text(x + 66, y + 294, "Сложность карты:", -1);
 		textm(x + 236, y + 294, 114, AlignCenter, getstr(e.level));
 		textm(x + 66, y + 324, 278, AlignCenter, e.description);

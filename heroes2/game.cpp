@@ -272,6 +272,8 @@ bool gamei::load(const char* url) {
 			types[i] = ComputerOnly;
 		races[i] = index2race(header.races[i]);
 	}
+	loss = loss_s(header.conditions_loss);
+	wins = header.conditions_wins;
 	return true;
 }
 

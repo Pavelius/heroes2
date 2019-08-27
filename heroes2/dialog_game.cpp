@@ -147,6 +147,10 @@ bool gamei::choose() {
 		cursor(ADVMCO, 0);
 		domodal();
 	}
+	if(getresult()) {
+		if(scenario_list.maximum > 0)
+			*this = *scenario_list.data[scenario_list.current];
+	}
 	scenario_list.release();
 	return true;
 }
@@ -154,9 +158,8 @@ bool gamei::choose() {
 static void choose_game() {
 	auto p = (gamei*)hot::param;
 	auto e = *p;
-	if(e.choose()) {
+	if(e.choose())
 		*p = e;
-	}
 }
 
 static void set_unsigned_char() {
@@ -196,7 +199,7 @@ static int race2index(int race, bool class_color) {
 	}
 }
 
-static void button_type(int x, int y, activity_s type, int i, bool show_name = true) {
+static void button_type(int x, int y, activity_s& type, int i, bool show_name = true) {
 	int index = 0;
 	switch(type) {
 	case Computer: index = 3 + i; break;
@@ -224,16 +227,21 @@ static void button_type(int x, int y, activity_s type, int i, bool show_name = t
 		text(x + (rc.width() - textw(p)) / 2, y + rc.height(), p);
 	}
 	if(hot::mouse.in(rc)) {
-		//if(hot::key == MouseLeft && hot::pressed) {
-		//	if(type == ComputerOnly)
-		//		return;
-		//	draw::execute(Human);
-		//}
+		if(hot::key == MouseLeft && hot::pressed) {
+			if(type == ComputerOnly)
+				return;
+			current_value = &type;
+			switch(type) {
+			case Computer: execute(set_unsigned_char, Human); break;
+			case Human: execute(set_unsigned_char, Computer); break;
+			}
+			
+		}
 	}
 }
 
-static void button_race(int x, int y, kind_s race, int i, bool show_name, bool disabled) {
-	int index = race2index(race, true);
+static void button_race(int x, int y, kind_s& value, int i, bool show_name, bool disabled) {
+	int index = race2index(value, true);
 	if(disabled)
 		index += 19;
 	draw::image(x, y, NGEXTRA, index, AFNoOffset);
@@ -242,13 +250,18 @@ static void button_race(int x, int y, kind_s race, int i, bool show_name, bool d
 	if(show_name) {
 		state push;
 		font = SMALFONT;
-		auto p = bsmeta<kindi>::elements[race].name_abbr;
+		auto p = bsmeta<kindi>::elements[value].name_abbr;
 		text(x + (w - textw(p)) / 2, y + h + 2, p);
 	}
 	rect rc = {x, y, x + w, y + h};
 	if(hot::mouse.in(rc) && !disabled) {
-		//if(hot::key == MouseLeft && hot::pressed)
-		//	draw::execute(Type);
+		if(hot::key == MouseLeft && hot::pressed) {
+			current_value = &value;
+			if(value == RandomKind)
+				execute(set_unsigned_char, Barbarian);
+			else
+				execute(set_unsigned_char, value + 1);
+		}
 	}
 }
 

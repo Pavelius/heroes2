@@ -34,6 +34,7 @@ struct cflags {
 template<typename T> struct bsmeta {
 	typedef T				data_type;
 	static T				elements[];
+	static unsigned			count;
 };
 template<typename T> const char* getstr(const T v) { return bsmeta<T>::elements[v].name; }
 #define DECLENUM(e) template<> struct bsmeta<e##_s> : bsmeta<e##i> {}

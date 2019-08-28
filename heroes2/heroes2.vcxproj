@@ -152,11 +152,14 @@
     <ClCompile Include="difficult.cpp" />
     <ClCompile Include="draw_list.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="generator.cpp" />
     <ClCompile Include="indexes.cpp" />
     <ClCompile Include="kind.cpp" />
     <ClCompile Include="level.cpp" />
     <ClCompile Include="luck.cpp" />
     <ClCompile Include="map.cpp" />
+    <ClCompile Include="map_moveable.cpp" />
+    <ClCompile Include="map_objects.cpp" />
     <ClCompile Include="morale.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="resource.cpp" />

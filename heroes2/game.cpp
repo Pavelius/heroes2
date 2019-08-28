@@ -424,7 +424,10 @@ void gamei::updatebase() {
 	}
 }
 
+void add_moveable(short unsigned index, variant v, short unsigned quantity = 0);
+
 void gamei::prepare() {
+	generator generate;
 	//static map_object_s decode_resource[] = {Wood, Mercury, Ore, Sulfur, Crystal, Gems, Gold, AncientLamp, Resource, TreasureChest};
 	char temp[260]; zprint(temp, "maps/%1.mp2", file);
 	io::file st(temp);
@@ -487,9 +490,9 @@ void gamei::prepare() {
 		if(findobject > 0) {
 			const mp2::tile& tile = tiles[findobject];
 			switch(tile.generalObject) {
-			case mp2obj(CastleOnMap):
 			case mp2obj(RndTown):
 			case mp2obj(RndCastle):
+			case mp2obj(CastleObject):
 				// add castle
 				if(sizeblock == sizeof(mp2::castle)) {
 					auto p = castlei::add();
@@ -629,17 +632,20 @@ void gamei::prepare() {
 		auto i1 = mp2i(i);
 		auto m = tiles[i].generalObject;
 		switch(m) {
+		case mp2obj(MonsterObject):
+			add_moveable(i1, generate.add(monster_s(FirstMonster + tiles[i].indexName1)), 0);
+			break;
 		case mp2obj(RndMonster):
-			//add_moveable(i1, game::random::monster(0), 0);
+			add_moveable(i1, generate.monster(0), 0);
 			break;
 		case mp2obj(RndMonster1):
 		case mp2obj(RndMonster2):
 		case mp2obj(RndMonster3):
 		case mp2obj(RndMonster4):
-			//add_moveable(i1, game::random::monster(tiles[i].generalObject - mp2obj(RndMonster1) + 1), 0);
+			add_moveable(i1, generate.monster(tiles[i].generalObject - mp2obj(RndMonster1) + 1), 0);
 			break;
 		case mp2obj(ArtifactObject):
-			//add_moveable(i1, FirstArtifact + (tiles[i].indexName1 - 1) / 2, 0);
+			add_moveable(i1, generate.add(artifact_s(FirstArtifact + (tiles[i].indexName1 - 1) / 2)), 0);
 			break;
 		case mp2obj(RndArtifact):
 			//add_moveable(i1, game::random::artifact(0), 0);
@@ -651,9 +657,6 @@ void gamei::prepare() {
 			break;
 		case mp2obj(RndUltimateArtifact):
 			//add_moveable(i1, game::random::artifact(4), 0);
-			break;
-		case mp2obj(MonsterObject):
-			//add_moveable(i1, FirstMonster + tiles[i].indexName1, 0);
 			break;
 		case mp2obj(Resource):
 			//add_moveable(i1, decode_resource[tiles[i].indexName1 / 2], 0);

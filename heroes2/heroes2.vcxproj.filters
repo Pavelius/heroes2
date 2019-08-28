@@ -188,5 +188,14 @@
     <ClCompile Include="armysize.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="map_objects.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="map_moveable.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="generator.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

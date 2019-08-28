@@ -39,7 +39,7 @@ enum spell_s : unsigned char {
 };
 enum resource_s : unsigned char {
 	Gold, Wood, Mercury, Ore, Sulfur, Crystal, Gems,
-	FirstResource = Gold,
+	FirstResource = Gold, RandomResource,
 };
 enum luck_s : unsigned char {
 	CursedLuck, AwfulLuck, BadLuck, NormalLuck, GoodLuck, GreatLuck, IrishLuck,
@@ -131,14 +131,14 @@ enum map_object_s : unsigned char {
 	DragonCity, LitghHouse, WaterWheel, Mines, // 0x95-0x97
 	MonsterObject, Obelisk, Oasis, ResourceObject, // 0x98-0x9B
 	Map0x9C, SawMill, Oracle, Shrine1, // 0x9C-0x9F
-	ShipWreck, Map0xA1, DesertTent, CastleOnMap, // 0xA0-0xA3
+	ShipWreck, Map0xA1, DesertTent, CastleObject, // 0xA0-0xA3
 	Teleporter, RogueCamp, Map0xA6, WhirlPool, // 0xA4-0xA7
 	WindMill, ArtifactObject, Map0xAA, Boat, // 0xA8-0xAB
 	RndUltimateArtifact, RndArtifact, RndResource, RndMonster, // 0xAC-0xAF
 	RndTown, RndCastle, Map0xB2, RndMonster1, // 0xB0-0xB3
 	RndMonster2, RndMonster3, RndMonster4, HeroObject, // 0xB4-0xB7
 	Map0xB8, Map0xB9, WatchTower, SpriteHouse, // 0xB8-0xBB
-	SpriteHouseCity, Ruins, Fort, TradingPost, // 0xBC-0xBF
+	SpriteCity, Ruins, Fort, TradingPost, // 0xBC-0xBF
 	AbandoneMine, ThatchedHut, StandingStones, Idol, // 0xC0-xC3
 	TreeKnowledge, DoctorHut, Temple, HillFort, // 0xC4-0xC7
 	HalflingHole, MercenaryCamp, Shrine2, Shrine3, // 0xC8-0xCB
@@ -156,6 +156,11 @@ enum map_object_s : unsigned char {
 	TravellerTent, Map0xF9, Map0xFA, Jail, // 0xF8-0xFB
 	FireAltar, AirAltar, EarthAltar, WaterAltar, // 0xFC-0xFF
 	FirstObject = WaterChest, LastObject = WaterAltar,
+	// Standart landscape objects
+	Brush, Cactus, Cliff, Crack, Flowers, Hill, Hole, Lake, Mountains, Mushrooms, Rock, Trees, Volcano,
+	RiverDeltaDown, Stumps,
+	DiggingHole,
+	EmpthyObject,
 };
 enum tag_s : unsigned char {
 	Air, Cold, Dragon, Earth, Fire, Lighting, Water, Undead,
@@ -358,6 +363,12 @@ public:
 	void					remove(spell_s v) { data[v / size] &= ~(1 << (v % 32)); }
 	void					set(spell_s v) { data[v / size] |= (1 << (v % 32)); }
 };
+struct moveablei {
+	short unsigned			index;
+	variant					element;
+	short unsigned			value;
+	static moveablei*		add();
+};
 class heroi : public namei, public armyi {
 	kind_s					kind;
 	unsigned char			level;
@@ -533,6 +544,16 @@ struct pvar {
 	constexpr pvar(castlei* v) : type(CastleVar), castle(v) {}
 	constexpr bool operator==(const pvar& e) const { return type == e.type && value == e.value; }
 	constexpr explicit operator bool() const { return type != NoVariant; }
+};
+class generator {
+	unsigned char			artifacts[LastArtifact + 1];
+	unsigned char			monsters[WaterElement + 1];
+public:
+	generator();
+	artifact_s				add(artifact_s v) { artifacts[v]++; return v; }
+	monster_s				add(monster_s v) { monsters[v]++; return v; }
+	artifact_s				artifact(int level = 0);
+	monster_s				monster(int level = 0);
 };
 namespace map {
 extern point				camera;

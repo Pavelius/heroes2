@@ -19,6 +19,14 @@ void playeri::initialize() {
 	}
 }
 
+void playeri::endturn() {
+	for(auto& e : bsmeta<playeri>::elements) {
+		if(!e)
+			continue;
+	}
+	map::day++;
+}
+
 void playeri::setup(difficult_s id) {
 	resources = bsmeta<difficulti>::elements[id].resources;
 	sethire(0);

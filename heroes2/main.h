@@ -301,6 +301,7 @@ public:
 	constexpr explicit operator bool() const { return activity == Human || activity == Computer; }
 	void					adventure();
 	void					clear();
+	static void				endturn();
 	static void				initialize();
 	int						getadventurers() const;
 	int						getbuildings(building_s v) const;
@@ -317,6 +318,7 @@ public:
 	int						getspies() const;
 	int						gettowns() const;
 	void					marketplace();
+	void					quickmessage(const costi& cost, const char* format, ...);
 	bool					recruit(monster_s unit, int& count, int maximum);
 	void					set(activity_s v) { activity = v; }
 	void					set(kind_s v) { kind = v; }
@@ -545,6 +547,7 @@ void						clear();
 inline unsigned				getmonth() { return day / (7*4); }
 inline unsigned				getweek() { return day / 7; }
 inline unsigned				getweekday() { return day % 7; }
+inline unsigned				getmonthweek() { return getweek() % 4; }
 inline int					i2x(short unsigned i) { return i % 256; }
 inline int					i2y(short unsigned i) { return i >> 8; }
 inline unsigned short		m2i(int x, int y) { return (y << 8) + x; }

@@ -1,16 +1,23 @@
+#include "stringbuilder.h"
 #include "view.h"
 
 using namespace draw;
+
+enum infotype_s : unsigned char {
+	DayInfo, KindomInfo, ObjectInfo,
+	LastInfo = ObjectInfo,
+};
 
 static pvar			cvar;
 const unsigned		delay_information = 8;
 const int			map_sx = 14;
 const int			map_sy = 14;
-static unsigned		info_stamp;
 static char			info_text[512];
+static costi		info_cost;
 static rect			rcmap = {16, 16, 16 + 32 * 14, 16 + 32 * 14};
-static unsigned		show_information = delay_information;
+static unsigned		show_message = delay_information;
 static unsigned		show_sunrise = delay_information;
+static infotype_s	info_type = ObjectInfo;
 
 static void information_hero() {
 	auto hero = (heroi*)hot::param;
@@ -21,6 +28,7 @@ static void choose_hero() {
 	cvar = (heroi*)hot::param;
 	if(!cvar)
 		return;
+	info_type = ObjectInfo;
 	map::setcamera(cvar.hero->getpos());
 }
 
@@ -147,13 +155,18 @@ static void paint_blank_info(int x, int y, const playeri* player) {
 	image(x, y, isevil(HEROLOGE, HEROLOGO), 0, 0);
 }
 
+static void endturn() {
+	playeri::endturn();
+	show_sunrise = delay_information;
+}
+
 static int paint_buttons(int x, int y, const playeri* player) {
 	auto icn = isevil(ADVEBTNS, ADVBTNS);
 	draw::button(x + 0 * 36, y + 0 * 36, icn, buttonok, {0, 0, 1}, Alpha + 'H', "Следующий герой");
 	draw::button(x + 1 * 36, y + 0 * 36, icn, buttonok, {2, 2, 3}, Alpha + 'M', "Продолжить движение");
 	draw::button(x + 2 * 36, y + 0 * 36, icn, buttonok, {4, 4, 5});
 	draw::button(x + 3 * 36, y + 0 * 36, icn, buttonok, {6, 6, 7});
-	draw::button(x + 0 * 36, y + 1 * 36, icn, buttonok, {8, 8, 9}, Alpha + 'E', "Закончить ход");
+	draw::button(x + 0 * 36, y + 1 * 36, icn, endturn, {8, 8, 9}, Alpha + 'E', "Закончить ход");
 	draw::button(x + 1 * 36, y + 1 * 36, icn, buttonok, {10, 10, 11});
 	draw::button(x + 2 * 36, y + 1 * 36, icn, buttonok, {12, 12, 13});
 	draw::button(x + 3 * 36, y + 1 * 36, icn, buttonok, {14, 14, 15});
@@ -163,14 +176,14 @@ static int paint_buttons(int x, int y, const playeri* player) {
 static void paint_calendar(int x, int y) {
 	auto d = map::getweekday();
 	if(d == 0)
-		image(x, y, isevil(SUNMOONE, SUNMOON), 4 - (map::getweek() % 4));
+		image(x, y, isevil(SUNMOONE, SUNMOON), 4 - map::getmonthweek());
 	else
 		image(x, y, isevil(SUNMOONE, SUNMOON), 0);
 	char temp[64];
 	if(true) {
 		state push;
 		font = SMALFONT;
-		zprint(temp, "%1: %3i, %2: %4i", "Месяц", "Неделя", map::getmonth() + 1, map::getweek() + 1);
+		zprint(temp, "%1: %3i, %2: %4i", "Месяц", "Неделя", map::getmonth() + 1, map::getmonthweek() + 1);
 		textm(x, y + 34, 140, AlignCenter, temp);
 	}
 	zprint(temp, "%1: %2i", "День", map::getweekday() + 1);
@@ -179,7 +192,10 @@ static void paint_calendar(int x, int y) {
 
 static void change_mode() {
 	show_sunrise = 0;
-	show_information = 0;
+	show_message = 0;
+	info_type = infotype_s(info_type + 1);
+	if(info_type > LastInfo)
+		info_type = infotype_s(0);
 }
 
 static void information_resource(int x, int y, resource_s id, const playeri* player) {
@@ -205,7 +221,7 @@ static void paint_kindom(int x, int y, const playeri* player) {
 }
 
 static void paint_army(int x, int y, const armyi& e) {
-	e.paintsmall({x+2, y+2, x + 142, y + 70}, true, true);
+	e.paintsmall({x+2, y+2, x + 142, y + 70}, true, false);
 }
 
 static void paint_information(int x, int y, const playeri* player) {
@@ -220,17 +236,29 @@ static void paint_information(int x, int y, const playeri* player) {
 		paint_calendar(x, y);
 		if(hot::key == InputTimer)
 			show_sunrise--;
-	} else if(show_information) {
+	} else if(show_message) {
 		state push;
 		font = SMALFONT;
 		if(info_text[0])
 			textf(x + 2, y + 8, 142 - 4, info_text);
 		if(hot::key == InputTimer)
-			show_information--;
-	} else if(cvar.type == Hero)
-		paint_army(x, y, *cvar.hero);
-	else
-		paint_kindom(x, y, player);
+			show_message--;
+	} else {
+		switch(info_type) {
+		case ObjectInfo:
+			if(cvar.type==Hero)
+				paint_army(x, y, *cvar.hero);
+			else
+				paint_kindom(x, y, player);
+			break;
+		case KindomInfo:
+			paint_kindom(x, y, player);
+			break;
+		default:
+			paint_calendar(x, y);
+			break;
+		}
+	}
 }
 
 void map::setcamera(short unsigned index) {
@@ -239,38 +267,7 @@ void map::setcamera(short unsigned index) {
 	correct_camera();
 }
 
-//static void paint_test(int x, int y) {
-//	// Show text information
-//	switch(information_mode) {
-//	case Resource:
-//		if(true) {
-//		}
-//		break;
-//	case Hero:
-//		//army(x + 4, y + 20, 132, world::hero->garmy()->units, 5, false);
-//		break;
-//	case Information:
-//		draw::image(x, y, draw::isevil(res::SUNMOONE, res::SUNMOON), 3 - ((game::getweek() - 1) % 4) + 1);
-//		if(true) {
-//			draw::state push;
-//			draw::font = res::SMALFONT;
-//			szprint(temp, "%1: %3i, %2: %4i",
-//				szt("Month", "Месяц"), szt("Week", "Неделя"),
-//				game::getmonth(), game::getweek());
-//			draw::textm(x, y + 34, 140, draw::Center, temp);
-//		}
-//		szprint(temp, "%1: %2i",
-//			szt("Day", "День"),
-//			game::getday());
-//		draw::textm(x, y + 50, 140, draw::Center, temp);
-//		break;
-//	}
-//}
-
 static void paint_screen(const playeri* player) {
-	// After some time clear text info
-	if(info_stamp < clock())
-		info_text[0] = 0;
 	image(0, 0, isevil(ADVBORDE, ADVBORD), 0, 0);
 	minimap(480, 16, 0);
 	heroes.draw(481, 176, 56, 32);
@@ -281,15 +278,23 @@ static void paint_screen(const playeri* player) {
 	//paint_route(rcmap, map::camera);
 }
 
-static void setup_collections(const playeri* player) {
+static void update_lists(const playeri* player) {
 	castles.row_per_screen = 4;
 	castles.setup(player);
 	heroes.row_per_screen = 4;
 	heroes.setup(player);
 }
 
+void playeri::quickmessage(const costi& cost, const char* format, ...) {
+	stringbuilder sb(info_text);
+	sb.addv(format, xva_start(format));
+	info_cost = cost;
+	show_message = delay_information;
+}
+
 void playeri::adventure() {
-	setup_collections(this);
+	update_lists(this);
+	quickmessage({}, "Ход начал %1 игрок", getname());
 	while(ismodal()) {
 		paint_screen(this);
 		cursor(ADVMCO, 0);

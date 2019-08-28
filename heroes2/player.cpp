@@ -14,6 +14,8 @@ void playeri::initialize() {
 		if(e.getid() == RandomPlayer)
 			continue;
 		e.setname(random_names[e.getid()]);
+		e.heroes[0] = RandomHero;
+		e.heroes[1] = RandomHero;
 	}
 }
 
@@ -147,7 +149,7 @@ static bool already_hired(const heroi* hero) {
 	return false;
 }
 
-static heroi* find_hero(kind_s kind, kind_s excude_kind) {
+heroi* playeri::randomhire(kind_s kind, kind_s excude_kind) {
 	heroi* heroes[LastHero - FirstHero + 1];
 	unsigned count = heroi::select(heroes, zendof(heroes), 0, kind, excude_kind);
 	if(count) {
@@ -164,16 +166,21 @@ static heroi* find_hero(kind_s kind, kind_s excude_kind) {
 	return heroes[rand()%count];
 }
 
-void playeri::sethire(int index) {
+heroi* playeri::randomhire(int index) const {
 	heroi* hero = 0;
 	if(kind != MultiPlayer) {
-		if(index==0)
-			hero = find_hero(kind, RandomKind);
+		if(index == 0)
+			hero = randomhire(kind, RandomKind);
 		else
-			hero = find_hero(RandomKind, kind);
+			hero = randomhire(RandomKind, kind);
 	}
 	if(!hero)
-		hero = find_hero(RandomKind, RandomKind);
+		hero = randomhire(RandomKind, RandomKind);
+	return hero;
+}
+
+void playeri::sethire(int index) {
+	auto hero = randomhire(index);
 	if(hero)
 		this->heroes[index] = hero->getid();
 	else

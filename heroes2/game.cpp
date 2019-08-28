@@ -252,8 +252,7 @@ bool gamei::load(const char* url) {
 	default: return false;
 	}
 	// start player
-	if(header.hero)
-		start_hero = true;
+	start_hero = !header.hero;
 	// text info
 	szfnamewe(file, url);
 	zcpy(description, header.text, sizeof(description) - 1);
@@ -414,6 +413,17 @@ static void load_object(heroi& e, mp2::hero& r) {
 	}
 }
 
+void gamei::updatebase() {
+	for(auto i = FirstPlayer; i <= LastPlayer; i = player_s(i+1)) {
+		auto& e1 = bsmeta<playeri>::elements[i];
+		e1.set(this->types[i]);
+		if(this->races[i]==RandomKind)
+			e1.set(Knight);
+		else
+			e1.set(this->races[i]);
+	}
+}
+
 void gamei::prepare() {
 	//static map_object_s decode_resource[] = {Wood, Mercury, Ore, Sulfur, Crystal, Gems, Gold, AncientLamp, Resource, TreasureChest};
 	char temp[260]; zprint(temp, "maps/%1.mp2", file);
@@ -427,6 +437,7 @@ void gamei::prepare() {
 	map::height = get32(st);
 	if(!map::width || !map::height)
 		return;
+	updatebase();
 	// tiles loading
 	short unsigned tiles_count = map::height * map::width;
 	mp2::tile* tiles = new mp2::tile[tiles_count];
@@ -676,6 +687,8 @@ void gamei::prepare() {
 			auto& e = bsmeta<playeri>::elements[i];
 			if(!e)
 				continue;
+			auto hero = e.randomhire(0);
+			hero->set(&e);
 			//auto castle = bsfind(FirstCastle, Player, player);
 			//if(castle)
 			//	game::hire(0, player, bsget(castle, Index));

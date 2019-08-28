@@ -142,6 +142,7 @@
     <ClCompile Include="dialog_city.cpp" />
     <ClCompile Include="dialog_game.cpp" />
     <ClCompile Include="dialog_market.cpp" />
+    <ClCompile Include="dialog_pallette.cpp" />
     <ClCompile Include="dialog_resource.cpp" />
     <ClCompile Include="dialog_spellbook.cpp" />
     <ClCompile Include="dialog_tavern.cpp" />

@@ -319,6 +319,7 @@ bool gamei::setupmap() {
 }
 
 void gamei::newgame() {
+	heroi::initialize();
 	playeri::initialize();
 	auto n = new_game();
 	if(!n)
@@ -329,6 +330,6 @@ void gamei::newgame() {
 		//if(!game.setupmap())
 		//	return;
 		game.prepare();
-		bsmeta<playeri>::elements[0].adventure();
+		bsmeta<playeri>::elements[PlayerRed].adventure();
 	}
 }

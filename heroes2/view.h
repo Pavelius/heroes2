@@ -171,7 +171,7 @@ private:
 bool						ask(const char* format, const variantcol* footer = 0, unsigned count = 0);
 void						breakmodal(int result);
 void						button(int x, int y, res_s res, const cmd& ev, const buttoni& decor, int key = 0, const char* tips = 0);
-bool						buttonx(int x, int y, res_s res, void* source, const buttoni& decor, int key, const char* tips);
+bool						buttonx(int x, int y, res_s res, void* source, const buttoni& decor, int key = 0, const char* tips = 0);
 void						buttoncancel();
 void						buttonok();
 bool						create(const char* title, unsigned milliseconds, bool fullscreen);

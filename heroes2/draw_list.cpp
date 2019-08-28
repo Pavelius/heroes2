@@ -11,23 +11,39 @@ static void execute_list() {
 
 list::list() : origin(0), current(0), maximum(0) {}
 
-static void input_edit() {
-}
-
-void list::draw(int x, int y, int sy, int sx) {
-	int ib = origin;
-	int ie = origin + row_per_screen;
-	int y1 = y;
+void list::draw(int x, int y, int sx, int sy) {
+	auto ib = origin;
+	auto ie = origin + row_per_screen;
+	auto yc = y;
 	while(ib < ie) {
-		row(x, y1, ib);
-		y1 += sy;
+		row(x, yc, ib);
+		yc += sy;
 		ib++;
 	}
 	// scroll
-	res_s icn = isevil(SCROLLE, SCROLLCN);
-	button(x + 56, y + 1, icn, input_edit, {0, 0, 1});
-	button(x + 56, y + 113, icn, input_edit, {2, 2, 3});
-	button(x + 59, y + 19, icn, input_edit, {4, 4, 4});
+	auto icn = isevil(SCROLLE, SCROLLCN);
+	auto y1 = y + 1;
+	auto y2 = y + sy*row_per_screen - getheight(icn, 2) - 1;
+	if(buttonx(x + sx, y1, icn, &current, {0, 0, 1}))
+		execute(&list::scroll, origin - 1);
+	if(buttonx(x + sx, y2, icn, &current, {2, 2, 3}))
+		execute(&list::scroll, origin + 1);
+	auto s1 = y1 + getheight(icn, 0) + 4;
+	auto s2 = y2 - getheight(icn, 4) - 4;
+	auto ds = s2 - s1;
+	auto dr = maximum - row_per_screen;
+	if(dr > 0) {
+		auto p = (origin*ds) / dr;
+		image(x + sx + 3, s1 + p, icn, 4);
+	}
+	rect rc = {x, y1, x + sx + getwidth(icn, 0), y2 + getheight(icn, 2)};
+	if(hot::mouse.in(rc)) {
+		switch(hot::key) {
+		case MouseWheelUp: execute(&list::scroll, origin - 1); break;
+		case MouseWheelDown: execute(&list::scroll, origin + 1); break;
+		}
+	}
+
 }
 
 void list::flatbutton(int x, int y, res_s icn, int index, int command) const {
@@ -97,10 +113,10 @@ void list::select(int index) {
 
 void list::scroll(int value) {
 	origin = value;
-	if(origin < 0)
-		origin = 0;
 	if(origin + row_per_screen > maximum)
 		origin = maximum - row_per_screen;
+	if(origin < 0)
+		origin = 0;
 }
 
 void list::box(int x, int y, res_s icn, int n1, int dx, int sbu, int sbd, int sbs, int sbds, int sb, int bf, res_s iss) const {

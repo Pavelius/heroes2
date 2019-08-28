@@ -182,5 +182,8 @@
     <ClCompile Include="map.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="dialog_pallette.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

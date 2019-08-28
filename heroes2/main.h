@@ -300,6 +300,8 @@ public:
 	player_s				getid() const { return player_s(this - bsmeta<playeri>::elements); }
 	kind_s					getkind() const { return kind; }
 	int						getmarket() const;
+	static heroi*			randomhire(kind_s kind, kind_s excude_kind);
+	heroi*					randomhire(int index) const;
 	static int				getrate(resource_s resf, resource_s rest, int markets);
 	costi&					getresources() { return resources; }
 	int						getspies() const;
@@ -307,6 +309,7 @@ public:
 	void					marketplace();
 	bool					recruit(monster_s unit, int& count, int maximum);
 	void					set(activity_s v) { activity = v; }
+	void					set(kind_s v) { kind = v; }
 	void					sethire(int index);
 	void					setup(difficult_s id);
 	void					tavern();
@@ -370,6 +373,7 @@ public:
 	int						getcost(spell_s v) const;
 	hero_s					getid() const { return hero_s(this - bsmeta<heroi>::elements); }
 	kind_s					getkind() const;
+	unsigned char			getportrait() const { return portrait; }
 	short unsigned			getpos() const { return index; }
 	static void				initialize();
 	bool					is(spell_s v) const { return spellbook.is(v); }
@@ -487,6 +491,8 @@ struct gamei {
 	static void				newgame();
 	void					prepare();
 	bool					setupmap();
+private:
+	void					updatebase();
 };
 struct hightscore {
 	char					name[32];
@@ -502,6 +508,7 @@ struct variantcol {
 };
 namespace map {
 extern point				camera;
+extern unsigned				day;
 extern unsigned char		flags[256 * 256];
 extern unsigned	char		height;
 extern unsigned	char		obelisc_count;
@@ -509,9 +516,13 @@ extern unsigned short		tiles[256 * 256];
 extern unsigned char		width;
 //
 void						clear();
+inline unsigned				getmonth() { return day / (7*4); }
+inline unsigned				getweek() { return day / 7; }
+inline unsigned				getweekday() { return day % 7; }
 inline int					i2x(short unsigned i) { return i % 256; }
 inline int					i2y(short unsigned i) { return i >> 8; }
 inline unsigned short		m2i(int x, int y) { return (y << 8) + x; }
+void						setcamera(short unsigned index);
 }
 const char*					getstr(building_s id, kind_s kind);
 DECLENUM(ability);

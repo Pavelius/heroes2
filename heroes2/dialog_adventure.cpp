@@ -2,12 +2,28 @@
 
 using namespace draw;
 
+static heroi*		current_hero;
+static playeri*		current_player;
+const unsigned		delay_information = 8;
 const int			map_sx = 14;
 const int			map_sy = 14;
 static unsigned		info_stamp;
 static char			info_text[512];
 static rect			rcmap = {16, 16, 16 + 32 * 14, 16 + 32 * 14};
-static void (*paint_information)(int x, int y, const playeri* player);
+static unsigned		show_information = delay_information;
+static unsigned		show_sunrise = delay_information;
+
+static void information_hero() {
+	auto hero = (heroi*)hot::param;
+	hero->show(true);
+}
+
+static void choose_hero() {
+	current_hero = (heroi*)hot::param;
+	if(!current_hero)
+		return;
+	map::setcamera(current_hero->getpos());
+}
 
 static struct castlec : public list {
 
@@ -42,9 +58,8 @@ static struct castlec : public list {
 			image(x - 1, y, icn, index_sprite);
 			//if(bsget(rec, AlreadyMoved))
 			//	draw::image(x - 1, y + 1, icn, 24);
-			//handle_input(x, y, rec);
 		} else
-			image(x - 1, y, isevil(LOCATORE, LOCATORS), 1 + index);
+			image(x - 1, y, isevil(LOCATORE, LOCATORS), 5 + index);
 	}
 
 } castles;
@@ -67,9 +82,17 @@ static struct heroc : public list {
 		if(index < maximum && data[index]) {
 			auto p = data[index];
 			image(x + 4, y + 5, PORTXTRA, 0);
-			image(x - 1, y, MINIPORT, p->getid());
+			image(x - 1, y, MINIPORT, p->getportrait());
 			image(x + 4, y + 5, MOBILITY, imin(1000 / 100, 25));
 			image(x + 43, y + 5, MANA, imin(20 / 5, 25));
+			if(current_hero == p)
+				rectb({x - 1, y, x + 54, y + 31}, 214);
+			if(mousein({x, y, x + 54, y + 31})) {
+				if(hot::key==MouseLeft && hot::pressed)
+					draw::execute(choose_hero, (int)data[index]);
+				else if(hot::key == MouseLeftDBL && hot::pressed)
+					draw::execute(information_hero, (int)data[index]);
+			}
 		} else
 			image(x - 1, y, isevil(LOCATORE, LOCATORS), 1 + index);
 	}
@@ -138,44 +161,74 @@ static int paint_buttons(int x, int y, const playeri* player) {
 	return 2 * 36;
 }
 
-static void paint_calendar(int x, int y, const playeri* player) {
+static void paint_calendar(int x, int y) {
+	auto d = map::getweekday();
+	if(d == 0)
+		image(x, y, isevil(SUNMOONE, SUNMOON), 4 - (map::getweek() % 4));
+	else
+		image(x, y, isevil(SUNMOONE, SUNMOON), 0);
+	char temp[64];
+	if(true) {
+		state push;
+		font = SMALFONT;
+		zprint(temp, "%1: %3i, %2: %4i", "Μερÿφ", "Νεδελÿ", map::getmonth() + 1, map::getweek() + 1);
+		textm(x, y + 34, 140, AlignCenter, temp);
+	}
+	zprint(temp, "%1: %2i", "Δενό", map::getweekday() + 1);
+	textm(x, y + 50, 140, AlignCenter, temp);
+}
+
+static void change_mode() {
+	show_sunrise = 0;
+	show_information = 0;
+}
+
+static void paint_information(int x, int y, const playeri* player) {
 	y += paint_buttons(x, y, player);
+	auto mouse_in_info = mousein({x, y, x + 142, y + 4 * 36});
+	if(mouse_in_info) {
+		if(hot::key == MouseLeft && hot::pressed)
+			execute(change_mode);
+	}
 	image(x, y, isevil(STONBAKE, STONBACK), 0);
-	image(x, y, isevil(SUNMOONE, SUNMOON), 3 - ((1 - 1) % 4) + 1);
+	if(show_sunrise) {
+		paint_calendar(x, y);
+		if(hot::key == InputTimer)
+			show_sunrise--;
+	} else if(show_information) {
+		state push;
+		font = SMALFONT;
+		if(info_text[0])
+			textf(x + 2, y + 8, 142 - 4, info_text);
+		if(hot::key == InputTimer)
+			show_information--;
+	} else if(true) {
+		state push;
+		font = SMALFONT;
+		image(x, y, RESSMALL, 0);
+		text(x + 26, y + 31, "1"); // castle
+		text(x + 78, y + 31, "0"); // town
+		//information_resource(x + 122, y + 31, Gold, player);
+		//information_resource(x + 14, y + 61, Wood, player);
+		//information_resource(x + 35, y + 61, Mercury, player);
+		//information_resource(x + 59, y + 61, Ore, player);
+		//information_resource(x + 82, y + 61, Sulfur, player);
+		//information_resource(x + 106, y + 61, Crystal, player);
+		//information_resource(x + 128, y + 61, Gems, player);
+	}
+}
+
+void map::setcamera(short unsigned index) {
+	camera.x = i2x(index) * 32 - (32 * map_sx / 2);
+	camera.y = i2y(index) * 32 - (32 * map_sy / 2);
+	correct_camera();
 }
 
 //static void paint_test(int x, int y) {
 //	// Show text information
-//	auto mouse_in_info = draw::mousein(x, y, x + 142, y + 4 * 36);
-//	if(info_text[0]) {
-//		draw::state push;
-//		draw::font = SMALFONT;
-//		draw::textf(x + 2, y + 8, 142 - 4, info_text);
-//		if(mouse_in_info) {
-//			if(hot::key == MouseLeft && hot::pressed)
-//				info_text[0] = 0;
-//		}
-//		return;
-//	}
-//	if(mouse_in_info) {
-//		if(hot::key == MouseLeft && hot::pressed)
-//			draw::execute(ChangeMode);
-//	}
 //	switch(information_mode) {
 //	case Resource:
 //		if(true) {
-//			draw::state push;
-//			draw::font = res::SMALFONT;
-//			draw::image(x, y, res::RESSMALL, 0);
-//			draw::text(x + 26, y + 31, "1"); // castle
-//			draw::text(x + 78, y + 31, "0"); // town
-//			information_resource(x + 122, y + 31, Gold, player);
-//			information_resource(x + 14, y + 61, Wood, player);
-//			information_resource(x + 35, y + 61, Mercury, player);
-//			information_resource(x + 59, y + 61, Ore, player);
-//			information_resource(x + 82, y + 61, Sulfur, player);
-//			information_resource(x + 106, y + 61, Crystal, player);
-//			information_resource(x + 128, y + 61, Gems, player);
 //		}
 //		break;
 //	case Hero:
@@ -205,17 +258,15 @@ static void paint_screen(const playeri* player) {
 		info_text[0] = 0;
 	image(0, 0, isevil(ADVBORDE, ADVBORD), 0, 0);
 	minimap(480, 16, 0);
-	heroes.draw(481, 176, 32, 32);
-	castles.draw(553, 176, 32, 32);
-	paint_calendar(480, 320, player);
+	heroes.draw(481, 176, 56, 32);
+	castles.draw(553, 176, 56, 32);
+	paint_information(480, 320, player);
 	paint_tiles(rcmap, map::camera);
 	//paint_objects(drawables, rcmap, map::camera);
 	//paint_route(rcmap, map::camera);
 }
 
 static void setup_collections(const playeri* player) {
-	if(!paint_information)
-		paint_information = paint_blank_info;
 	castles.row_per_screen = 4;
 	castles.setup(player);
 	heroes.row_per_screen = 4;
@@ -224,7 +275,6 @@ static void setup_collections(const playeri* player) {
 
 void playeri::adventure() {
 	setup_collections(this);
-	paint_information = paint_calendar;
 	while(ismodal()) {
 		paint_screen(this);
 		cursor(ADVMCO, 0);

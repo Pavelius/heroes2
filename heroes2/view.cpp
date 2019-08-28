@@ -491,13 +491,11 @@ static void colorize(unsigned char* pallette, int index, int count) {
 }
 
 static void colorize() {
-	unsigned char* pal = (unsigned char*)sys_get_pallette();
-	if(((draw::counter / 2) % 2) == 0) {
-		colorize(pal, 0xD6, 4);
-		colorize(pal, 0xDA, 4);
-		colorize(pal, 0xEE, 4);
-		colorize(pal, 0xE7, 4);
-	}
+	auto pal = (unsigned char*)sys_get_pallette();
+	colorize(pal, 0xD6, 4);
+	colorize(pal, 0xDA, 4);
+	colorize(pal, 0xEE, 4);
+	colorize(pal, 0xE7, 4);
 }
 
 unsigned char* draw::ptr(int x, int y) {

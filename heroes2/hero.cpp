@@ -82,8 +82,11 @@ heroi bsmeta<heroi>::elements[CaptainWizard + 1];
 const costi	heroi::cost = {{2500}};
 
 void heroi::initialize() {
-	for(auto i = 0; i <= CaptainWizard; i++)
+	for(auto i = 0; i <= CaptainWizard; i++) {
 		bsmeta<heroi>::elements[i].clear();
+		bsmeta<heroi>::elements[i].player = RandomPlayer;
+		bsmeta<heroi>::elements[i].portrait = bsmeta<heroi>::elements[i].getid();
+	}
 }
 
 void heroi::clear() {

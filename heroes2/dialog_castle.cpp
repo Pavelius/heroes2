@@ -186,7 +186,7 @@ static void captain(int x, int y, castlei* castle) {
 	}
 }
 
-static void information_hero() {
+void information_hero() {
 	auto hero = (heroi*)hot::param;
 	hero->show(false);
 }

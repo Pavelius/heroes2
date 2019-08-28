@@ -138,12 +138,9 @@ static int paint_buttons(int x, int y, const playeri* player) {
 	return 2 * 36;
 }
 
-static void paint_info_back(int x, int y) {
-	image(x, y, isevil(STONBAKE, STONBACK), 0);
-}
-
 static void paint_calendar(int x, int y, const playeri* player) {
 	y += paint_buttons(x, y, player);
+	image(x, y, isevil(STONBAKE, STONBACK), 0);
 	image(x, y, isevil(SUNMOONE, SUNMOON), 3 - ((1 - 1) % 4) + 1);
 }
 
@@ -210,7 +207,7 @@ static void paint_screen(const playeri* player) {
 	minimap(480, 16, 0);
 	heroes.draw(481, 176, 32, 32);
 	castles.draw(553, 176, 32, 32);
-	paint_information(480, 320, player);
+	paint_calendar(480, 320, player);
 	paint_tiles(rcmap, map::camera);
 	//paint_objects(drawables, rcmap, map::camera);
 	//paint_route(rcmap, map::camera);

@@ -134,6 +134,7 @@
     <ClCompile Include="ability.cpp" />
     <ClCompile Include="animation.cpp" />
     <ClCompile Include="army.cpp" />
+    <ClCompile Include="armysize.cpp" />
     <ClCompile Include="artifacts.cpp" />
     <ClCompile Include="castle.cpp" />
     <ClCompile Include="dialog_adventure.cpp" />

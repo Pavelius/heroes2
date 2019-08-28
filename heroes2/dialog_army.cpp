@@ -328,8 +328,15 @@ void armyi::paintsmall(const rect& rc, bool show_count, bool show_text) const {
 		sprites[count].res = MONS32;
 		sprites[count].frame = e.unit;
 		sprites[count].setsize();
-		if(show_count)
+		if(show_count) {
 			sprites[count].size.y += texth();
+			if(show_text) {
+				auto p = armysizei::find(e.count)->name;
+				auto s = textw(p) + 4;
+				if(sprites[count].size.x < s)
+					sprites[count].size.x = s;
+			}
+		}
 		values[count] = e.count;
 		count++;
 	}
@@ -350,8 +357,12 @@ void armyi::paintsmall(const rect& rc, bool show_count, bool show_text) const {
 			image(x1 + (e.size.x - getwidth(e.res, e.frame)) / 2, y1, e.res, e.frame, AFNoOffset);
 			if(show_count) {
 				char temp[32];
-				zprint(temp, "%1i", values[index]);
-				text(x1 + (e.size.x - textw(temp)) / 2, y1 + e.size.y - texth(), temp);
+				const char* p = temp;
+				if(show_text)
+					p = armysizei::find(values[index])->name;
+				else
+					zprint(temp, "%1i", values[index]);
+				text(x1 + (e.size.x - textw(p)) / 2, y1 + e.size.y - texth(), p);
 			}
 			x1 += sprites[index].size.x;
 			index++;

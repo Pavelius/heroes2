@@ -185,5 +185,8 @@
     <ClCompile Include="dialog_pallette.cpp">
       <Filter>Диалоги</Filter>
     </ClCompile>
+    <ClCompile Include="armysize.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

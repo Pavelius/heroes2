@@ -205,7 +205,7 @@ static void paint_kindom(int x, int y, const playeri* player) {
 }
 
 static void paint_army(int x, int y, const armyi& e) {
-	e.paintsmall({x+2, y+2, x + 142, y + 70}, true, false);
+	e.paintsmall({x+2, y+2, x + 142, y + 70}, true, true);
 }
 
 static void paint_information(int x, int y, const playeri* player) {

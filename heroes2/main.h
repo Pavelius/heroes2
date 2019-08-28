@@ -195,6 +195,9 @@ enum loss_s : unsigned char {
 enum direction_s : unsigned char {
 	Left, LeftUp, Up, RightUp, Right, RightDown, Down, LeftDown,
 };
+enum armysize_s {
+	Few, Several, Pack, Lots, Horde, Throng, Swarm, Zounds, Legion
+}; 
 class heroi;
 struct variant {
 	variant_s				type;
@@ -224,6 +227,12 @@ struct variant {
 struct resourcei {
 	const char*				name;
 	const char*				nameof;
+};
+struct armysizei {
+	const char*				name;
+	int						count;
+	static const armysizei* find(int value);
+	static armysize_s		get(int value);
 };
 struct costi {
 	int						data[Gems + 1];

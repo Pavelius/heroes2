@@ -1139,6 +1139,34 @@ void picture::set(const variant e) {
 	}
 }
 
+int picture::gettotalheight(unsigned count, int width_per_line) const {
+	auto p = this;
+	auto pe = p + count;
+	auto r = 0;
+	while(p < pe) {
+		int width = 0, height = 0;
+		auto c = getsize(count, width, height, width_per_line);
+		p += c;
+		count -= c;
+		r += height;
+	}
+	return r;
+}
+
+unsigned picture::getsize(unsigned count, int& width, int& height, int width_per_line) const {
+	auto p = this;
+	auto pe = p + count;
+	while(p < pe) {
+		if(width_per_line && (width + p->size.x) > width_per_line)
+			break;
+		width += p->size.x;
+		if(height < p->size.y)
+			height = p->size.y;
+		p++;
+	}
+	return p - this;
+}
+
 static unsigned getsize(const variantcol* source, const variantcol* pe, int& width, int& height, int width_per_line) {
 	auto p = source;
 	while(p < pe) {
@@ -1172,6 +1200,10 @@ int index_by_type(kind_s id);
 
 void picture::render(int x, int y, res_s res, int frame) const {
 	image(x + (size.x - getwidth(res, frame))/2, y, res, frame, AFNoOffset);
+}
+
+void picture::clear() {
+	memset(this, 0, sizeof(*this));
 }
 
 void picture::paint(int x, int y, int h1, variant element, int count) const {

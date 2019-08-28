@@ -313,3 +313,50 @@ bool playeri::recruit(monster_s unit, int& count, int maximum) {
 	}
 	return getresult() != 0;
 }
+
+void armyi::paintsmall(const rect& rc, bool show_count, bool show_text) const {
+	const auto maximum = sizeof(units) / sizeof(units[0]);
+	state		push;
+	picture		sprites[maximum];
+	int			values[maximum];
+	unsigned	count = 0;
+	font = SMALFONT;
+	for(auto& e : units) {
+		if(!e)
+			continue;
+		sprites[count].clear();
+		sprites[count].res = MONS32;
+		sprites[count].frame = e.unit;
+		sprites[count].setsize();
+		if(show_count)
+			sprites[count].size.y += texth();
+		values[count] = e.count;
+		count++;
+	}
+	auto width_total = rc.width();
+	auto height_total = rc.height();
+	auto index = 0;
+	auto height = sprites->gettotalheight(count, width_total);
+	auto y = rc.y1 + (rc.height() - height)/2;
+	//rectb(rc, 214);
+	//rectb({rc.x1, y, rc.x2, y + height}, 214);
+	while(count>0) {
+		int width = 0, height = 0;
+		auto count_per_line = sprites->getsize(count, width, height, width_total);
+		auto x1 = rc.x1 + (width_total - width) / 2;
+		for(unsigned i = 0; i < count_per_line; i++) {
+			auto& e = sprites[index];
+			auto y1 = y + height - e.size.y;
+			image(x1 + (e.size.x - getwidth(e.res, e.frame)) / 2, y1, e.res, e.frame, AFNoOffset);
+			if(show_count) {
+				char temp[32];
+				zprint(temp, "%1i", values[index]);
+				text(x1 + (e.size.x - textw(temp)) / 2, y1 + e.size.y - texth(), temp);
+			}
+			x1 += sprites[index].size.x;
+			index++;
+		}
+		y += sprites[index].size.y;
+		count -= count_per_line;
+	}
+}

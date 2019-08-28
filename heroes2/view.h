@@ -65,12 +65,15 @@ struct picture {
 	unsigned char			frame;
 	point					size;
 	const char*				format;
+	//
+	void					clear();
+	int						gettotalheight(unsigned count, int width_per_line) const;
+	unsigned				getsize(unsigned count, int& width, int& height, int width_per_line) const;
 	void					paint(int x, int y, int h1, variant element, int count) const;
+	void					render(int x, int y, res_s res, int frame) const;
 	void					set(const variant id);
 	void					setsize(res_s res, unsigned char frame);
 	void					setsize() { setsize(res, frame); }
-private:
-	void					render(int x, int y, res_s res, int frame) const;
 };
 struct animation {
 	point					pos;

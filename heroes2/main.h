@@ -173,7 +173,7 @@ enum spell_type_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Ability, Artifact, Hero,  Monster, Resource, Skill, Spell, Stat, Tag,
+	Ability, Artifact, CastleVar, Hero, Index, Monster, Player, Resource, Skill, Spell, Stat, Tag,
 };
 enum activity_s : unsigned char {
 	NotAllowed,
@@ -281,6 +281,7 @@ struct armyi {
 	bool					is(monster_s v) const { return find(v) != 0; }
 	bool					is(tag_s v) const;
 	void					paint(int x, int y, const heroi* hero = 0, bool allow_change = true) const;
+	void					paintsmall(const rect& rc, bool show_count, bool show_text) const;
 };
 class playeri : public namei {
 	kind_s					kind;
@@ -505,6 +506,22 @@ struct hightscore {
 struct variantcol {
 	variant					element;
 	int						count;
+};
+struct pvar {
+	variant_s				type;
+	union {
+		castlei*			castle;
+		heroi*				hero;
+		playeri*			player;
+		short unsigned		index;
+		int					value;
+	};
+	constexpr pvar() : type(NoVariant), value(0) {}
+	constexpr pvar(playeri* v) : type(Player), player(v) {}
+	constexpr pvar(heroi* v) : type(Hero), hero(v) {}
+	constexpr pvar(castlei* v) : type(CastleVar), castle(v) {}
+	constexpr bool operator==(const pvar& e) const { return type == e.type && value == e.value; }
+	constexpr explicit operator bool() const { return type != NoVariant; }
 };
 namespace map {
 extern point				camera;

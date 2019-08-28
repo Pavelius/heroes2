@@ -2,8 +2,7 @@
 
 using namespace draw;
 
-static heroi*		current_hero;
-static playeri*		current_player;
+static pvar			cvar;
 const unsigned		delay_information = 8;
 const int			map_sx = 14;
 const int			map_sy = 14;
@@ -19,10 +18,10 @@ static void information_hero() {
 }
 
 static void choose_hero() {
-	current_hero = (heroi*)hot::param;
-	if(!current_hero)
+	cvar = (heroi*)hot::param;
+	if(!cvar)
 		return;
-	map::setcamera(current_hero->getpos());
+	map::setcamera(cvar.hero->getpos());
 }
 
 static struct castlec : public list {
@@ -85,10 +84,10 @@ static struct heroc : public list {
 			image(x - 1, y, MINIPORT, p->getportrait());
 			image(x + 4, y + 5, MOBILITY, imin(1000 / 100, 25));
 			image(x + 43, y + 5, MANA, imin(20 / 5, 25));
-			if(current_hero == p)
+			if(cvar.hero == p)
 				rectb({x - 1, y, x + 54, y + 31}, 214);
 			if(mousein({x, y, x + 54, y + 31})) {
-				if(hot::key==MouseLeft && hot::pressed)
+				if(hot::key == MouseLeft && hot::pressed)
 					draw::execute(choose_hero, (int)data[index]);
 				else if(hot::key == MouseLeftDBL && hot::pressed)
 					draw::execute(information_hero, (int)data[index]);
@@ -183,6 +182,32 @@ static void change_mode() {
 	show_information = 0;
 }
 
+static void information_resource(int x, int y, resource_s id, const playeri* player) {
+	char temp[16];
+	auto& cost = ((playeri*)player)->getresources();
+	zprint(temp, "%1i", cost.get(id));
+	text(x - draw::textw(temp) / 2, y, temp);
+}
+
+static void paint_kindom(int x, int y, const playeri* player) {
+	state push;
+	font = SMALFONT;
+	image(x, y, RESSMALL, 0);
+	text(x + 26, y + 31, "1"); // castle
+	text(x + 78, y + 31, "0"); // town
+	information_resource(x + 122, y + 31, Gold, player);
+	information_resource(x + 14, y + 61, Wood, player);
+	information_resource(x + 35, y + 61, Mercury, player);
+	information_resource(x + 59, y + 61, Ore, player);
+	information_resource(x + 82, y + 61, Sulfur, player);
+	information_resource(x + 106, y + 61, Crystal, player);
+	information_resource(x + 128, y + 61, Gems, player);
+}
+
+static void paint_army(int x, int y, const armyi& e) {
+	e.paintsmall({x+2, y+2, x + 142, y + 70}, true, false);
+}
+
 static void paint_information(int x, int y, const playeri* player) {
 	y += paint_buttons(x, y, player);
 	auto mouse_in_info = mousein({x, y, x + 142, y + 4 * 36});
@@ -202,20 +227,10 @@ static void paint_information(int x, int y, const playeri* player) {
 			textf(x + 2, y + 8, 142 - 4, info_text);
 		if(hot::key == InputTimer)
 			show_information--;
-	} else if(true) {
-		state push;
-		font = SMALFONT;
-		image(x, y, RESSMALL, 0);
-		text(x + 26, y + 31, "1"); // castle
-		text(x + 78, y + 31, "0"); // town
-		//information_resource(x + 122, y + 31, Gold, player);
-		//information_resource(x + 14, y + 61, Wood, player);
-		//information_resource(x + 35, y + 61, Mercury, player);
-		//information_resource(x + 59, y + 61, Ore, player);
-		//information_resource(x + 82, y + 61, Sulfur, player);
-		//information_resource(x + 106, y + 61, Crystal, player);
-		//information_resource(x + 128, y + 61, Gems, player);
-	}
+	} else if(cvar.type == Hero)
+		paint_army(x, y, *cvar.hero);
+	else
+		paint_kindom(x, y, player);
 }
 
 void map::setcamera(short unsigned index) {

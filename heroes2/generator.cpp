@@ -29,13 +29,13 @@ static unsigned char get(unsigned char* source, unsigned char source_count, allo
 
 static bool allow_artifact(unsigned char i, int level) {
 	if(level == 0)
-		return true;
+		return bsmeta<artifacti>::elements[i].level != 4;
 	return bsmeta<artifacti>::elements[i].level == level;
 }
 
 static bool allow_monster(unsigned char i, int level) {
 	if(level == 0)
-		return true;
+		return bsmeta<artifacti>::elements[i].level != 4;
 	return bsmeta<monsteri>::elements[i].level == level;
 }
 

@@ -18,6 +18,8 @@ void drawable::paint() const {
 			image(x - 32, y, OBJNRSRC, object.moveable->element.resource * 2);
 			image(x, y, OBJNRSRC, object.moveable->element.resource * 2 + 1);
 			break;
+		case Artifact:
+			break;
 		}
 		break;
 	default:

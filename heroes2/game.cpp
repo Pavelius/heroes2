@@ -428,7 +428,7 @@ void add_moveable(short unsigned index, variant v, short unsigned quantity = 0);
 
 void gamei::prepare() {
 	generator generate;
-	static resource_s decode_resource[] = {Wood, Mercury, Ore, Sulfur, Crystal, Gems, Gold, Gold, Gold, Gold};
+	static resource_s decode_resource[] = {Wood, Mercury, Ore, Sulfur, Crystal, Gems, Gold};
 	char temp[260]; zprint(temp, "maps/%1.mp2", file);
 	io::file st(temp);
 	if(!st)
@@ -657,7 +657,7 @@ void gamei::prepare() {
 			add_moveable(i1, generate.artifact(m - mp2obj(RndArtifact1) + 1), 0);
 			break;
 		case mp2obj(RndUltimateArtifact):
-			//add_moveable(i1, generate.artifact(4), 0);
+			add_moveable(i1, generate.artifact(4), 0);
 			break;
 		case mp2obj(Resource):
 			ms = tiles[i].indexName1 / 2;

@@ -428,7 +428,7 @@ void add_moveable(short unsigned index, variant v, short unsigned quantity = 0);
 
 void gamei::prepare() {
 	generator generate;
-	//static map_object_s decode_resource[] = {Wood, Mercury, Ore, Sulfur, Crystal, Gems, Gold, AncientLamp, Resource, TreasureChest};
+	static resource_s decode_resource[] = {Wood, Mercury, Ore, Sulfur, Crystal, Gems, Gold, Gold, Gold, Gold};
 	char temp[260]; zprint(temp, "maps/%1.mp2", file);
 	io::file st(temp);
 	if(!st)
@@ -631,6 +631,7 @@ void gamei::prepare() {
 	for(short unsigned i = 0; i < tiles_count; i++) {
 		auto i1 = mp2i(i);
 		auto m = tiles[i].generalObject;
+		int ms;
 		switch(m) {
 		case mp2obj(MonsterObject):
 			add_moveable(i1, generate.add(monster_s(FirstMonster + tiles[i].indexName1)), 0);
@@ -659,7 +660,9 @@ void gamei::prepare() {
 			//add_moveable(i1, game::random::artifact(4), 0);
 			break;
 		case mp2obj(Resource):
-			//add_moveable(i1, decode_resource[tiles[i].indexName1 / 2], 0);
+			ms = tiles[i].indexName1 / 2;
+			if(ms<sizeof(decode_resource)/ sizeof(decode_resource[0]))
+				add_moveable(i1, decode_resource[ms], 0);
 			break;
 		case mp2obj(RndResource):
 			//add_moveable(i1, xrand(FirstResource, LastResource), 0);

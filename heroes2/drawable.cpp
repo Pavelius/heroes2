@@ -15,7 +15,8 @@ void drawable::paint() const {
 			image(x, y, object.moveable->element.monster, object.moveable->index);
 			break;
 		case Resource:
-
+			image(x - 32 - 16, y - 16, OBJNRSRC, object.moveable->element.resource * 2);
+			image(x - 16, y - 16, OBJNRSRC, object.moveable->element.resource * 2 + 1);
 			break;
 		}
 		break;

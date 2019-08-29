@@ -804,10 +804,10 @@ void draw::image(int x, int y, monster_s id, int n, unsigned flags) {
 	image(x, y, MINIMON, id * 9, flags);
 	switch(1) {
 	case 1:
-		image(x, y, MINIMON, id * 9 + 1 + monster_animation_cicl1[(counter + n * n) % (sizeof(monster_animation_cicl1) / sizeof(monster_animation_cicl1[0]))], flags);
+		image(x, y, MINIMON, id * 9 + 1 + monster_animation_cicl1[(counter/2 + n * n) % (sizeof(monster_animation_cicl1) / sizeof(monster_animation_cicl1[0]))], flags);
 		break;
 	default:
-		image(x, y, MINIMON, id * 9 + 1 + monster_animation_cicle[(counter + n * n) % (sizeof(monster_animation_cicle) / sizeof(monster_animation_cicle[0]))], flags);
+		image(x, y, MINIMON, id * 9 + 1 + monster_animation_cicle[(counter/2 + n * n) % (sizeof(monster_animation_cicle) / sizeof(monster_animation_cicle[0]))], flags);
 		break;
 	}
 }

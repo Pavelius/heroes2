@@ -267,6 +267,22 @@ void map::setcamera(short unsigned index) {
 	correct_camera();
 }
 
+static void paint_objects(const rect& rcmap, point camera) {
+	rect rc = {rcmap.x1 - 32, rcmap.y1 - 32, rcmap.x2 + 64, rcmap.y2 + 64};
+	state push;
+	clipping = rcmap;
+	for(unsigned i = 0; i < bsmeta<moveablei>::count; i++) {
+		auto& e = bsmeta<moveablei>::elements[i];
+		drawable dw;
+		dw.object = &e;
+		dw.x = map::i2x(e.index) * 32 + 16 - camera.x;
+		dw.y = map::i2y(e.index) * 32 + 16 - camera.y;
+		if(!dw.in(rc))
+			continue;
+		dw.paint();
+	}
+}
+
 static void paint_screen(const playeri* player) {
 	image(0, 0, isevil(ADVBORDE, ADVBORD), 0, 0);
 	minimap(480, 16, 0);
@@ -274,7 +290,7 @@ static void paint_screen(const playeri* player) {
 	castles.draw(553, 176, 56, 32);
 	paint_information(480, 320, player);
 	paint_tiles(rcmap, map::camera);
-	//paint_objects(drawables, rcmap, map::camera);
+	paint_objects(rcmap, map::camera);
 	//paint_route(rcmap, map::camera);
 }
 

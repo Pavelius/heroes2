@@ -60,6 +60,11 @@ struct buttoni {
 	unsigned char			hilite;
 	unsigned char			pressed;
 };
+struct drawable : point {
+	pvar					object;
+	void					border() const;
+	void					paint() const;
+};
 struct picture {
 	res_s					res;
 	unsigned char			frame;

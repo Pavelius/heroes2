@@ -178,7 +178,8 @@ enum spell_type_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Ability, Artifact, CastleVar, Hero, Index, Monster, Player, Resource, Skill, Spell, Stat, Tag,
+	Ability, Artifact, CastleVar, Hero, Index, Monster, Moveable,
+	Player, Resource, Skill, Spell, Stat, Tag,
 };
 enum activity_s : unsigned char {
 	NotAllowed,
@@ -535,13 +536,15 @@ struct pvar {
 		castlei*			castle;
 		heroi*				hero;
 		playeri*			player;
+		moveablei*			moveable;
 		short unsigned		index;
 		int					value;
 	};
 	constexpr pvar() : type(NoVariant), value(0) {}
-	constexpr pvar(playeri* v) : type(Player), player(v) {}
-	constexpr pvar(heroi* v) : type(Hero), hero(v) {}
 	constexpr pvar(castlei* v) : type(CastleVar), castle(v) {}
+	constexpr pvar(heroi* v) : type(Hero), hero(v) {}
+	constexpr pvar(playeri* v) : type(Player), player(v) {}
+	constexpr pvar(moveablei* v) : type(Moveable), moveable(v) {}
 	constexpr bool operator==(const pvar& e) const { return type == e.type && value == e.value; }
 	constexpr explicit operator bool() const { return type != NoVariant; }
 };

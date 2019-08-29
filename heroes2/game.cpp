@@ -428,7 +428,7 @@ void add_moveable(short unsigned index, variant v, short unsigned quantity = 0);
 
 void gamei::prepare() {
 	generator generate;
-	static resource_s decode_resource[] = {Wood, Mercury, Ore, Sulfur, Crystal, Gems, Gold};
+	static resource_s decode_resource[] = {Gold, Wood, Mercury, Ore, Sulfur, Crystal, Gems};
 	char temp[260]; zprint(temp, "maps/%1.mp2", file);
 	io::file st(temp);
 	if(!st)
@@ -497,8 +497,7 @@ void gamei::prepare() {
 				if(sizeblock == sizeof(mp2::castle)) {
 					auto p = castlei::add();
 					load_object(*p, *((mp2::castle*)pblock));
-					//game::random::spells(rec);
-					//bsset(rec, Index, mp2i(findobject));
+					p->setpos(mp2i(findobject));
 				}
 				break;
 			case mp2obj(Hero):
@@ -631,7 +630,6 @@ void gamei::prepare() {
 	for(short unsigned i = 0; i < tiles_count; i++) {
 		auto i1 = mp2i(i);
 		auto m = tiles[i].generalObject;
-		int ms;
 		switch(m) {
 		case mp2obj(MonsterObject):
 			add_moveable(i1, generate.add(monster_s(FirstMonster + tiles[i].indexName1)), 0);
@@ -660,29 +658,31 @@ void gamei::prepare() {
 			add_moveable(i1, generate.artifact(4), 0);
 			break;
 		case mp2obj(Resource):
-			ms = tiles[i].indexName1 / 2;
-			if(ms<sizeof(decode_resource)/ sizeof(decode_resource[0]))
-				add_moveable(i1, decode_resource[ms], 0);
+			if(isresource(tiles[i].objectName1)) {
+				auto ms = tiles[i].indexName1 / 2;
+				if(ms < sizeof(decode_resource) / sizeof(decode_resource[0]))
+					add_moveable(i1, decode_resource[ms], 0);
+			}
 			break;
 		case mp2obj(RndResource):
 			add_moveable(i1, generate.resource(), 0);
 			break;
 		case mp2obj(TreasureChest):
-			//if(res::map(tiles[i].objectName1) == res::OBJNRSRC) {
-			//	int quantity = tiles[i].quantity1;
-			//	if(!quantity) {
-			//		int percent = d100();
-			//		if(percent < 75) // Золото
-			//			quantity = rand() % 4;
-			//		else if(percent < 95)
-			//			quantity = game::random::artifact(1);
-			//		else {
-			//			static tokens bad_artifacts[] = {TaxLien, FizbinMesfortune, HideousMask};
-			//			quantity = bad_artifacts[rand() % sizeof(bad_artifacts) / sizeof(bad_artifacts[0])];
-			//		}
-			//	}
-			//	add_moveable(i1, TreasureChest, quantity);
-			//}
+			if(isresource(tiles[i].objectName1)) {
+				auto quantity = tiles[i].quantity1;
+				if(!quantity) {
+					auto percent = d100();
+					if(percent < 75) // Золото
+						quantity = rand() % 4;
+					else if(percent < 95)
+						quantity = generate.artifact(1);
+					else {
+						static artifact_s bad_artifacts[] = {TaxLien, FizbinMesfortune, HideousMask};
+						quantity = bad_artifacts[rand() % sizeof(bad_artifacts) / sizeof(bad_artifacts[0])];
+					}
+				}
+				add_moveable(i1, TreasureChest, quantity);
+			}
 			break;
 		}
 	}
@@ -695,9 +695,9 @@ void gamei::prepare() {
 				continue;
 			auto hero = e.randomhire(0);
 			hero->set(&e);
-			//auto castle = bsfind(FirstCastle, Player, player);
-			//if(castle)
-			//	game::hire(0, player, bsget(castle, Index));
+			auto castle = castlei::find(&e);
+			if(castle)
+				hero->setpos(castle->getpos());
 		}
 	}
 	delete tiles;

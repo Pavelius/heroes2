@@ -178,7 +178,7 @@ enum spell_type_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Ability, Artifact, CastleVar, Hero, Index, Monster, Moveable,
+	Ability, Artifact, CastleVar, Hero, Index, MapObject, Monster, Moveable,
 	Player, Resource, Skill, Spell, Stat, Tag,
 };
 enum activity_s : unsigned char {
@@ -215,6 +215,7 @@ struct variant {
 		spell_s				spell;
 		resource_s			resource;
 		tag_s				tag;
+		map_object_s		mapobject;
 		monster_s			monster;
 		unsigned char		value;
 	};
@@ -222,6 +223,7 @@ struct variant {
 	constexpr variant(ability_s v) : type(Ability), ability(v) {}
 	constexpr variant(artifact_s v) : type(Artifact), artifact(v) {}
 	constexpr variant(hero_s v) : type(Hero), hero(v) {}
+	constexpr variant(map_object_s v) : type(MapObject), mapobject(v) {}
 	constexpr variant(monster_s v) : type(Monster), monster(v) {}
 	constexpr variant(resource_s v) : type(Resource), resource(v) {}
 	constexpr variant(skill_s v) : type(Skill), skill(v) {}
@@ -395,6 +397,7 @@ public:
 	int						get(ability_s v) const;
 	int						get(skill_s v) const { return skills[v]; }
 	int						getcost(spell_s v) const;
+	direction_s				getdirection() const { return direction; }
 	hero_s					getid() const { return hero_s(this - bsmeta<heroi>::elements); }
 	kind_s					getkind() const;
 	unsigned char			getportrait() const { return portrait; }
@@ -416,6 +419,7 @@ class castlei : public namei, public armyi {
 	spellbooki				mageguild;
 	kind_s					kind;
 	player_s				player;
+	short unsigned			index;
 	short unsigned			population[6];
 	building_s				getupgraded(building_s v) const;
 	void					paint_panel(int x, int y, const heroi* hero) const;
@@ -429,6 +433,7 @@ public:
 	void					build();
 	bool					build(building_s building, bool confirm);
 	void					clear();
+	static castlei*			find(const playeri* player, castlei* first = 0);
 	static building_s		getbase(building_s v);
 	static const costi&		getcost(building_s v, kind_s k);
 	static const char*		getdescription(building_s v, kind_s k);
@@ -438,6 +443,7 @@ public:
 	kind_s					getkind() const { return kind; }
 	static monster_s		getmonster(building_s building, kind_s kind);
 	playeri*				getplayer() const { return bsmeta<playeri>::elements + player; }
+	short unsigned			getpos() const { return index; }
 	static cflags<building_s> getprereqisit(building_s v, kind_s k);
 	static int				getstatueincome() { return 250; }
 	static int				gettavernmorale() { return 1; }
@@ -455,6 +461,7 @@ public:
 	void					set(const playeri* v) { player = (v ? v->getid() : RandomPlayer); }
 	void					set(building_s v) { buildings.add(v); }
 	void					set(kind_s v) { kind = v; }
+	void					setpos(short unsigned v) { index = v; }
 	void					show();
 	void					well();
 	void					remove(building_s v) { buildings.remove(v); }
@@ -511,6 +518,7 @@ struct gamei {
 	void					clear();
 	int						getplayers() const;
 	bool					isallow(int index) const { return types[index] != NotAllowed; }
+	static bool				isresource(unsigned char object);
 	bool					load(const char* filename);
 	static void				newgame();
 	void					prepare();

@@ -22,6 +22,16 @@ static building_s buildings_downgrade[NoBuilding + 1] = {
 	MageGuild, MageGuild2, MageGuild3, MageGuild4, NoBuilding
 };
 
+castlei* castlei::find(const playeri* player, castlei* first) {
+	for(auto& e : bsmeta<castlei>::elements) {
+		if(!e)
+			continue;
+		if(e.getplayer() == player)
+			return &e;
+	}
+	return 0;
+}
+
 void castlei::clear() {
 	memset(this, 0, sizeof(*this));
 }

@@ -31,5 +31,5 @@ extern "C" void						srand(unsigned seed); // Set random seed
 extern "C" int						strcmp(const char* s1, const char* s2); // Compare two strings
 extern "C" int						system(const char* command); // Execute system command
 //
-inline int							xrand(int i1, int i2) { return 11 + (rand() % (i2-i1+1)); }
+inline int							xrand(int v1, int v2) { return v1 + (rand() % (v2 - v1 + 1)); }
 inline int							d100() { return rand() % 100; }

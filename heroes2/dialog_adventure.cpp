@@ -281,6 +281,17 @@ static void paint_objects(const rect& rcmap, point camera) {
 			continue;
 		dw.paint();
 	}
+	for(auto i = FirstHero; i <= LastHero; i = (hero_s)(i+1)) {
+		auto& e = bsmeta<heroi>::elements[i];
+		drawable dw;
+		dw.object = &e;
+		auto index = e.getpos();
+		dw.x = map::i2x(index) * 32 + 16 - camera.x;
+		dw.y = map::i2y(index) * 32 + 30 - camera.y;
+		if(!dw.in(rc))
+			continue;
+		dw.paint();
+	}
 }
 
 static void paint_screen(const playeri* player) {

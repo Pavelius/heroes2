@@ -193,6 +193,7 @@ const icn::record*			get(res_s id, int n);
 rect						get(res_s id, int n, int x, int y, unsigned flags);
 res_s						getbuildings(kind_s v);
 int							getheight(res_s id, int n);
+res_s						getres(unsigned char object);
 int							getresult();
 int							getwidth(res_s id, int n);
 void						hexagon(int x, int y, unsigned char m);

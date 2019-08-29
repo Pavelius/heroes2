@@ -28,6 +28,8 @@ static unsigned char get(unsigned char* source, unsigned char source_count, allo
 }
 
 static bool allow_artifact(unsigned char i, int level) {
+	if(i == HideousMask || i == FizbinMesfortune || i == TaxLien)
+		return false;
 	if(level == 0)
 		return bsmeta<artifacti>::elements[i].level != 4;
 	return bsmeta<artifacti>::elements[i].level == level;

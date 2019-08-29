@@ -802,7 +802,7 @@ res_s draw::isevil(res_s evil, res_s good) {
 
 void draw::image(int x, int y, monster_s id, int n, unsigned flags) {
 	image(x, y, MINIMON, id * 9, flags);
-	switch(1) {
+	switch(0) {
 	case 1:
 		image(x, y, MINIMON, id * 9 + 1 + monster_animation_cicl1[(counter/2 + n * n) % (sizeof(monster_animation_cicl1) / sizeof(monster_animation_cicl1[0]))], flags);
 		break;

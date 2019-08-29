@@ -111,10 +111,10 @@ static void correct_camera() {
 		map::camera.x = 0;
 	if(map::camera.y < 0)
 		map::camera.y = 0;
-	if(map::camera.y >= (map::height - map_sy - 1) * 32)
-		map::camera.y = (map::height - map_sy - 1) * 32;
-	if(map::camera.x >= (map::width - map_sx - 1) * 32)
-		map::camera.x = (map::width - map_sy - 1) * 32;
+	if(map::camera.y >= (map::height - map_sy) * 32)
+		map::camera.y = (map::height - map_sy) * 32;
+	if(map::camera.x >= (map::width - map_sx) * 32)
+		map::camera.x = (map::width - map_sx) * 32;
 }
 
 static void move_camera() {

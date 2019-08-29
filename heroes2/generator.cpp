@@ -50,3 +50,7 @@ artifact_s generator::artifact(int level) {
 monster_s generator::monster(int level) {
 	return (monster_s)get(monsters, sizeof(monsters), allow_monster, level);
 }
+
+resource_s generator::resource() {
+	return resource_s(xrand(Gold, Gems));
+}

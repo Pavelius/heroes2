@@ -557,6 +557,7 @@ public:
 	monster_s				add(monster_s v) { monsters[v]++; return v; }
 	artifact_s				artifact(int level = 0);
 	monster_s				monster(int level = 0);
+	resource_s				resource();
 };
 namespace map {
 extern point				camera;

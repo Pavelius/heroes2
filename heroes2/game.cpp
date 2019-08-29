@@ -649,15 +649,15 @@ void gamei::prepare() {
 			add_moveable(i1, generate.add(artifact_s(FirstArtifact + (tiles[i].indexName1 - 1) / 2)), 0);
 			break;
 		case mp2obj(RndArtifact):
-			//add_moveable(i1, game::random::artifact(0), 0);
+			add_moveable(i1, generate.artifact(0), 0);
 			break;
 		case mp2obj(RndArtifact1):
 		case mp2obj(RndArtifact2):
 		case mp2obj(RndArtifact3):
-			//add_moveable(i1, game::random::artifact(m - mp2obj(RndArtifact1) + 1), 0);
+			add_moveable(i1, generate.artifact(m - mp2obj(RndArtifact1) + 1), 0);
 			break;
 		case mp2obj(RndUltimateArtifact):
-			//add_moveable(i1, game::random::artifact(4), 0);
+			//add_moveable(i1, generate.artifact(4), 0);
 			break;
 		case mp2obj(Resource):
 			ms = tiles[i].indexName1 / 2;
@@ -665,7 +665,7 @@ void gamei::prepare() {
 				add_moveable(i1, decode_resource[ms], 0);
 			break;
 		case mp2obj(RndResource):
-			//add_moveable(i1, xrand(FirstResource, LastResource), 0);
+			add_moveable(i1, generate.resource(), 0);
 			break;
 		case mp2obj(TreasureChest):
 			//if(res::map(tiles[i].objectName1) == res::OBJNRSRC) {

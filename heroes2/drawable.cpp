@@ -3,7 +3,7 @@
 using namespace draw;
 
 void drawable::border() const {
-	rectb({x - 16, y - 16, x + 16, y + 16}, 0x10);
+	rectb({x, y, x + 32, y + 32}, 0x10);
 }
 
 void drawable::paint() const {
@@ -12,11 +12,11 @@ void drawable::paint() const {
 		border();
 		switch(object.moveable->element.type) {
 		case Monster:
-			image(x, y, object.moveable->element.monster, object.moveable->index);
+			image(x + 16, y + 16, object.moveable->element.monster, object.moveable->index);
 			break;
 		case Resource:
-			image(x - 32 - 16, y - 16, OBJNRSRC, object.moveable->element.resource * 2);
-			image(x - 16, y - 16, OBJNRSRC, object.moveable->element.resource * 2 + 1);
+			image(x - 32, y, OBJNRSRC, object.moveable->element.resource * 2);
+			image(x, y, OBJNRSRC, object.moveable->element.resource * 2 + 1);
 			break;
 		}
 		break;

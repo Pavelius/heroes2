@@ -64,6 +64,7 @@ struct drawable : point {
 	pvar					object;
 	void					border() const;
 	void					paint() const;
+	static void				paint_castle(int x, int y, landscape_s tile, kind_s race, bool town, bool shadow);
 };
 struct picture {
 	res_s					res;

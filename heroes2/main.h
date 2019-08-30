@@ -2,6 +2,10 @@
 #include "crt.h"
 #include "point.h"
 
+enum index_s : unsigned short {
+	Blocked = 0xFFFF,
+};
+
 enum kind_s : unsigned char {
 	Barbarian, Knight, Necromancer, Sorcerer, Warlock, Wizard,
 	RandomKind,
@@ -204,6 +208,9 @@ enum direction_s : unsigned char {
 enum armysize_s {
 	Few, Several, Pack, Lots, Horde, Throng, Swarm, Zounds, Legion
 }; 
+enum landscape_s : unsigned char {
+	Beach, Desert, Dirt, Grass, Swamp, Snow, Sea, Lava, Waste,
+};
 class heroi;
 struct variant {
 	variant_s				type;
@@ -257,6 +264,7 @@ struct costi {
 };
 struct namei {
 	char					name[32];
+	constexpr operator bool() const { return name[0] != 0; }
 	const char*				getname() const { return name; }
 	void					setname(const char* v) { zcpy(name, v, sizeof(name) - 1); }
 };
@@ -427,7 +435,6 @@ class castlei : public namei, public armyi {
 	void					paint_name() const;
 	void					paint_monster(int x, int y, int height, int width, int level);
 public:
-	constexpr operator bool() const { return name[0] != 0; }
 	static castlei*			add();
 	void					add(monster_s id, unsigned short count) { armyi::add(id, count); }
 	void					build();
@@ -578,6 +585,7 @@ extern unsigned char		width;
 //
 void						clear();
 inline unsigned				getmonth() { return day / (7*4); }
+landscape_s					gettile(short unsigned index);
 inline unsigned				getweek() { return day / 7; }
 inline unsigned				getweekday() { return day % 7; }
 inline unsigned				getmonthweek() { return getweek() % 4; }

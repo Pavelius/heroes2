@@ -84,8 +84,6 @@ const costi	heroi::cost = {{2500}};
 void heroi::initialize() {
 	for(auto i = 0; i <= CaptainWizard; i++) {
 		bsmeta<heroi>::elements[i].clear();
-		bsmeta<heroi>::elements[i].player = RandomPlayer;
-		bsmeta<heroi>::elements[i].portrait = bsmeta<heroi>::elements[i].getid();
 	}
 }
 
@@ -108,6 +106,9 @@ void heroi::clear() {
 		add(MagicBook);
 		set(bsmeta<kindi>::elements[kind].spell);
 	}
+	player = RandomPlayer;
+	portrait = getid();
+	index = Blocked;
 }
 
 playeri* heroi::getplayer() const {

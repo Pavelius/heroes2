@@ -221,7 +221,7 @@ static void paint_kindom(int x, int y, const playeri* player) {
 }
 
 static void paint_army(int x, int y, const armyi& e) {
-	e.paintsmall({x+2, y+2, x + 142, y + 70}, true, false);
+	e.paintsmall({x + 2, y + 2, x + 142, y + 70}, true, false);
 }
 
 static void paint_information(int x, int y, const playeri* player) {
@@ -246,7 +246,7 @@ static void paint_information(int x, int y, const playeri* player) {
 	} else {
 		switch(info_type) {
 		case ObjectInfo:
-			if(cvar.type==Hero)
+			if(cvar.type == Hero)
 				paint_army(x, y, *cvar.hero);
 			else
 				paint_kindom(x, y, player);
@@ -275,19 +275,32 @@ static void paint_objects(const rect& rcmap, point camera) {
 		auto& e = bsmeta<moveablei>::elements[i];
 		drawable dw;
 		dw.object = &e;
-		dw.x = map::i2x(e.index) * 32 + 16 - camera.x;
-		dw.y = map::i2y(e.index) * 32 + 16 - camera.y;
+		dw.x = map::i2x(e.index) * 32 - camera.x + 16;
+		dw.y = map::i2y(e.index) * 32 - camera.y + 16;
 		if(!dw.in(rc))
 			continue;
 		dw.paint();
 	}
-	for(auto i = FirstHero; i <= LastHero; i = (hero_s)(i+1)) {
-		auto& e = bsmeta<heroi>::elements[i];
+	for(unsigned i = 0; i < bsmeta<castlei>::count; i++) {
+		auto& e = bsmeta<castlei>::elements[i];
 		drawable dw;
 		dw.object = &e;
 		auto index = e.getpos();
-		dw.x = map::i2x(index) * 32 + 16 - camera.x;
-		dw.y = map::i2y(index) * 32 + 30 - camera.y;
+		dw.x = map::i2x(index) * 32 - 32 * 2 - camera.x;
+		dw.y = map::i2y(index) * 32 - 32 * 4 - camera.y;
+		if(!dw.in(rc))
+			continue;
+		dw.paint();
+	}
+	for(auto i = FirstHero; i <= LastHero; i = (hero_s)(i + 1)) {
+		auto& e = bsmeta<heroi>::elements[i];
+		if(e.getpos() == Blocked)
+			continue;
+		drawable dw;
+		dw.object = &e;
+		auto index = e.getpos();
+		dw.x = map::i2x(index) * 32 - camera.x;
+		dw.y = map::i2y(index) * 32 - camera.y;
 		if(!dw.in(rc))
 			continue;
 		dw.paint();

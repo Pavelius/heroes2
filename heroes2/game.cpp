@@ -318,6 +318,7 @@ static void load_object(armyi& e, mp2::army& r) {
 
 static void load_object(castlei& e, mp2::castle& r) {
 	auto pla = index2player(r.player);
+	e.setname("Порталис");
 	e.set(bsmeta<playeri>::elements + pla);
 	e.set(index2race(r.race));
 	// custom building
@@ -378,7 +379,7 @@ static void load_object(castlei& e, mp2::castle& r) {
 	// name
 	if(r.has_name)
 		zcpy(e.name, e.name, sizeof(e.name));
-	if(r.castle_in_town)
+	if(!r.castle_in_town)
 		e.set(Castle);
 	// allow upgrade to castle (0 - true, 1 - false)
 	//bsset(rec, DisableCastleUpgrade, p->disable_castle_upgrade);

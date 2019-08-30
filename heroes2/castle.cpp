@@ -2,6 +2,7 @@
 #include "stringbuilder.h"
 
 castlei bsmeta<castlei>::elements[128];
+unsigned bsmeta<castlei>::count;
 
 static building_s buildings_upgrade[NoBuilding + 1] = {
 	NoBuilding, NoBuilding, NoBuilding, NoBuilding, NoBuilding, NoBuilding,
@@ -23,9 +24,8 @@ static building_s buildings_downgrade[NoBuilding + 1] = {
 };
 
 castlei* castlei::find(const playeri* player, castlei* first) {
-	for(auto& e : bsmeta<castlei>::elements) {
-		if(!e)
-			continue;
+	for(unsigned i = 0; i < bsmeta<castlei>::count; i++) {
+		auto& e = bsmeta<castlei>::elements[i];
 		if(e.getplayer() == player)
 			return &e;
 	}
@@ -142,11 +142,7 @@ int playeri::getbuildings(building_s v) const {
 }
 
 castlei* castlei::add() {
-	for(auto& e : bsmeta<castlei>::elements) {
-		if(!e)
-			return &e;
-	}
-	return 0;
+	return &bsmeta<castlei>::elements[bsmeta<castlei>::count++];
 }
 
 const costi& castlei::getcost(building_s v, kind_s k) {

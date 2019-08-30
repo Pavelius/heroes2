@@ -500,10 +500,6 @@ static mapitemi multiobj2[] = {{RiverDeltaDown, sh3x3u1r1},
 {SawMill, sh4x2}, // Green grass
 };
 
-enum landscape_s : unsigned char {
-	Grass, Lava, Swamp, Sea, Waste, Desert, Dirt, Snow,
-};
-
 static struct mapobjectset {
 	int			tile;
 	res_s		icn;

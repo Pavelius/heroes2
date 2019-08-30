@@ -83,6 +83,55 @@ static void paint_shad(int x, int y, direction_s direction, int index) {
 	image(x, y, icn, index_sprite + (index % 9));
 }
 
+void drawable::paint_castle(int x, int y, landscape_s tile, kind_s race, bool town, bool shadow) {
+	int index;
+	switch(tile) {
+	case Grass: index = 0; break;
+	case Snow: index = 10; break;
+	case Swamp: index = 20; break;
+	case Lava: index = 30; break;
+	case Desert: index = 40; break;
+	case Dirt: index = 50; break;
+	case Waste: index = 60; break;
+	default: index = 70; break;
+	}
+	// Paint background
+	for(int ii = 0; ii < 5; ++ii)
+		image(x + ii * 32, y + 3 * 32, OBJNTWBA, index + ii);
+	for(int ii = 0; ii < 5; ++ii)
+		image(x + ii * 32, y + 4 * 32, OBJNTWBA, index + 5 + ii);
+	// draw castle
+	switch(race) {
+	case Knight: index = 0; break;
+	case Barbarian: index = 32; break;
+	case Sorcerer: index = 64; break;
+	case Warlock: index = 96; break;
+	case Necromancer: index = 160; break;
+	default: index = 128; break;
+	}
+	if(town)
+		index += 16;
+	if(shadow) {
+		for(int iy = 0; iy < 4; iy++) {
+			for(int ix = -2; ix <= 1; ix++) {
+				int x1 = x + ix * 32;
+				int y1 = y + iy * 32;
+				if(iy == 3)
+					x1 += 32;
+				draw::image(x1, y1, OBJNTWSH, index + iy * 4 + (ix + 2));
+			}
+		}
+	}
+	// Town
+	image(x + 2 * 32, y, OBJNTOWN, index);
+	for(int ii = 0; ii < 5; ++ii)
+		image(x + ii * 32, y + 1 * 32, OBJNTOWN, index + 1 + ii);
+	for(int ii = 0; ii < 5; ++ii)
+		image(x + ii * 32, y + 2 * 32, OBJNTOWN, index + 6 + ii);
+	for(int ii = 0; ii < 5; ++ii)
+		image(x + ii * 32, y + 3 * 32, OBJNTOWN, index + 11 + ii);
+}
+
 void drawable::border() const {
 	rectb({x, y, x + 32, y + 32}, 0x10);
 }
@@ -90,9 +139,9 @@ void drawable::border() const {
 void drawable::paint() const {
 	static unsigned char decode_resource[] = {12, 0, 2, 4, 6, 8, 10, 16};
 	int i;
+	border();
 	switch(object.type) {
 	case Moveable:
-		//border();
 		switch(object.moveable->element.type) {
 		case Monster:
 			image(x + 16, y + 30, object.moveable->element.monster, object.moveable->index);
@@ -125,6 +174,11 @@ void drawable::paint() const {
 		paint_hero(x, y + 30, object.hero->getkind(), object.hero->getdirection(), false);
 		paint_flag(x, y + 30, object.hero->getplayer()->getid(), object.hero->getdirection(), draw::counter, true);
 		paint_shad(x, y + 30, object.hero->getdirection(), 0);
+		break;
+	case CastleVar:
+		paint_castle(x, y,
+			map::gettile(object.castle->getpos()),
+			object.castle->getkind(), object.castle->is(Castle), true);
 		break;
 	default:
 		break;

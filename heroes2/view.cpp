@@ -943,15 +943,15 @@ static void standart_domodal() {
 			status_text);
 	}
 #ifdef _DEBUG
-	static bool show_debug_view = true;
-	if(hot::key == Ctrl + Alpha + 'D')
-		show_debug_view = !show_debug_view;
-	if(show_debug_view) {
-		draw::state push;
-		font = SMALFONT;
-		char temp[100]; zprint(temp, "%1i, %2i", hot::mouse.x, hot::mouse.y);
-		text(2, 2, temp);
-	}
+	//static bool show_debug_view = true;
+	//if(hot::key == Ctrl + Alpha + 'D')
+	//	show_debug_view = !show_debug_view;
+	//if(show_debug_view) {
+	//	draw::state push;
+	//	font = SMALFONT;
+	//	char temp[100]; zprint(temp, "%1i, %2i", hot::mouse.x, hot::mouse.y);
+	//	text(2, 2, temp);
+	//}
 #endif
 	hot::key = sys_input(true);
 	switch(hot::key) {

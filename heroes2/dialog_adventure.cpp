@@ -9,7 +9,7 @@ enum infotype_s : unsigned char {
 };
 
 static pvar				cvar;
-static short unsigned	cindex;
+static short unsigned	hilite_index, current_index;
 const unsigned			delay_information = 8;
 const int				map_sx = 14;
 const int				map_sy = 14;
@@ -19,6 +19,53 @@ static rect				rcmap = {16, 16, 16 + 32 * 14, 16 + 32 * 14};
 static unsigned			show_message = delay_information;
 static unsigned			show_sunrise = delay_information;
 static infotype_s		info_type = ObjectInfo;
+static drawable			drawables[2048];
+static unsigned			drawables_count;
+
+static unsigned select_drawables(const rect& rcmap, point camera, drawable* source, unsigned count) {
+	rect rc = {rcmap.x1 - 32, rcmap.y1 - 32, rcmap.x2 + 64, rcmap.y2 + 64};
+	auto p = source;
+	auto pe = p + count;
+	for(unsigned i = 0; i < bsmeta<moveablei>::count; i++) {
+		auto& e = bsmeta<moveablei>::elements[i];
+		p->object = &e;
+		p->x = map::i2x(e.index) * 32 - camera.x + 16;
+		p->y = map::i2y(e.index) * 32 - camera.y + 16;
+		if(!p->in(rc))
+			continue;
+		if(p<pe)
+			p++;
+	}
+	for(unsigned i = 0; i < bsmeta<castlei>::count; i++) {
+		auto& e = bsmeta<castlei>::elements[i];
+		auto index = e.getpos();
+		p->object = &e;
+		p->x = map::i2x(index) * 32 - 32 * 2 - camera.x;
+		p->y = map::i2y(index) * 32 - 32 * 3 - camera.y;
+		if(!p->in(rc))
+			continue;
+		if(p<pe)
+			p++;
+	}
+	for(auto i = FirstHero; i <= LastHero; i = (hero_s)(i + 1)) {
+		auto& e = bsmeta<heroi>::elements[i];
+		if(e.getpos() == Blocked)
+			continue;
+		p->object = &e;
+		auto index = e.getpos();
+		p->x = map::i2x(index) * 32 - camera.x;
+		p->y = map::i2y(index) * 32 - camera.y;
+		if(!p->in(rc))
+			continue;
+		if(p<pe)
+			p++;
+	}
+	return p - source;
+}
+
+static void update_drawables() {
+	drawables_count = select_drawables(rcmap, map::camera, drawables, sizeof(drawables) / sizeof(drawables[0]));
+}
 
 static void information_hero() {
 	auto hero = (heroi*)hot::param;
@@ -116,6 +163,7 @@ static void correct_camera() {
 		map::camera.y = (map::height - map_sy) * 32;
 	if(map::camera.x >= (map::width - map_sx) * 32)
 		map::camera.x = (map::width - map_sx) * 32;
+	update_drawables();
 }
 
 static void move_camera() {
@@ -131,7 +179,7 @@ static void move_camera() {
 static void paint_tiles(rect screen, point camera) {
 	draw::state push;
 	draw::clipping = screen;
-	cindex = Blocked;
+	hilite_index = Blocked;
 	auto x2 = camera.x + screen.width();
 	auto y2 = camera.y + screen.height();
 	for(int y = camera.y; y < y2; y += 32) {
@@ -140,9 +188,14 @@ static void paint_tiles(rect screen, point camera) {
 			auto x1 = x - camera.x + screen.x1;
 			auto y1 = y - camera.y + screen.y1;
 			imagt(x1, y1, TisGROUND32, map::tiles[index], map::flags[index] & 0x03);
-			if(mousein({x1, y1, x1 + 31, y1 + 31})) {
+			const rect rc = {x1, y1, x1 + 31, y1 + 31};
+			if(mousein(rc)) {
 				cvar = map::gettile(index);
-				cindex = index;
+				hilite_index = index;
+#ifdef _DEBUG
+				if(hilite_index == index)
+					rectb(rc, 0x10);
+#endif // _DEBUG
 			}
 		}
 	}
@@ -278,42 +331,18 @@ void map::setcamera(short unsigned index) {
 }
 
 static void paint_objects(const rect& rcmap, point camera) {
-	rect rc = {rcmap.x1 - 32, rcmap.y1 - 32, rcmap.x2 + 64, rcmap.y2 + 64};
 	state push;
 	clipping = rcmap;
-	for(unsigned i = 0; i < bsmeta<moveablei>::count; i++) {
-		auto& e = bsmeta<moveablei>::elements[i];
-		drawable dw;
-		dw.object = &e;
-		dw.x = map::i2x(e.index) * 32 - camera.x + 16;
-		dw.y = map::i2y(e.index) * 32 - camera.y + 16;
-		if(!dw.in(rc))
-			continue;
-		dw.paint();
-	}
-	for(unsigned i = 0; i < bsmeta<castlei>::count; i++) {
-		auto& e = bsmeta<castlei>::elements[i];
-		drawable dw;
-		dw.object = &e;
-		auto index = e.getpos();
-		dw.x = map::i2x(index) * 32 - 32 * 2 - camera.x;
-		dw.y = map::i2y(index) * 32 - 32 * 3 - camera.y;
-		if(!dw.in(rc))
-			continue;
-		dw.paint();
-	}
-	for(auto i = FirstHero; i <= LastHero; i = (hero_s)(i + 1)) {
-		auto& e = bsmeta<heroi>::elements[i];
-		if(e.getpos() == Blocked)
-			continue;
-		drawable dw;
-		dw.object = &e;
-		auto index = e.getpos();
-		dw.x = map::i2x(index) * 32 - camera.x;
-		dw.y = map::i2y(index) * 32 + 30 - camera.y;
-		if(!dw.in(rc))
-			continue;
-		dw.paint();
+	for(unsigned i = 0; i < drawables_count; i++)
+		drawables[i].paint();
+}
+
+static void paint_debug() {
+	if(hilite_index != Blocked) {
+		char temp[260]; zprint(temp, "%1i (%2i, %3i)", hilite_index, map::i2x(hilite_index), map::i2y(hilite_index));
+		auto pf = font;
+		font = SMALFONT;
+		text(4, 4, temp);
 	}
 }
 
@@ -326,6 +355,7 @@ static void paint_screen(const playeri* player) {
 	paint_tiles(rcmap, map::camera);
 	paint_objects(rcmap, map::camera);
 	//paint_route(rcmap, map::camera);
+	paint_debug();
 }
 
 static void update_lists(const playeri* player) {
@@ -343,6 +373,7 @@ void playeri::quickmessage(const costi& cost, const char* format, ...) {
 }
 
 void playeri::adventure() {
+	update_drawables();
 	update_lists(this);
 	quickmessage({}, "Ход начал %1 игрок", getname());
 	while(ismodal()) {

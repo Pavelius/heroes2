@@ -697,8 +697,10 @@ void gamei::prepare() {
 			auto hero = e.randomhire(0);
 			hero->set(&e);
 			auto castle = castlei::find(&e);
-			if(castle)
+			if(castle) {
 				hero->setpos(castle->getpos());
+				hero->set(Up);
+			}
 		}
 	}
 	delete tiles;

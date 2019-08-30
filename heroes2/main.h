@@ -558,9 +558,9 @@ struct pvar : variant {
 	};
 	constexpr pvar() : variant(), value(0) {}
 	template<class T> constexpr pvar(const T v) : variant(v) {}
-	constexpr pvar(castlei* v) : variant(), castle(v) {}
-	constexpr pvar(heroi* v) : variant(Hero, v->getid()), hero(v) {}
-	constexpr pvar(playeri* v) : variant(Player, v->getid()), player(v) {}
+	constexpr pvar(castlei* v) : variant(CastleVar, 0), castle(v) {}
+	constexpr pvar(heroi* v) : variant(Hero, 0), hero(v) {}
+	constexpr pvar(playeri* v) : variant(Player, 0), player(v) {}
 	constexpr pvar(moveablei* v) : variant(Moveable, 0), moveable(v) {}
 	constexpr bool operator==(const pvar& e) const { return type == e.type && value == e.value; }
 	constexpr explicit operator bool() const { return type != NoVariant; }

@@ -171,9 +171,9 @@ void drawable::paint() const {
 		}
 		break;
 	case Hero:
-		paint_hero(x, y, object.hero->getkind(), object.hero->getdirection(), false);
-		paint_flag(x, y, object.hero->getplayer()->getid(), object.hero->getdirection(), draw::counter, true);
-		paint_shad(x, y, object.hero->getdirection(), 0);
+		paint_hero(x + 16, y, object.hero->getkind(), object.hero->getdirection(), false);
+		paint_flag(x + 16, y, object.hero->getplayer()->getid(), object.hero->getdirection(), draw::counter, true);
+		paint_shad(x + 16, y, object.hero->getdirection(), 0);
 		break;
 	case CastleVar:
 		paint_castle(x + 16, y + 16,

@@ -78,6 +78,7 @@ static void main_menu() {
 
 int main() {
 	//setevil(true);
+	return 0;
 	if(!draw::create("test", 190, false))
 		return -1;
 	main_menu();

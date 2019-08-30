@@ -8,16 +8,17 @@ enum infotype_s : unsigned char {
 	LastInfo = ObjectInfo,
 };
 
-static pvar			cvar;
-const unsigned		delay_information = 8;
-const int			map_sx = 14;
-const int			map_sy = 14;
-static char			info_text[512];
-static costi		info_cost;
-static rect			rcmap = {16, 16, 16 + 32 * 14, 16 + 32 * 14};
-static unsigned		show_message = delay_information;
-static unsigned		show_sunrise = delay_information;
-static infotype_s	info_type = ObjectInfo;
+static pvar				cvar;
+static short unsigned	cindex;
+const unsigned			delay_information = 8;
+const int				map_sx = 14;
+const int				map_sy = 14;
+static char				info_text[512];
+static costi			info_cost;
+static rect				rcmap = {16, 16, 16 + 32 * 14, 16 + 32 * 14};
+static unsigned			show_message = delay_information;
+static unsigned			show_sunrise = delay_information;
+static infotype_s		info_type = ObjectInfo;
 
 static void information_hero() {
 	auto hero = (heroi*)hot::param;
@@ -130,13 +131,19 @@ static void move_camera() {
 static void paint_tiles(rect screen, point camera) {
 	draw::state push;
 	draw::clipping = screen;
+	cindex = Blocked;
 	auto x2 = camera.x + screen.width();
 	auto y2 = camera.y + screen.height();
 	for(int y = camera.y; y < y2; y += 32) {
 		for(int x = camera.x; x < x2; x += 32) {
 			int index = map::m2i(x / 32, y / 32);
-			imagt(x - camera.x + screen.x1, y - camera.y + screen.y1,
-				TisGROUND32, map::tiles[index], map::flags[index] & 0x03);
+			auto x1 = x - camera.x + screen.x1;
+			auto y1 = y - camera.y + screen.y1;
+			imagt(x1, y1, TisGROUND32, map::tiles[index], map::flags[index] & 0x03);
+			if(mousein({x1, y1, x1 + 31, y1 + 31})) {
+				cvar = map::gettile(index);
+				cindex = index;
+			}
 		}
 	}
 	switch(hot::key) {

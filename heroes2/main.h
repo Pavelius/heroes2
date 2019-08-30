@@ -182,7 +182,7 @@ enum spell_type_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Ability, Artifact, CastleVar, Hero, Index, MapObject, Monster, Moveable,
+	Ability, Artifact, CastleVar, Hero, Index, Landscape, MapObject, Monster, Moveable,
 	Player, Resource, Skill, Spell, Stat, Tag,
 };
 enum activity_s : unsigned char {
@@ -218,6 +218,7 @@ struct variant {
 		ability_s			ability;
 		artifact_s			artifact;
 		hero_s				hero;
+		landscape_s			landscape;
 		skill_s				skill;
 		spell_s				spell;
 		resource_s			resource;
@@ -227,9 +228,11 @@ struct variant {
 		unsigned char		value;
 	};
 	constexpr variant() : type(NoVariant), value(0) {}
+	constexpr variant(variant_s t, unsigned char v) : type(t), value(v) {}
 	constexpr variant(ability_s v) : type(Ability), ability(v) {}
 	constexpr variant(artifact_s v) : type(Artifact), artifact(v) {}
 	constexpr variant(hero_s v) : type(Hero), hero(v) {}
+	constexpr variant(landscape_s v) : type(Landscape), landscape(v) {}
 	constexpr variant(map_object_s v) : type(MapObject), mapobject(v) {}
 	constexpr variant(monster_s v) : type(Monster), monster(v) {}
 	constexpr variant(resource_s v) : type(Resource), resource(v) {}
@@ -544,8 +547,7 @@ struct variantcol {
 	variant					element;
 	int						count;
 };
-struct pvar {
-	variant_s				type;
+struct pvar : variant {
 	union {
 		castlei*			castle;
 		heroi*				hero;
@@ -554,11 +556,12 @@ struct pvar {
 		short unsigned		index;
 		int					value;
 	};
-	constexpr pvar() : type(NoVariant), value(0) {}
-	constexpr pvar(castlei* v) : type(CastleVar), castle(v) {}
-	constexpr pvar(heroi* v) : type(Hero), hero(v) {}
-	constexpr pvar(playeri* v) : type(Player), player(v) {}
-	constexpr pvar(moveablei* v) : type(Moveable), moveable(v) {}
+	constexpr pvar() : variant(), value(0) {}
+	template<class T> constexpr pvar(const T v) : variant(v) {}
+	constexpr pvar(castlei* v) : variant(), castle(v) {}
+	constexpr pvar(heroi* v) : variant(Hero, v->getid()), hero(v) {}
+	constexpr pvar(playeri* v) : variant(Player, v->getid()), player(v) {}
+	constexpr pvar(moveablei* v) : variant(Moveable, 0), moveable(v) {}
 	constexpr bool operator==(const pvar& e) const { return type == e.type && value == e.value; }
 	constexpr explicit operator bool() const { return type != NoVariant; }
 };

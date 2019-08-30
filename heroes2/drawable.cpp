@@ -176,7 +176,7 @@ void drawable::paint() const {
 		paint_shad(x, y, object.hero->getdirection(), 0);
 		break;
 	case CastleVar:
-		paint_castle(x, y,
+		paint_castle(x + 16, y + 16,
 			map::gettile(object.castle->getpos()),
 			object.castle->getkind(), object.castle->is(Castle), true);
 		break;

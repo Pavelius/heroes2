@@ -130,10 +130,13 @@ static void move_camera() {
 static void paint_tiles(rect screen, point camera) {
 	draw::state push;
 	draw::clipping = screen;
-	for(int y = screen.y1; y < screen.y2; y += 32) {
-		for(int x = screen.x1; x < screen.x2; x += 32) {
-			int index = map::m2i((x + camera.x) / 32, (y + camera.y) / 32);
-			imagt(x, y, TisGROUND32, map::tiles[index], map::flags[index] & 0x03);
+	auto x2 = camera.x + screen.width();
+	auto y2 = camera.y + screen.height();
+	for(int y = camera.y; y < y2; y += 32) {
+		for(int x = camera.x; x < x2; x += 32) {
+			int index = map::m2i(x / 32, y / 32);
+			imagt(x - camera.x + screen.x1, y - camera.y + screen.y1,
+				TisGROUND32, map::tiles[index], map::flags[index] & 0x03);
 		}
 	}
 	switch(hot::key) {

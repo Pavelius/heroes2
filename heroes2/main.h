@@ -60,7 +60,6 @@ enum player_s : unsigned char {
 	RandomPlayer, MultiPlayer
 };
 enum artifact_s : unsigned char {
-	NoArtifact,
 	UltimateBook, UltimateSword, UltimateCloack, UltimateWand, UltimateShied, UltimateStaff, UltimateCrown, GoldenGoose,
 	ArcaneNecklage, CasterBracers, MageRing, WitchesBroach,
 	MedalValor, MedalCourage, MedalHonor, MedalDistinction, FizbinMesfortune,
@@ -83,6 +82,7 @@ enum artifact_s : unsigned char {
 	WhitePearl, BlackPearl,
 	MagicBook,
 	FirstArtifact = UltimateBook, LastArtifact = MagicBook,
+	NoArtifact,
 };
 enum building_s : unsigned char {
 	Castle, ThievesGuild, Tavern, Shipyard, Well, Statue,

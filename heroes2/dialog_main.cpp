@@ -11,7 +11,7 @@ static void test_message() {
 static void full_castle(const playeri* player, kind_s type) {
 	//heroi::initialize();
 	//bsmeta<heroi>::elements[Dimitry].show();
-	auto p = castlei::add();
+	auto p = bsmeta<castlei>::add();
 	p->clear();
 	p->setname("Ãנטםגויכ");
 	p->set(player);

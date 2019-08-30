@@ -139,9 +139,9 @@ void drawable::border() const {
 void drawable::paint() const {
 	static unsigned char decode_resource[] = {12, 0, 2, 4, 6, 8, 10, 16};
 	int i;
-	border();
 	switch(object.type) {
 	case Moveable:
+		border();
 		switch(object.moveable->element.type) {
 		case Monster:
 			image(x + 16, y + 30, object.moveable->element.monster, object.moveable->index);
@@ -171,9 +171,9 @@ void drawable::paint() const {
 		}
 		break;
 	case Hero:
-		paint_hero(x, y + 30, object.hero->getkind(), object.hero->getdirection(), false);
-		paint_flag(x, y + 30, object.hero->getplayer()->getid(), object.hero->getdirection(), draw::counter, true);
-		paint_shad(x, y + 30, object.hero->getdirection(), 0);
+		paint_hero(x, y, object.hero->getkind(), object.hero->getdirection(), false);
+		paint_flag(x, y, object.hero->getplayer()->getid(), object.hero->getdirection(), draw::counter, true);
+		paint_shad(x, y, object.hero->getdirection(), 0);
 		break;
 	case CastleVar:
 		paint_castle(x, y,

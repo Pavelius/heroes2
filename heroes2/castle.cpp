@@ -32,8 +32,13 @@ castlei* castlei::find(const playeri* player, castlei* first) {
 	return 0;
 }
 
+void castlei::initialize() {
+	bsmeta<castlei>::count = 0;
+}
+
 void castlei::clear() {
 	memset(this, 0, sizeof(*this));
+	index = Blocked;
 }
 
 void castlei::random(bool castle) {
@@ -139,10 +144,6 @@ int playeri::getbuildings(building_s v) const {
 			result++;
 	}
 	return result;
-}
-
-castlei* castlei::add() {
-	return &bsmeta<castlei>::elements[bsmeta<castlei>::count++];
 }
 
 const costi& castlei::getcost(building_s v, kind_s k) {

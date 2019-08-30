@@ -287,7 +287,7 @@ static void paint_objects(const rect& rcmap, point camera) {
 		dw.object = &e;
 		auto index = e.getpos();
 		dw.x = map::i2x(index) * 32 - 32 * 2 - camera.x;
-		dw.y = map::i2y(index) * 32 - 32 * 4 - camera.y;
+		dw.y = map::i2y(index) * 32 - 32 * 3 - camera.y;
 		if(!dw.in(rc))
 			continue;
 		dw.paint();
@@ -300,7 +300,7 @@ static void paint_objects(const rect& rcmap, point camera) {
 		dw.object = &e;
 		auto index = e.getpos();
 		dw.x = map::i2x(index) * 32 - camera.x;
-		dw.y = map::i2y(index) * 32 - camera.y;
+		dw.y = map::i2y(index) * 32 + 30 - camera.y;
 		if(!dw.in(rc))
 			continue;
 		dw.paint();

@@ -378,7 +378,6 @@ struct moveablei {
 	short unsigned			index;
 	variant					element;
 	short unsigned			value;
-	static moveablei*		add();
 };
 class heroi : public namei, public armyi {
 	kind_s					kind;
@@ -435,7 +434,6 @@ class castlei : public namei, public armyi {
 	void					paint_name() const;
 	void					paint_monster(int x, int y, int height, int width, int level);
 public:
-	static castlei*			add();
 	void					add(monster_s id, unsigned short count) { armyi::add(id, count); }
 	void					build();
 	bool					build(building_s building, bool confirm);
@@ -458,6 +456,7 @@ public:
 	static int				getwell2grow() { return 8; }
 	static building_s		getupgrade(building_s v);
 	static building_s		getupgrade(building_s v, kind_s k);
+	static void				initialize();
 	constexpr int			is(building_s v) const { return buildings.is(v); }
 	bool					is(monster_s v) const { return armyi::is(v); }
 	bool					isallow(monster_s v) const;

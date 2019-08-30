@@ -496,7 +496,7 @@ void gamei::prepare() {
 			case mp2obj(CastleObject):
 				// add castle
 				if(sizeblock == sizeof(mp2::castle)) {
-					auto p = castlei::add();
+					auto p = bsmeta<castlei>::add();
 					load_object(*p, *((mp2::castle*)pblock));
 					p->setpos(mp2i(findobject));
 				}

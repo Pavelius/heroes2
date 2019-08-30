@@ -3,12 +3,8 @@
 moveablei	bsmeta<moveablei>::elements[2048];
 unsigned	bsmeta<moveablei>::count;
 
-moveablei* moveablei::add() {
-	return &bsmeta<moveablei>::elements[bsmeta<moveablei>::count++];
-}
-
 void add_moveable(short unsigned index, variant v, short unsigned quantity) {
-	auto p = moveablei::add();
+	auto p = bsmeta<moveablei>::add();
 	switch(v.type) {
 	case Resource:
 		switch(v.resource) {

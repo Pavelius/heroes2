@@ -132,16 +132,15 @@ void drawable::paint_castle(int x, int y, landscape_s tile, kind_s race, bool to
 		image(x + ii * 32, y + 3 * 32, OBJNTOWN, index + 11 + ii);
 }
 
-void drawable::border() const {
-	rectb({x, y, x + 32, y + 32}, 0x10);
-}
+//void drawable::border() const {
+//	rectb({x, y, x + 32, y + 32}, 0x10);
+//}
 
 void drawable::paint() const {
 	static unsigned char decode_resource[] = {12, 0, 2, 4, 6, 8, 10, 16};
 	int i;
 	switch(object.type) {
 	case Moveable:
-		border();
 		switch(object.moveable->element.type) {
 		case Monster:
 			image(x + 16, y + 30, object.moveable->element.monster, object.moveable->index);

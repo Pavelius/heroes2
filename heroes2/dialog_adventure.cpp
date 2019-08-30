@@ -333,8 +333,20 @@ void map::setcamera(short unsigned index) {
 static void paint_objects(const rect& rcmap, point camera) {
 	state push;
 	clipping = rcmap;
-	for(unsigned i = 0; i < drawables_count; i++)
-		drawables[i].paint();
+	for(unsigned i = 0; i < drawables_count; i++) {
+		auto& e = drawables[i];
+		switch(e.object.type) {
+		case CastleVar:
+			if(e.object.castle->getpos()==hilite_index)
+				cvar = e.object;
+			break;
+		case Hero:
+			if(e.object.hero->getpos() == hilite_index)
+				cvar = e.object;
+			break;
+		}
+		e.paint();
+	}
 }
 
 static void paint_debug() {

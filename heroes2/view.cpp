@@ -800,14 +800,14 @@ res_s draw::isevil(res_s evil, res_s good) {
 	return evil_interface ? evil : good;
 }
 
-void draw::image(int x, int y, monster_s id, int n, unsigned flags) {
+void draw::image(int x, int y, monster_s id, int n, unsigned flags, int mode) {
 	image(x, y, MINIMON, id * 9, flags);
-	switch(0) {
+	switch(mode) {
 	case 1:
-		image(x, y, MINIMON, id * 9 + 1 + monster_animation_cicl1[(counter/2 + n * n) % (sizeof(monster_animation_cicl1) / sizeof(monster_animation_cicl1[0]))], flags);
+		image(x, y, MINIMON, id * 9 + 1 + monster_animation_cicl1[(counter / 2 + n * n) % (sizeof(monster_animation_cicl1) / sizeof(monster_animation_cicl1[0]))], flags);
 		break;
 	default:
-		image(x, y, MINIMON, id * 9 + 1 + monster_animation_cicle[(counter/2 + n * n) % (sizeof(monster_animation_cicle) / sizeof(monster_animation_cicle[0]))], flags);
+		image(x, y, MINIMON, id * 9 + 1 + monster_animation_cicle[(counter / 2 + n * n) % (sizeof(monster_animation_cicle) / sizeof(monster_animation_cicle[0]))], flags);
 		break;
 	}
 }
@@ -1099,7 +1099,7 @@ int draw::dialog(int height, int* bottom_position) {
 	}
 	//line(x + 16, y - 1, x + w4 * 2 - 16, y - 1, 0xF0);
 	if(bottom_position)
-		*bottom_position = y + h5/2;
+		*bottom_position = y + h5 / 2;
 	draw::image(x, y, icn, 6, AFNoOffset);
 	draw::image(x + getwidth(icn, 6), y, icn, 2, AFNoOffset);
 	//rectb({x, y1, x + w4 * 2, y1 + height}, 0x40);
@@ -1185,7 +1185,7 @@ static int getsize(const variantcol* source, unsigned count, int width_per_line)
 	state push;
 	font = SMALFONT;
 	int y = 0;
-	while(count>0) {
+	while(count > 0) {
 		auto h1 = 0;
 		auto w1 = 0;
 		auto line_count = getsize(source, source + count, w1, h1, width_per_line);
@@ -1199,7 +1199,7 @@ void unit_info_monster();
 int index_by_type(kind_s id);
 
 void picture::render(int x, int y, res_s res, int frame) const {
-	image(x + (size.x - getwidth(res, frame))/2, y, res, frame, AFNoOffset);
+	image(x + (size.x - getwidth(res, frame)) / 2, y, res, frame, AFNoOffset);
 }
 
 void picture::clear() {
@@ -1223,7 +1223,7 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 			draw::state push;
 			font = FONT;
 			auto w1 = draw::textw(temp);
-			auto x1 = x + (size.x - getwidth(STRIP, 12))/2;
+			auto x1 = x + (size.x - getwidth(STRIP, 12)) / 2;
 			text(x1 - textw(temp) - 4, y + h1 - texth() - 8, temp);
 		}
 		break;
@@ -1242,7 +1242,7 @@ int draw::imagex(int x, int y, int width, const variantcol* source, unsigned cou
 	state push;
 	font = SMALFONT;
 	auto y1 = y;
-	while(count>0) {
+	while(count > 0) {
 		auto h1 = 0;
 		auto w1 = 0;
 		auto line_count = getsize(source, source + count, w1, h1, width);
@@ -1289,17 +1289,17 @@ int draw::message(const char* format, kind_s kind, building_s building, const va
 	auto th = textf(dialog_width, format);
 	auto x = (width - dialog_width) / 2;
 	auto h1 = th;
-	if(mode!=NoButtons)
+	if(mode != NoButtons)
 		h1 += getheight(ic1, 1) + 8;
 	if(footer)
 		h1 += getsize(footer, footer_count, dialog_width) + 8;
-	if(building!=NoBuilding)
+	if(building != NoBuilding)
 		h1 += bld_h + 8;
 	while(ismodal()) {
 		surface.restore();
 		auto y2 = 0;
 		auto y1 = dialog(h1, &y2);
-		if(building!=NoBuilding) {
+		if(building != NoBuilding) {
 			auto bld_res = getbuildings(kind);
 			auto bld_index = castlei::getframe(building);
 			auto x = (width - bld_w) / 2;
@@ -1325,7 +1325,7 @@ int draw::message(const char* format, kind_s kind, building_s building, const va
 			button((width - getwidth(ic1, 1)) / 2, y1, ic1, buttonok, {1, 1, 2}, KeyEnter);
 			break;
 		}
-		if(mode!=NoButtons)
+		if(mode != NoButtons)
 			cursor(ADVMCO, 0);
 		domodal();
 		if(mode == NoButtons) {
@@ -1348,6 +1348,27 @@ void draw::message(const char* format) {
 
 bool draw::ask(const char* format, const variantcol* footer, unsigned count) {
 	return message(format, RandomKind, NoBuilding, footer, count, ButtonYesNo) != 0;
+}
+
+void draw::quicktips(int x, int y, const char* format) {
+	state push;
+	screenshoot screen;
+	const auto res = QWIKINFO;
+	font = SMALFONT;
+	auto sx = getwidth(res, 0);
+	auto sy = getheight(res, 0);
+	auto x1 = x - (sx - 13) / 2 - 13;
+	auto y1 = y - (sy - 13) / 2 - 2;
+	auto tw = sx - 13 - 20;
+	auto th = textf(tw, format);
+	while(ismodal()) {
+		screen.restore();
+		image(x1, y1, res, 0);
+		textf(x - tw / 2, y - th / 2, tw, format);
+		domodal();
+		if(hot::key == MouseRight || hot::key == MouseLeft || hot::key == MouseLeftDBL)
+			buttoncancel();
+	}
 }
 
 void draw::splitter(int x, int y, res_s res, int& value, int minimum, int maximum) {

@@ -8,7 +8,7 @@ enum infotype_s : unsigned char {
 	LastInfo = ObjectInfo,
 };
 
-static pvar				cvar;
+static pvar				hilite_var, current_var;
 static short unsigned	hilite_index, current_index;
 const unsigned			delay_information = 8;
 const int				map_sx = 14;
@@ -33,7 +33,7 @@ static unsigned select_drawables(const rect& rcmap, point camera, drawable* sour
 		p->y = map::i2y(e.index) * 32 - camera.y + 16;
 		if(!p->in(rc))
 			continue;
-		if(p<pe)
+		if(p < pe)
 			p++;
 	}
 	for(unsigned i = 0; i < bsmeta<castlei>::count; i++) {
@@ -44,7 +44,7 @@ static unsigned select_drawables(const rect& rcmap, point camera, drawable* sour
 		p->y = map::i2y(index) * 32 - 32 * 3 - camera.y;
 		if(!p->in(rc))
 			continue;
-		if(p<pe)
+		if(p < pe)
 			p++;
 	}
 	for(auto i = FirstHero; i <= LastHero; i = (hero_s)(i + 1)) {
@@ -54,10 +54,10 @@ static unsigned select_drawables(const rect& rcmap, point camera, drawable* sour
 		p->object = &e;
 		auto index = e.getpos();
 		p->x = map::i2x(index) * 32 - camera.x;
-		p->y = map::i2y(index) * 32 - camera.y;
+		p->y = map::i2y(index) * 32 + 30 - camera.y;
 		if(!p->in(rc))
 			continue;
-		if(p<pe)
+		if(p < pe)
 			p++;
 	}
 	return p - source;
@@ -73,11 +73,11 @@ static void information_hero() {
 }
 
 static void choose_hero() {
-	cvar = (heroi*)hot::param;
-	if(!cvar)
+	current_var = (heroi*)hot::param;
+	if(!current_var)
 		return;
 	info_type = ObjectInfo;
-	map::setcamera(cvar.hero->getpos());
+	map::setcamera(current_var.hero->getpos());
 }
 
 static struct castlec : public list {
@@ -140,7 +140,7 @@ static struct heroc : public list {
 			image(x - 1, y, MINIPORT, p->getportrait());
 			image(x + 4, y + 5, MOBILITY, imin(1000 / 100, 25));
 			image(x + 43, y + 5, MANA, imin(20 / 5, 25));
-			if(cvar.hero == p)
+			if(current_var.hero == p)
 				rectb({x - 1, y, x + 54, y + 31}, 214);
 			if(mousein({x, y, x + 54, y + 31})) {
 				if(hot::key == MouseLeft && hot::pressed)
@@ -180,6 +180,7 @@ static void paint_tiles(rect screen, point camera) {
 	draw::state push;
 	draw::clipping = screen;
 	hilite_index = Blocked;
+	hilite_var.clear();
 	auto x2 = camera.x + screen.width();
 	auto y2 = camera.y + screen.height();
 	for(int y = camera.y; y < y2; y += 32) {
@@ -190,7 +191,7 @@ static void paint_tiles(rect screen, point camera) {
 			imagt(x1, y1, TisGROUND32, map::tiles[index], map::flags[index] & 0x03);
 			const rect rc = {x1, y1, x1 + 31, y1 + 31};
 			if(mousein(rc)) {
-				cvar = map::gettile(index);
+				hilite_var = map::gettile(index);
 				hilite_index = index;
 #ifdef _DEBUG
 				if(hilite_index == index)
@@ -309,8 +310,8 @@ static void paint_information(int x, int y, const playeri* player) {
 	} else {
 		switch(info_type) {
 		case ObjectInfo:
-			if(cvar.type == Hero)
-				paint_army(x, y, *cvar.hero);
+			if(current_var.type == Hero)
+				paint_army(x, y, *current_var.hero);
 			else
 				paint_kindom(x, y, player);
 			break;
@@ -335,27 +336,56 @@ static void paint_objects(const rect& rcmap, point camera) {
 	clipping = rcmap;
 	for(unsigned i = 0; i < drawables_count; i++) {
 		auto& e = drawables[i];
+		e.paint();
 		switch(e.object.type) {
 		case CastleVar:
-			if(e.object.castle->getpos()==hilite_index)
-				cvar = e.object;
+			if(e.object.castle->getpos() == hilite_index)
+				hilite_var = e.object;
 			break;
 		case Hero:
 			if(e.object.hero->getpos() == hilite_index)
-				cvar = e.object;
+				hilite_var = e.object;
+			break;
+		case Moveable:
+			if(e.object.moveable->index == hilite_index)
+				hilite_var = e.object;
 			break;
 		}
-		e.paint();
 	}
 }
 
-static void paint_debug() {
-	if(hilite_index != Blocked) {
-		char temp[260]; zprint(temp, "%1i (%2i, %3i)", hilite_index, map::i2x(hilite_index), map::i2y(hilite_index));
-		auto pf = font;
-		font = SMALFONT;
-		text(4, 4, temp);
+static void tips_info() {
+	char temp[260]; stringbuilder sb(temp); temp[0] = 0;
+	//sb.add("%1i (%2i, %3i)", hilite_index, map::i2x(hilite_index), map::i2y(hilite_index));
+	switch(hilite_var.type) {
+	case Moveable:
+		switch(hilite_var.moveable->element.type) {
+		case Monster:
+			sb.addn("%1i %2", hilite_var.moveable->value, getstr(hilite_var.moveable->element.monster));
+			break;
+		case Artifact:
+			sb.addn(getstr(hilite_var.moveable->element.artifact));
+			break;
+		case Resource:
+			sb.addn(getstr(hilite_var.moveable->element.resource));
+			break;
+		case MapObject:
+			switch(hilite_var.moveable->element.mapobject) {
+			case TreasureChest:
+				sb.addn("Сундук с сокровищами");
+				break;
+			case AncientLamp:
+				sb.addn("Волшебная лампа");
+				break;
+			}
+			break;
+		}
+		break;
+	case CastleVar: sb.addn("Замок %1", hilite_var.castle->getname()); break;
+	case Hero: sb.addn("Герой %1", hilite_var.hero->getname()); break;
+	case Landscape: sb.addn(getstr(hilite_var.landscape)); break;
 	}
+	quicktips(hot::mouse.x, hot::mouse.y, temp);
 }
 
 static void paint_screen(const playeri* player) {
@@ -367,7 +397,10 @@ static void paint_screen(const playeri* player) {
 	paint_tiles(rcmap, map::camera);
 	paint_objects(rcmap, map::camera);
 	//paint_route(rcmap, map::camera);
-	paint_debug();
+	if(mousein(rcmap)) {
+		if(hot::key == MouseRight && hot::pressed)
+			execute(tips_info);
+	}
 }
 
 static void update_lists(const playeri* player) {

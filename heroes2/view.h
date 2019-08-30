@@ -200,7 +200,7 @@ int							getwidth(res_s id, int n);
 void						hexagon(int x, int y, unsigned char m);
 void						hexagonf(int x, int y, unsigned char intense);
 void						image(int x, int y, res_s res, int n, unsigned flags = 0, unsigned char* change = 0);
-void						image(int x, int y, monster_s res, int n, unsigned flags = 0);
+void						image(int x, int y, monster_s res, int n, unsigned flags = 0, int mode= 1);
 void						image(int x, int y, hero_s res, bool large = true);
 void						image(int x, int y, skill_s res, int level);
 int							image(int x, int y, int width, const costi& e);
@@ -216,6 +216,7 @@ int							message(const char* format, kind_s kind, building_s building, const co
 bool						mousein(const rect& rc);
 void						pixel(int x, int y, unsigned char a);
 unsigned char*				ptr(int x, int y);
+void						quicktips(int x, int y, const char* format);
 void						rectb(const rect& rc, unsigned char m);
 void						rectf(const rect& rc, unsigned char m);
 void						setevil(bool value);

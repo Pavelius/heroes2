@@ -209,7 +209,7 @@ enum armysize_s {
 	Few, Several, Pack, Lots, Horde, Throng, Swarm, Zounds, Legion
 }; 
 enum landscape_s : unsigned char {
-	Beach, Desert, Dirt, Grass, Swamp, Snow, Sea, Lava, Waste,
+	Beach, Desert, Dirt, Grass, Lava, Sea, Snow, Swamp, Waste,
 };
 class heroi;
 struct variant {
@@ -344,6 +344,7 @@ public:
 	void					sethire(int index);
 	void					setup(difficult_s id);
 	void					tavern();
+	void					tooltips(const char* format, ...);
 	void					thieves();
 	void					trade(resource_s rs, resource_s rt, int count, int market_count);
 };
@@ -357,6 +358,9 @@ struct kindi {
 	skill_s					skills[2];
 	monster_s				units[2];
 	spell_s					spell;
+};
+struct landscapei {
+	const char*				name;
 };
 struct skilli {
 	const char*				id;
@@ -564,6 +568,7 @@ struct pvar : variant {
 	constexpr pvar(moveablei* v) : variant(Moveable, 0), moveable(v) {}
 	constexpr bool operator==(const pvar& e) const { return type == e.type && value == e.value; }
 	constexpr explicit operator bool() const { return type != NoVariant; }
+	void					clear() { type = NoVariant; variant::value = 0; value = 0; }
 };
 class generator {
 	unsigned char			artifacts[LastArtifact + 1];
@@ -603,6 +608,7 @@ DECLENUM(difficult);
 DECLENUM(skill);
 DECLENUM(spell);
 DECLENUM(kind);
+DECLENUM(landscape);
 DECLENUM(level);
 DECLENUM(luck);
 DECLENUM(monster);

@@ -132,9 +132,15 @@ void drawable::paint_castle(int x, int y, landscape_s tile, kind_s race, bool to
 		image(x + ii * 32, y + 3 * 32, OBJNTOWN, index + 11 + ii);
 }
 
-//void drawable::border() const {
-//	rectb({x, y, x + 32, y + 32}, 0x10);
-//}
+static int getmode(monster_s m) {
+	switch(m) {
+	case Zombie:
+	case MutantZombie:
+		return 1;
+	default:
+		return 0;
+	}
+}
 
 void drawable::paint() const {
 	static unsigned char decode_resource[] = {12, 0, 2, 4, 6, 8, 10, 16};
@@ -143,7 +149,7 @@ void drawable::paint() const {
 	case Moveable:
 		switch(object.moveable->element.type) {
 		case Monster:
-			image(x + 16, y + 30, object.moveable->element.monster, object.moveable->index);
+			image(x + 16, y + 30, object.moveable->element.monster, object.moveable->index, 0, getmode(object.moveable->element.monster));
 			break;
 		case Resource:
 			i = decode_resource[object.moveable->element.resource];

@@ -156,6 +156,7 @@
     <ClCompile Include="generator.cpp" />
     <ClCompile Include="indexes.cpp" />
     <ClCompile Include="kind.cpp" />
+    <ClCompile Include="landscape.cpp" />
     <ClCompile Include="level.cpp" />
     <ClCompile Include="luck.cpp" />
     <ClCompile Include="map.cpp" />

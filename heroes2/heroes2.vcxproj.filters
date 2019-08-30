@@ -200,5 +200,8 @@
     <ClCompile Include="drawable.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="landscape.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

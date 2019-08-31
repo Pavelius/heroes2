@@ -5,7 +5,10 @@ using namespace draw;
 static void test_message() {
 	setevil(true);
 	variantcol elements[] = {{DivineBreastPlate}, {Ore, 10}, {Wood, 10}};
-	message("Во время посещения форта вы улучшили некоторые войска в своей армии.", Knight, Tavern, elements, 3, ButtonOK);
+	string str;
+	str.addh("Форт Месса");
+	str.add("Во время посещения форта вы улучшили некоторые войска в своей армии.");
+	message(str, Knight, Tavern, elements, 3, ButtonOK);
 }
 
 static void full_castle(const playeri* player, kind_s type) {

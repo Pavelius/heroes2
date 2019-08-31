@@ -1,6 +1,7 @@
 #include "collection.h"
 #include "crt.h"
 #include "point.h"
+#include "stringbuilder.h"
 
 enum index_s : unsigned short {
 	Blocked = 0xFFFF,
@@ -606,6 +607,13 @@ public:
 	const char*				castlename();
 	monster_s				monster(int level = 0);
 	resource_s				resource();
+};
+class string : public stringbuilder {
+	char					buffer[512];
+public:
+	string() : stringbuilder(buffer) {}
+	void					addh(const char* format, ...);
+	void					addi(variant v, int value);
 };
 namespace map {
 extern point				camera;

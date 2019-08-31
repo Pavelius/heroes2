@@ -1,4 +1,3 @@
-#include "stringbuilder.h"
 #include "view.h"
 
 using namespace draw;
@@ -1000,16 +999,21 @@ void draw::execute(eventproc proc, int param) {
 }
 
 int draw::textf(int x, int y, int width, const char* p) {
-	int y4 = y;
+	state push;
+	auto y4 = y;
 	p = zskipspcr(p);
 	auto start = p;
 	while(*p) {
-		int c = textbc(p, width);
+		if(p[0] == '#' && p[1] == '#' && (p == start || p[-1] == '\n')) {
+			p += 2;
+			font_color = font_yellow;
+		}
+		auto c = textbc(p, width);
 		text(x, y, width, AlignCenter, p, c);
 		y += texth();
 		p += c;
-		if(p > start && p[-1] == '\n')
-			y += texth() / 2;
+		if(p != start && p[-1] == '\n')
+			font_color = 0;
 		p = zskipspcr(p);
 	}
 	return y - y4;

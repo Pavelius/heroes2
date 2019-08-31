@@ -177,6 +177,7 @@
     <ClCompile Include="screenshot.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="speed.cpp" />
+    <ClCompile Include="string.cpp" />
     <ClCompile Include="stringbuilder.cpp" />
     <ClCompile Include="util.cpp" />
     <ClCompile Include="view.cpp" />

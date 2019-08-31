@@ -212,5 +212,8 @@
     <ClCompile Include="util.cpp">
       <Filter>Утилиты</Filter>
     </ClCompile>
+    <ClCompile Include="string.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

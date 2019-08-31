@@ -1,5 +1,4 @@
 #include "main.h"
-#include "stringbuilder.h"
 
 DECLBASE(castlei, 128);
 

@@ -1,5 +1,4 @@
 #include "view.h"
-#include "stringbuilder.h"
 
 using namespace draw;
 

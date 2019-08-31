@@ -104,3 +104,16 @@ void heroi::show(bool allow_change) const {
 		domodal();
 	}
 }
+
+static void information_hero() {
+	auto p = (heroi*)hot::param;
+	p->show(true);
+}
+
+void heroi::input(const playeri* player) const {
+	status(getname());
+	if(hot::key == MouseLeftDBL && hot::pressed) {
+		if(!player || getplayer() == player)
+			execute(information_hero, (int)this);
+	}
+}

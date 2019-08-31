@@ -198,7 +198,6 @@ void information_hero() {
 }
 
 static void hire_hero() {
-
 }
 
 static void hireling(int x, int y, playeri* player, short unsigned index, heroi* hero) {

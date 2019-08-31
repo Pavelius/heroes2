@@ -19,6 +19,7 @@ static rect				rcmap = {16, 16, 16 + 32 * 14, 16 + 32 * 14};
 static unsigned			show_message = delay_information;
 static unsigned			show_sunrise = delay_information;
 static infotype_s		info_type = ObjectInfo;
+static playeri*			current_player;
 static drawable			drawables[2048];
 static unsigned			drawables_count;
 
@@ -86,22 +87,12 @@ static void update_drawables() {
 	normalize_drawables();
 }
 
-static void information_hero() {
-	auto p = (heroi*)hot::param;
-	p->show(true);
-}
-
 static void choose_hero() {
 	current_var = (heroi*)hot::param;
 	if(!current_var)
 		return;
 	info_type = ObjectInfo;
 	map::setcamera(current_var.hero->getpos());
-}
-
-static void information_castle() {
-	auto p = (castlei*)hot::param;
-	p->show();
 }
 
 static void choose_castle() {
@@ -150,8 +141,8 @@ static struct castlec : public list {
 			if(mousein({x, y, x + 54, y + 31})) {
 				if(hot::key == MouseLeft && hot::pressed)
 					draw::execute(choose_castle, (int)data[index]);
-				else if(hot::key == MouseLeftDBL && hot::pressed)
-					draw::execute(information_castle, (int)data[index]);
+				else
+					data[index]->input(current_player);
 			}
 		} else
 			image(x - 1, y, isevil(LOCATORE, LOCATORS), 5 + index);
@@ -185,8 +176,8 @@ static struct heroc : public list {
 			if(mousein({x, y, x + 54, y + 31})) {
 				if(hot::key == MouseLeft && hot::pressed)
 					draw::execute(choose_hero, (int)data[index]);
-				else if(hot::key == MouseLeftDBL && hot::pressed)
-					draw::execute(information_hero, (int)data[index]);
+				else
+					data[index]->input(current_player);
 			}
 		} else
 			image(x - 1, y, isevil(LOCATORE, LOCATORS), 1 + index);
@@ -456,12 +447,12 @@ static void tips_info() {
 	tips_info(true, false, true);
 }
 
-static void paint_screen(const playeri* player) {
+static void paint_screen() {
 	image(0, 0, isevil(ADVBORDE, ADVBORD), 0, 0);
 	minimap(480, 16, 0);
 	heroes.draw(481, 176, 56, 32);
 	castles.draw(553, 176, 56, 32);
-	paint_information(480, 320, player);
+	paint_information(480, 320, current_player);
 	paint_tiles(rcmap, map::camera);
 	paint_objects(rcmap, map::camera);
 	//paint_route(rcmap, map::camera);
@@ -471,11 +462,11 @@ static void paint_screen(const playeri* player) {
 	}
 }
 
-static void update_lists(const playeri* player) {
+static void update_lists() {
 	castles.row_per_screen = 4;
-	castles.setup(player);
+	castles.setup(current_player);
 	heroes.row_per_screen = 4;
-	heroes.setup(player);
+	heroes.setup(current_player);
 }
 
 void playeri::quickmessage(const costi& cost, const char* format, ...) {
@@ -486,11 +477,20 @@ void playeri::quickmessage(const costi& cost, const char* format, ...) {
 }
 
 void playeri::adventure() {
+	current_player = this;
 	update_drawables();
-	update_lists(this);
+	update_lists();
 	quickmessage({}, "Ход начал %1 игрок", getname());
 	while(ismodal()) {
-		paint_screen(this);
+		paint_screen();
+		switch(hilite_var.type) {
+		case CastleVar:
+			hilite_var.castle->input(0);
+			break;
+		case Hero:
+			hilite_var.hero->input(0);
+			break;
+		}
 		cursor(ADVMCO, 0);
 		domodal();
 	}

@@ -408,16 +408,22 @@ void castlei::paint_panorama(int x, int y) const {
 
 void castlei::paint_panel(int x, int y, const heroi* hero) const {
 	image(x, y, STRIP, 0);
-	image(x + 5, y + 6, CREST, 3);
-	armyi::paint(x + 112, y + 6, 0);
+	image(x + 5, y + 6, CREST, player);
+	if(mousein({x + 6, y + 7, x + 6 + 100, y + 7 + 92}))
+		status("Μερÿφ: %1i, Νεδελÿ: %2i, Δενό: %3i",
+			map::getmonth() + 1, map::getmonthweek() + 1, map::getweekday() + 1);
 	if(hero) {
 		image(x + 5, y + 105, hero->getid(), true);
-		hero->paint(x + 112, y + 105, hero);
+		if(mousein({x + 6, y + 105, x + 6 + 100, y + 105 + 92}))
+			hero->input(getplayer());
+		armyi::paint(x + 112, y + 6, 0, true, false);
+		hero->paint(x + 112, y + 105, hero, true, true);
 	} else {
-		//if(bsget(mid, Captain))
-		//	draw::clipart(x + 5 + 50, y + 105, bsget(mid, Type) - Barbarian + BarbarianCaptain, bsget(mid, Player));
-		//else
-		image(x + 5, y + 105, STRIP, 3);
+		armyi::paint(x + 112, y + 6, 0);
+		if(is(Captain)) {
+			//draw::clipart(x + 5 + 50, y + 105, bsget(mid, Type) - Barbarian + BarbarianCaptain, bsget(mid, Player));
+		} else
+			image(x + 5, y + 105, STRIP, 3);
 		image(x + 112, y + 105, STRIP, 11);
 	}
 }
@@ -463,5 +469,17 @@ void castlei::show() {
 		paint(hero);
 		cursor(ADVMCO, 0);
 		domodal();
+	}
+}
+
+static void open_dialog() {
+	auto p = (castlei*)hot::param;
+	p->show();
+}
+
+void castlei::input(const playeri* player) const {
+	if(hot::key == MouseLeftDBL && hot::pressed) {
+		if(!player || getplayer() == player)
+			execute(open_dialog, (int)this);
 	}
 }

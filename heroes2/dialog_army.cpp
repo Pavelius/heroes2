@@ -37,10 +37,6 @@ static void unit_edit() {
 }
 
 static void choose_unit() {
-	current_unit = (squadi*)hot::param;
-}
-
-static void swap_unit() {
 	auto s1 = *((squadi*)hot::param);
 	if(current_unit) {
 		*((squadi*)hot::param) = *current_unit;
@@ -103,11 +99,8 @@ void squadi::paint(int x, int y, const heroi* hero, bool allow_change) const {
 				break;
 			case MouseLeft:
 				if(pressed) {
-					if(current_hero != hero) {
-						current_hero = hero;
-						execute(choose_unit, (int)this);
-					} else
-						execute(swap_unit, (int)this);
+					current_hero = hero;
+					execute(choose_unit, (int)this);
 				}
 				break;
 			}
@@ -117,13 +110,20 @@ void squadi::paint(int x, int y, const heroi* hero, bool allow_change) const {
 	}
 }
 
-void armyi::paint(int x, int y, const heroi* hero, bool allow_change) const {
+static void army_input_update() {
+	if(hot::key == MouseLeft && hot::pressed)
+		current_unit = 0;
+}
+
+void armyi::paint(int x, int y, const heroi* hero, bool allow_change, bool clean_current_unit) const {
 	int w = getwidth(STRIP, 2);
 	int h = getwidth(STRIP, 2);
 	for(int i = 0; i < 5; i++) {
 		units[i].paint(x, y, hero, allow_change);
 		x += 88;
 	}
+	if(clean_current_unit)
+		army_input_update();
 }
 
 static int field(int x, int y, const char* name, const char* v1) {

@@ -310,7 +310,7 @@ struct armyi {
 	const squadi*			find(monster_s v) const;
 	bool					is(monster_s v) const { return find(v) != 0; }
 	bool					is(tag_s v) const;
-	void					paint(int x, int y, const heroi* hero = 0, bool allow_change = true) const;
+	void					paint(int x, int y, const heroi* hero = 0, bool allow_change = true, bool clean_current_unit = true) const;
 	void					paintsmall(const rect& rc, bool show_count, bool show_text) const;
 };
 class playeri : public namei {
@@ -424,6 +424,7 @@ public:
 	unsigned char			getportrait() const { return portrait; }
 	short unsigned			getpos() const { return index; }
 	static void				initialize();
+	void					input(const playeri* player) const;
 	bool					is(spell_s v) const { return spellbook.is(v); }
 	static unsigned			select(heroi** result, heroi** result_maximum, const playeri* player, kind_s kind, kind_s kind_exclude, bool include_special = false);
 	void					set(direction_s v) { direction = v; }
@@ -473,6 +474,7 @@ public:
 	static building_s		getupgrade(building_s v);
 	static building_s		getupgrade(building_s v, kind_s k);
 	static void				initialize();
+	void					input(const playeri* player) const;
 	constexpr int			is(building_s v) const { return buildings.is(v); }
 	bool					is(monster_s v) const { return armyi::is(v); }
 	bool					is(castle_flag_s v) const { return flags.is(v); }

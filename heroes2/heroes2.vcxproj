@@ -137,6 +137,7 @@
     <ClCompile Include="armysize.cpp" />
     <ClCompile Include="artifacts.cpp" />
     <ClCompile Include="castle.cpp" />
+    <ClCompile Include="castle_names.cpp" />
     <ClCompile Include="dialog_adventure.cpp" />
     <ClCompile Include="dialog_army.cpp" />
     <ClCompile Include="dialog_castle.cpp" />
@@ -171,6 +172,7 @@
     <ClCompile Include="pallette.cpp" />
     <ClCompile Include="resources.cpp" />
     <ClCompile Include="dialog_hero.cpp" />
+    <ClCompile Include="rumor.cpp" />
     <ClCompile Include="screenshot.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="speed.cpp" />

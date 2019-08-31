@@ -200,5 +200,11 @@
     <ClCompile Include="map_moveable.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="castle_names.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="rumor.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

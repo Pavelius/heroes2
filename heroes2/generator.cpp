@@ -1,5 +1,9 @@
 #include "main.h"
 
+const char* castle_names[] = {"Потралис", "Черный Ров", "Зеленый луг", "Сорпигал", "Речной опор",
+"Неприступная стена", "Черный замок", "Чернолесье", "Западный предел", "Орлинное гнездо",
+"Высокая стена", "Золотые ворота"};
+
 typedef bool(*allowproc)(unsigned char i, int param);
 
 static unsigned char fill_source(unsigned char* indecies, unsigned char* source, unsigned char source_count, unsigned char level, allowproc allow, int param) {
@@ -55,4 +59,8 @@ monster_s generator::monster(int level) {
 
 resource_s generator::resource() {
 	return resource_s(xrand(Gold, Gems));
+}
+
+const char* generator::castlename() {
+	return castle_names[(castle_index++)% (sizeof(castle_names) / sizeof(castle_names[0]))];
 }

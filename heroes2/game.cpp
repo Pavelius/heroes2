@@ -103,7 +103,7 @@ struct info {
 };
 // origin mp2 event for coord
 struct eventcoord {
-	unsigned char	id;		// 0x01
+	unsigned char	id;			// 0x01
 	unsigned		wood;
 	unsigned		mercury;
 	unsigned		ore;
@@ -121,11 +121,11 @@ struct eventcoord {
 	unsigned char	yellow;
 	unsigned char	orange;
 	unsigned char	purple;
-	char			text[1];		// message + '/0'
+	char			text[1];	// message + '/0'
 };
 // origin mp2 event for day
 struct eventday {
-	unsigned char	id;		// 0x00
+	unsigned char	id;			// 0x00
 	unsigned		wood;
 	unsigned		mercury;
 	unsigned		ore;
@@ -148,7 +148,7 @@ struct eventday {
 };
 // origin mp2 rumor
 struct rumor {
-	unsigned char	id;		// 0x00
+	unsigned char	id;			// 0x00
 	unsigned char	zero[7];	// 7 byte 0x00
 	char			text[1];   	// message + '/0'
 };
@@ -325,7 +325,11 @@ static void load_object(castlei& e, mp2::castle& r) {
 	}
 	e.set(player);
 	e.set(kind);
-	e.setname("Порталис");
+	// Castle or Town
+	if(!r.disable_castle_upgrade)
+		e.set(Tent);
+	if(!r.castle_in_town)
+		e.set(Castle);
 	// custom building
 	if(r.has_buildings) {
 		// building
@@ -381,12 +385,8 @@ static void load_object(castlei& e, mp2::castle& r) {
 	if(r.has_captain)
 		e.set(Captain);
 	// name
-	if(r.has_name)
+	if(r.has_name && r.name[0])
 		zcpy(e.name, e.name, sizeof(e.name));
-	if(!r.castle_in_town)
-		e.set(Castle);
-	// allow upgrade to castle (0 - true, 1 - false)
-	//bsset(rec, DisableCastleUpgrade, p->disable_castle_upgrade);
 }
 
 static void load_object(heroi& e, mp2::hero& r) {
@@ -412,7 +412,8 @@ static void load_object(heroi& e, mp2::hero& r) {
 		}
 	}
 	// custom name
-	//bsset(rec, Name, p->name);
+	if(r.name[0])
+		e.setname(r.name);
 	// patrol
 	if(r.has_patrol) {
 	}
@@ -503,6 +504,8 @@ void gamei::prepare() {
 				if(sizeblock == sizeof(mp2::castle)) {
 					auto p = bsmeta<castlei>::add();
 					load_object(*p, *((mp2::castle*)pblock));
+					if(!p->getname() || p->getname()[0] == 0)
+						p->setname(generate.castlename());
 					p->setpos(mp2i(findobject));
 				}
 				break;
@@ -589,10 +592,12 @@ void gamei::prepare() {
 		} else if(pblock[0] == 0) {
 			if(sizeblock > sizeof(mp2::eventday) - 1 && pblock[42] == 1) {
 				// add event day
-			} else if(sizeblock > sizeof(mp2::rumor) - 1 && pblock[8]) {
-				//int mid = signs::add();
-				//signs::set(mid, Index, e.id);
-				//signs::set(mid, Name, e.text);
+			} else if(sizeblock > sizeof(mp2::rumor) - 1) {
+				auto m = (mp2::rumor*)pblock;
+				if(m->text[0]) {
+					auto p = bsmeta<rumori>::add();
+					p->settext(m->text);
+				}
 			}
 		} else {
 			// error

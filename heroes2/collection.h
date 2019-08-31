@@ -35,10 +35,13 @@ template<typename T> struct bsmeta {
 	typedef T				data_type;
 	static T				elements[];
 	static unsigned			count;
-	static T*				add() { return &elements[count++]; }
+	static const unsigned	count_maximum;
+	static T*				add() { return (count >= count_maximum) ? 0 : &elements[count++]; }
 };
 template<typename T> const char* getstr(const T v) { return bsmeta<T>::elements[v].name; }
 #define DECLENUM(e) template<> struct bsmeta<e##_s> : bsmeta<e##i> {}
+#define DECLBASE(t, n) t bsmeta<t>::elements[n]; unsigned bsmeta<t>::count;\
+const unsigned bsmeta<t>::count_maximum = sizeof(bsmeta<t>::elements) / sizeof(bsmeta<t>::elements[0])
 #define SH(v) (1<<v)
 #define assert_enum(e, last) static_assert(sizeof(bsmeta<e##i>::elements) / sizeof(bsmeta<e##i>::elements[0]) == last + 1, "Invalid count of " #e " elements");
 #define maptbl(t,i) t[(i>(sizeof(t)/sizeof(t[0])-1)) ? sizeof(t)/sizeof(t[0])-1: i]

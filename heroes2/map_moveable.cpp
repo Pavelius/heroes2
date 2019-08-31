@@ -2,8 +2,7 @@
 
 using namespace draw;
 
-moveablei	bsmeta<moveablei>::elements[8192];
-unsigned	bsmeta<moveablei>::count;
+DECLBASE(moveablei, 8192);
 
 static resource_s	frame2resource[] = {Ore, Sulfur, Crystal, Gems, Gold};
 

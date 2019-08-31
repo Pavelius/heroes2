@@ -1,8 +1,7 @@
 #include "main.h"
 #include "stringbuilder.h"
 
-castlei bsmeta<castlei>::elements[128];
-unsigned bsmeta<castlei>::count;
+DECLBASE(castlei, 128);
 
 static building_s buildings_upgrade[NoBuilding + 1] = {
 	NoBuilding, NoBuilding, NoBuilding, NoBuilding, NoBuilding, NoBuilding,

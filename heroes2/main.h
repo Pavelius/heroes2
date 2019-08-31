@@ -423,6 +423,7 @@ public:
 	void					set(skill_s id, int v) { skills[id] = v; }
 	void					set(spell_s id) { spellbook.set(id); }
 	void					set(playeri* v) { if(v) player = v->getid(); else player = RandomPlayer; }
+	void					set(player_s v) { player = v; }
 	void					setportrait(unsigned char i) { portrait = i; }
 	void					setpos(short unsigned i) { index = i; }
 	void					show(bool allow_change = true) const;
@@ -548,6 +549,10 @@ struct hightscore {
 	monster_s				monster;
 	static void				show();
 };
+struct rumori {
+	char					text[128];
+	void					settext(const char* v) { zcpy(text, v, sizeof(text) - 1); }
+};
 struct variantcol {
 	variant					element;
 	int						count;
@@ -574,11 +579,13 @@ struct pvar : variant {
 class generator {
 	unsigned char			artifacts[LastArtifact + 1];
 	unsigned char			monsters[WaterElement + 1];
+	unsigned				castle_index;
 public:
 	generator();
 	artifact_s				add(artifact_s v) { artifacts[v]++; return v; }
 	monster_s				add(monster_s v) { monsters[v]++; return v; }
 	artifact_s				artifact(int level = 0);
+	const char*				castlename();
 	monster_s				monster(int level = 0);
 	resource_s				resource();
 };

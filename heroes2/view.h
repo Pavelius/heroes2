@@ -191,7 +191,7 @@ struct shapei {
 };
 struct drawobji			{
 	res_s					res;
-	map_object_s			object;
+	object_s			object;
 	shapei&					shape;
 	unsigned char			first;
 	unsigned char			last;

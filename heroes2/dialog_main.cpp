@@ -79,6 +79,9 @@ static void main_menu() {
 int main() {
 	//setevil(true);
 	//return 0;
+	//auto p0 = bsmeta<objecti>::elements[WaterBue].name;
+	//auto p1 = bsmeta<objecti>::elements[RndTown].name;
+	//auto p2 = bsmeta<objecti>::elements[SawMill].name;
 	if(!draw::create("test", 190, false))
 		return -1;
 	drawobji::initialize();

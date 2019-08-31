@@ -126,7 +126,7 @@ moveablei* add_object(unsigned short index, unsigned char object, unsigned char 
 	case EXTRAOVR:
 		if(last_object) {
 			// Abandone mine and Mountain Mines has overlay just after their objects
-			if(last_object->element.mapobject == Mines || last_object->element.mapobject == AbandoneMine)
+			if(last_object->element.object == Mines || last_object->element.object == AbandoneMine)
 				last_object->value2 = maptbl(frame2resource, frame);
 		}
 		return last_object;
@@ -331,7 +331,7 @@ void drawable::paint() const {
 			image(x, y, OBJNARTI, i + 1);
 			break;
 		case MapObject:
-			switch(moveable->element.mapobject) {
+			switch(moveable->element.object) {
 			case TreasureChest:
 				image(x - 32, y, OBJNRSRC, 18);
 				image(x, y, OBJNRSRC, 19);
@@ -405,7 +405,7 @@ void drawable::border() const {
 
 int	drawable::getlevel() const {
 	if(type == Moveable && moveable->element.type == MapObject) {
-		switch(moveable->element.mapobject) {
+		switch(moveable->element.object) {
 		case Road: return 3;
 		case Lake: case Cliff: case Hole: return 2;
 		case Stream: case StreamDelta: return 1;
@@ -418,7 +418,7 @@ int	drawable::getlevel() const {
 int drawable::getzpos() const {
 	auto v = y;
 	if(type == Moveable && moveable->element.type == MapObject) {
-		switch(moveable->element.mapobject) {
+		switch(moveable->element.object) {
 		case TreeKnowledge:
 			v += 33;
 			break;

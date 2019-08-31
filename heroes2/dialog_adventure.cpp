@@ -441,14 +441,7 @@ static void tips_info(bool show_resource_count, bool show_monster_count, bool sh
 				sb.addn(getstr(hilite_var.moveable->element.resource));
 			break;
 		case MapObject:
-			switch(hilite_var.moveable->element.mapobject) {
-			case TreasureChest:
-				sb.addn("Сундук с сокровищами");
-				break;
-			case AncientLamp:
-				sb.addn("Волшебная лампа");
-				break;
-			}
+			sb.addn(getstr(hilite_var.moveable->element.object));
 			break;
 		}
 		break;

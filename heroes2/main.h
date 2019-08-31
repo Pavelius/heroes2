@@ -125,7 +125,7 @@ enum hero_s : unsigned char {
 	CaptainBarbarian, CaptainKnight, CaptainNecromancer, CaptainSorcerer, CaptainWarlock, CaptainWizard,
 	RandomHero
 };
-enum map_object_s : unsigned char {
+enum object_s : unsigned char {
 	WaterChest, AlchemyLab, Sign, WaterBue, // 0x80-0x83
 	DeadSkeleton, DemonCave, TreasureChest, FaerieRing, // 0x84-0x87
 	CampFire, Fountain, Gazebo, AncientLamp, // 0x88-0x8B
@@ -224,7 +224,7 @@ struct variant {
 		spell_s				spell;
 		resource_s			resource;
 		tag_s				tag;
-		map_object_s		mapobject;
+		object_s			object;
 		monster_s			monster;
 		unsigned char		value;
 	};
@@ -234,7 +234,7 @@ struct variant {
 	constexpr variant(artifact_s v) : type(Artifact), artifact(v) {}
 	constexpr variant(hero_s v) : type(Hero), hero(v) {}
 	constexpr variant(landscape_s v) : type(Landscape), landscape(v) {}
-	constexpr variant(map_object_s v) : type(MapObject), mapobject(v) {}
+	constexpr variant(object_s v) : type(MapObject), object(v) {}
 	constexpr variant(monster_s v) : type(Monster), monster(v) {}
 	constexpr variant(resource_s v) : type(Resource), resource(v) {}
 	constexpr variant(skill_s v) : type(Skill), skill(v) {}
@@ -553,6 +553,9 @@ struct gamei {
 private:
 	void					updatebase();
 };
+struct objecti {
+	const char*				name;
+};
 struct hightscore {
 	char					name[32];
 	char					map[32];
@@ -636,5 +639,6 @@ DECLENUM(level);
 DECLENUM(luck);
 DECLENUM(monster);
 DECLENUM(morale);
+DECLENUM(object);
 DECLENUM(resource);
 DECLENUM(speed);

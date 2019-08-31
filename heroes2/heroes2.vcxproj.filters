@@ -203,7 +203,10 @@
     <ClCompile Include="rumor.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
-    <ClCompile Include="drawobji.cpp">
+    <ClCompile Include="object.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="drawobj.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
   </ItemGroup>

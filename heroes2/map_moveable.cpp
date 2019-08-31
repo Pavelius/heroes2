@@ -251,7 +251,7 @@ static void paint_shad(int x, int y, direction_s direction, int index) {
 	image(x, y, icn, index_sprite + (index % 9));
 }
 
-void drawable::paint_castle(int x, int y, landscape_s tile, kind_s race, bool town, bool shadow) {
+void drawable::paint_castle(int x, int y, landscape_s tile, kind_s race, bool castle, bool shadow) {
 	int index;
 	switch(tile) {
 	case Grass: index = 0; break;
@@ -277,7 +277,7 @@ void drawable::paint_castle(int x, int y, landscape_s tile, kind_s race, bool to
 	case Necromancer: index = 160; break;
 	default: index = 128; break;
 	}
-	if(town)
+	if(castle)
 		index += 16;
 	if(shadow) {
 		for(int iy = 0; iy < 4; iy++) {
@@ -365,18 +365,43 @@ void drawable::paint() const {
 		}
 		break;
 	case Hero:
-		paint_hero(x + 16, y, hero->getkind(), hero->getdirection(), false);
-		paint_flag(x + 16, y, hero->getplayer()->getid(), hero->getdirection(), draw::counter, true);
-		paint_shad(x + 16, y, hero->getdirection(), 0);
+		paint_hero(x, y, hero->getkind(), hero->getdirection(), false);
+		paint_flag(x, y, hero->getplayer()->getid(), hero->getdirection(), draw::counter, true);
+		paint_shad(x, y, hero->getdirection(), 0);
 		break;
 	case CastleVar:
-		paint_castle(x + 16, y + 16,
+		paint_castle(x - 32 * 2, y - 32 * 3,
 			map::gettile(castle->getpos()),
-			castle->getkind(), castle->is(Castle), true);
+			castle->getkind(), !castle->is(Castle), true);
+		border();
 		break;
 	default:
 		break;
 	}
+}
+
+void drawable::getrect(rect& rc) const {
+	rc.x1 = x;
+	rc.y1 = y;
+	if(type == Moveable && moveable->element.type == MapObject) {
+		auto& sh = bsmeta<mapobjecti>::elements[moveable->value].shape;
+		rc.x1 += sh.offset.x * 32;
+		rc.y1 += sh.offset.y * 32;
+		rc.x2 += rc.x1 + sh.size.x * 32;
+		rc.y2 += rc.y1 + sh.size.y * 32;
+	} else if(type == CastleVar) {
+		rc.x1 -= 32 * 3;
+		rc.y1 -= 32 * 3;
+		rc.x2 = rc.x1 + 6 * 32;
+		rc.y2 = rc.y1 + 6 * 32;
+	} else {
+		rc.x2 = rc.x1 + 32;
+		rc.y2 = rc.y1 + 32;
+	}
+}
+
+void drawable::border() const {
+	rectb({x, y, x + 32, y + 32}, 0x10);
 }
 
 int	drawable::getlevel() const {

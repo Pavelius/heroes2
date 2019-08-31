@@ -16,6 +16,8 @@ void map::clear() {
 }
 
 landscape_s map::gettile(short unsigned index) {
+	if(index == Blocked)
+		return Beach;
 	index = tiles[index];
 	if(30 > index) // 30 indexes
 		return Sea;
@@ -34,4 +36,54 @@ landscape_s map::gettile(short unsigned index) {
 	else if(415 > index)
 		return Waste;
 	return Beach;
+}
+
+short unsigned map::to(short unsigned i, direction_s d) {
+	if(i == Blocked)
+		return Blocked;
+	auto x = i2x(i), y = i2y(i);
+	switch(d) {
+	case Left:
+		if(x == 0)
+			return Blocked;
+		return i - 1;
+	case LeftUp:
+		if(x == 0)
+			return Blocked;
+		if(y == 0)
+			return Blocked;
+		return m2i(x - 1, y - 1);
+	case LeftDown:
+		if(x == 0)
+			return Blocked;
+		if(y >= height - 1)
+			return Blocked;
+		return m2i(x - 1, y + 1);
+	case Right:
+		if(x >= width - 1)
+			return Blocked;
+		return i + 1;
+	case RightUp:
+		if(x >= width - 1)
+			return Blocked;
+		if(y == 0)
+			return Blocked;
+		return m2i(x + 1, y - 1);
+	case RightDown:
+		if(x >= width - 1)
+			return Blocked;
+		if(y >= height - 1)
+			return Blocked;
+		return m2i(x + 1, y + 1);
+	case Up:
+		if(y == 0)
+			return Blocked;
+		return m2i(x, y - 1);
+	case Down:
+		if(y >= height - 1)
+			return Blocked;
+		return m2i(x, y + 1);
+	default:
+		return i;
+	}
 }

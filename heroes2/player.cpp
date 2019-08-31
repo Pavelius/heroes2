@@ -194,3 +194,25 @@ void playeri::sethire(int index) {
 	else
 		this->heroes[index] = RandomHero;
 }
+
+void playeri::prepare(difficult_s difficult) {
+	// ¬ зависимости от сложности создадим начальные услови€
+	auto difficult_computer = bsmeta<difficulti>::elements[difficult].opposition;
+	for(auto& e : bsmeta<playeri>::elements) {
+		if(!e)
+			continue;
+		if(e.activity == ComputerOnly)
+			e.activity = Computer;
+		switch(e.getactivity()) {
+		case Human: e.setup(difficult); break;
+		case Computer: e.setup(difficult_computer); break;
+		}
+	}
+	// ѕервоначальный прирост
+	for(unsigned i = 0; i < bsmeta<castlei>::count; i++) {
+		auto& e = bsmeta<castlei>::elements[i];
+		if(!e)
+			continue;
+		e.growth();
+	}
+}

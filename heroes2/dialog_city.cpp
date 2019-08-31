@@ -288,7 +288,7 @@ void castlei::information(building_s v, kind_s k) {
 }
 
 void castlei::paint_panorama(int x, int y) const {
-	bool coastal = true;
+	bool coastal = iscoastal();
 	switch(kind) {
 	case Knight:
 		image(x, y, TOWNBKG0, 0, 0);
@@ -411,8 +411,8 @@ void castlei::paint_panel(int x, int y, const heroi* hero) const {
 	image(x + 5, y + 6, CREST, 3);
 	armyi::paint(x + 112, y + 6, 0);
 	if(hero) {
-		image(x + 5 + 50, y + 105, hero->getid(), true);
-		armyi::paint(x + 112, y + 105, hero);
+		image(x + 5, y + 105, hero->getid(), true);
+		hero->paint(x + 112, y + 105, hero);
 	} else {
 		//if(bsget(mid, Captain))
 		//	draw::clipart(x + 5 + 50, y + 105, bsget(mid, Type) - Barbarian + BarbarianCaptain, bsget(mid, Player));
@@ -458,7 +458,7 @@ building_s castlei::getupgrade(building_s v, kind_s k) {
 }
 
 void castlei::show() {
-	heroi* hero = 0;
+	heroi* hero = heroi::find(getpos());
 	while(ismodal()) {
 		paint(hero);
 		cursor(ADVMCO, 0);

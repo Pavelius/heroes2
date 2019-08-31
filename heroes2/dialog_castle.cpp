@@ -62,6 +62,7 @@ bool castlei::build(building_s building, bool confirm) {
 	screenshoot first;
 	player->getresources() -= cost;
 	set(building);
+	set(AlreadyMoved);
 	paint(0);
 	screenshoot second;
 	first.blend(second);
@@ -93,7 +94,7 @@ static void building_control(const rect& rc, building_s building, castlei* castl
 	bool lack_resources = !(c1 >= c2);
 	bool lack_requisits = !isallow(*castle, r2);
 	auto already_build = castle->is(building);
-	auto already_moved = false;
+	auto already_moved = castle->is(AlreadyMoved);
 	auto hilite = mousein({rc.x1, rc.y1, rc.x1 + 135, rc.y1 + 80});
 	const char* name = getstr(building, kind);
 	if(paint_border) {
@@ -117,6 +118,10 @@ static void building_control(const rect& rc, building_s building, castlei* castl
 		image(rc.x2, rc.y2, TOWNWIND, 13);
 		if(hilite)
 			statelack(c1, c2);
+	} if(already_moved) {
+		image(rc.x2, rc.y2, TOWNWIND, 12);
+		if(hilite)
+			status("Построить можно только одно здание в день", name);
 	} else if(!already_build) {
 		if(hilite) {
 			status("Построить %1", name);
@@ -195,17 +200,22 @@ static void hire_hero() {
 
 }
 
-static void hireling(int x, int y, playeri* player, heroi* hero) {
+static void hireling(int x, int y, playeri* player, short unsigned index, heroi* hero) {
 	rect rc = {x, y, x + getwidth(PORT0000, 0), y + getheight(PORT0000, 0)};
 	auto hilite = mousein(rc);
 	auto& c1 = player->getresources();
 	auto& c2 = hero->cost;
 	auto lack_resources = !(c1>=c2);
+	auto already_hero = heroi::find(index) != 0;
 	image(x, y, hero->getid());
 	if(lack_resources) {
 		image(rc.x2 - 20, rc.y2 - 20, TOWNWIND, 13);
 		if(hilite)
 			statelack(c1, c2);
+	} else if(already_hero) {
+		image(rc.x2 - 20, rc.y2 - 20, TOWNWIND, 12);
+		if(hilite)
+			status("Нельзя нанять потому что в замке уже есть герой");
 	} else {
 		if(hilite) {
 			status("Нанять героя");
@@ -256,8 +266,8 @@ void castlei::build() {
 		building(293, 387, Moat, this);
 		captain(444, 165, this);
 		if(player) {
-			hireling(443, 260, player, player->gethire(0));
-			hireling(443, 362, player, player->gethire(1));
+			hireling(443, 260, player, getpos(), player->gethire(0));
+			hireling(443, 362, player, getpos(), player->gethire(1));
 			player->getresources().paint(552, 262);
 		}
 		button(553, 428, SWAPBTN, buttoncancel, {0, 0, 1}, KeyEscape, "Вернуться в город");

@@ -29,8 +29,8 @@ static unsigned select_drawables(const rect& rcmap, point camera, drawable* sour
 	for(unsigned i = 0; i < bsmeta<moveablei>::count; i++) {
 		auto& e = bsmeta<moveablei>::elements[i];
 		*(static_cast<pvar*>(p)) = &e;
-		p->x = map::i2x(e.index) * 32 - camera.x + 16;
-		p->y = map::i2y(e.index) * 32 - camera.y + 16;
+		p->x = map::i2x(e.index) * 32 - camera.x + rcmap.x1;
+		p->y = map::i2y(e.index) * 32 - camera.y + rcmap.y1;
 		if(!p->in(rc))
 			continue;
 		if(p < pe)
@@ -40,8 +40,8 @@ static unsigned select_drawables(const rect& rcmap, point camera, drawable* sour
 		auto& e = bsmeta<castlei>::elements[i];
 		auto index = e.getpos();
 		*(static_cast<pvar*>(p)) = &e;
-		p->x = map::i2x(index) * 32 - 32 * 2 - camera.x;
-		p->y = map::i2y(index) * 32 - 32 * 3 - camera.y;
+		p->x = map::i2x(index) * 32 - camera.x + rcmap.x1;
+		p->y = map::i2y(index) * 32 - camera.y + rcmap.y1;
 		if(!p->in(rc))
 			continue;
 		if(p < pe)
@@ -53,8 +53,8 @@ static unsigned select_drawables(const rect& rcmap, point camera, drawable* sour
 			continue;
 		*(static_cast<pvar*>(p)) = &e;
 		auto index = e.getpos();
-		p->x = map::i2x(index) * 32 - camera.x;
-		p->y = map::i2y(index) * 32 + 30 - camera.y;
+		p->x = map::i2x(index) * 32 - camera.x + rcmap.x1;
+		p->y = map::i2y(index) * 32 + 30 - camera.y + rcmap.y1;
 		if(!p->in(rc))
 			continue;
 		if(p < pe)
@@ -85,8 +85,8 @@ static void update_drawables() {
 }
 
 static void information_hero() {
-	auto hero = (heroi*)hot::param;
-	hero->show(true);
+	auto p = (heroi*)hot::param;
+	p->show(true);
 }
 
 static void choose_hero() {
@@ -97,13 +97,26 @@ static void choose_hero() {
 	map::setcamera(current_var.hero->getpos());
 }
 
+static void information_castle() {
+	auto p = (castlei*)hot::param;
+	p->show();
+}
+
+static void choose_castle() {
+	current_var = (castlei*)hot::param;
+	if(!current_var)
+		return;
+	info_type = ObjectInfo;
+	map::setcamera(current_var.castle->getpos());
+}
+
 static struct castlec : public list {
 
 	castlei*		data[128];
 
 	void setup(const playeri* player) {
 		maximum = 0;
-		for(auto i = 0; i < 128; i++) {
+		for(unsigned i = 0; i < bsmeta<castlei>::count; i++) {
 			auto& e = bsmeta<castlei>::elements[i];
 			if(!e)
 				continue;
@@ -128,8 +141,16 @@ static struct castlec : public list {
 			case Necromancer: index_sprite = iscastle ? 14 : 20; break;
 			}
 			image(x - 1, y, icn, index_sprite);
-			//if(bsget(rec, AlreadyMoved))
-			//	draw::image(x - 1, y + 1, icn, 24);
+			if(p->is(AlreadyMoved))
+				draw::image(x - 1, y + 1, icn, 24);
+			if(current_var.castle == p)
+				rectb({x - 1, y, x + 54, y + 31}, 214);
+			if(mousein({x, y, x + 54, y + 31})) {
+				if(hot::key == MouseLeft && hot::pressed)
+					draw::execute(choose_castle, (int)data[index]);
+				else if(hot::key == MouseLeftDBL && hot::pressed)
+					draw::execute(information_castle, (int)data[index]);
+			}
 		} else
 			image(x - 1, y, isevil(LOCATORE, LOCATORS), 5 + index);
 	}
@@ -351,22 +372,31 @@ void map::setcamera(short unsigned index) {
 static void paint_objects(const rect& rcmap, point camera) {
 	state push;
 	clipping = rcmap;
+	point p1, p2;
+	rect rc;
+	p1.x = map::i2x(hilite_index);
+	p1.y = map::i2y(hilite_index);
 	for(unsigned i = 0; i < drawables_count; i++) {
 		auto& e = drawables[i];
 		e.paint();
-		switch(e.type) {
-		case CastleVar:
-			if(e.castle->getpos() == hilite_index)
-				hilite_var = e;
-			break;
-		case Hero:
-			if(e.hero->getpos() == hilite_index)
-				hilite_var = e;
-			break;
-		case Moveable:
-			if(e.moveable->index == hilite_index)
-				hilite_var = e;
-			break;
+		if(hilite_index != Blocked) {
+			switch(e.type) {
+			case CastleVar:
+				p2.x = map::i2x(e.castle->getpos());
+				p2.y = map::i2y(e.castle->getpos());
+				rc.set(p2.x - 1, p2.y - 2, p2.x + 1, p2.y);
+				if(p1.in(rc))
+					hilite_var = e;
+				break;
+			case Hero:
+				if(e.hero->getpos() == hilite_index)
+					hilite_var = e;
+				break;
+			case Moveable:
+				if(e.moveable->index == hilite_index)
+					hilite_var = e;
+				break;
+			}
 		}
 	}
 }

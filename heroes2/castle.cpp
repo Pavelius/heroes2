@@ -113,6 +113,17 @@ bool castlei::isallow(monster_s v) const {
 	return false;
 }
 
+bool castlei::iscoastal() const {
+	if(index == Blocked)
+		return false;
+	auto i1 = map::to(index, Down);
+	if(map::gettile(map::to(i1, LeftDown)) == Sea)
+		return true;
+	if(map::gettile(map::to(i1, RightDown)) == Sea)
+		return true;
+	return false;
+}
+
 void castlei::recruit(building_s building) {
 	auto unit = getmonster(building, getkind());
 	if(unit == RandomMonster)

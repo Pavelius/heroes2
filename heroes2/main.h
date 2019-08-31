@@ -209,6 +209,9 @@ enum armysize_s {
 enum landscape_s : unsigned char {
 	Beach, Desert, Dirt, Grass, Lava, Sea, Snow, Swamp, Waste,
 };
+enum castle_flag_s : unsigned char {
+	AlreadyMoved,
+};
 class heroi;
 struct variant {
 	variant_s				type;
@@ -283,6 +286,7 @@ struct lucki {
 };
 struct difficulti {
 	const char*				name;
+	difficult_s				opposition;
 	costi					resources;
 	int						rating;
 };
@@ -321,6 +325,7 @@ public:
 	static void				endturn();
 	static void				initialize();
 	int						getadventurers() const;
+	activity_s				getactivity() const { return activity; }
 	int						getbuildings(building_s v) const;
 	int						getcastles() const;
 	int						getheroes() const;
@@ -328,14 +333,15 @@ public:
 	player_s				getid() const { return player_s(this - bsmeta<playeri>::elements); }
 	kind_s					getkind() const { return kind; }
 	int						getmarket() const;
-	static heroi*			randomhire(kind_s kind, kind_s excude_kind);
-	heroi*					randomhire(int index) const;
 	static int				getrate(resource_s resf, resource_s rest, int markets);
 	costi&					getresources() { return resources; }
 	int						getspies() const;
 	int						gettowns() const;
 	void					marketplace();
+	static void				prepare(difficult_s difficult);
 	void					quickmessage(const costi& cost, const char* format, ...);
+	static heroi*			randomhire(kind_s kind, kind_s excude_kind);
+	heroi*					randomhire(int index) const;
 	bool					recruit(monster_s unit, int& count, int maximum);
 	void					set(activity_s v) { activity = v; }
 	void					set(kind_s v) { kind = v; }
@@ -407,6 +413,7 @@ public:
 	void					add(monster_s id, short unsigned count) { armyi::add(id, count); }
 	void					clear();
 	static const costi		cost;
+	static heroi*			find(short unsigned index);
 	playeri*				getplayer() const;
 	int						get(ability_s v) const;
 	int						get(skill_s v) const { return skills[v]; }
@@ -441,6 +448,7 @@ class castlei : public namei, public armyi {
 	void					paint_panorama(int x, int y) const;
 	void					paint_name() const;
 	void					paint_monster(int x, int y, int height, int width, int level);
+	cflags<castle_flag_s, unsigned char> flags;
 public:
 	void					add(monster_s id, unsigned short count) { armyi::add(id, count); }
 	void					build();
@@ -467,11 +475,14 @@ public:
 	static void				initialize();
 	constexpr int			is(building_s v) const { return buildings.is(v); }
 	bool					is(monster_s v) const { return armyi::is(v); }
+	bool					is(castle_flag_s v) const { return flags.is(v); }
 	bool					isallow(monster_s v) const;
+	bool					iscoastal() const;
 	static void				information(building_s v, kind_s k);
 	void					paint(const heroi* hero) const;
 	void					random(bool castle);
 	void					recruit(building_s building);
+	void					set(castle_flag_s v) { flags.add(v); }
 	void					set(const playeri* v) { player = (v ? v->getid() : RandomPlayer); }
 	void					set(player_s v) { player = v; }
 	void					set(building_s v) { buildings.add(v); }
@@ -480,6 +491,7 @@ public:
 	void					show();
 	void					well();
 	void					remove(building_s v) { buildings.remove(v); }
+	void					remove(castle_flag_s v) { flags.remove(v); }
 	void					growth();
 };
 struct spelli {
@@ -598,6 +610,8 @@ extern unsigned	char		obelisc_count;
 extern unsigned	char		roads[256 * 256];
 extern unsigned short		tiles[256 * 256];
 extern unsigned char		width;
+//
+short unsigned				to(short unsigned i, direction_s d);
 //
 void						clear();
 inline unsigned				getmonth() { return day / (7*4); }

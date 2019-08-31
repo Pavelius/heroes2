@@ -325,10 +325,13 @@ static void load_object(castlei& e, mp2::castle& r) {
 	}
 	e.set(player);
 	e.set(kind);
+	// name
+	if(!r.has_name && r.name[0])
+		e.setname(r.name);
 	// Castle or Town
 	if(!r.disable_castle_upgrade)
 		e.set(Tent);
-	if(!r.castle_in_town)
+	if(r.castle_in_town)
 		e.set(Castle);
 	// custom building
 	if(r.has_buildings) {
@@ -384,9 +387,6 @@ static void load_object(castlei& e, mp2::castle& r) {
 	// captain
 	if(r.has_captain)
 		e.set(Captain);
-	// name
-	if(r.has_name && r.name[0])
-		zcpy(e.name, e.name, sizeof(e.name));
 }
 
 static void load_object(heroi& e, mp2::hero& r) {

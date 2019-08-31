@@ -61,7 +61,9 @@ struct buttoni {
 	unsigned char			pressed;
 };
 struct drawable : point, pvar {
+	void					border() const;
 	int						getlevel() const;
+	void					getrect(rect& rc) const;
 	void					paint() const;
 	static void				paint_castle(int x, int y, landscape_s tile, kind_s race, bool town, bool shadow);
 };

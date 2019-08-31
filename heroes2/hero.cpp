@@ -179,3 +179,13 @@ unsigned heroi::select(heroi** result, heroi** result_maximum, const playeri* pl
 	}
 	return p - result;
 }
+
+heroi* heroi::find(short unsigned index) {
+	if(index == Blocked)
+		return 0;
+	for(auto& e : bsmeta<heroi>::elements) {
+		if(e.index == index)
+			return &e;
+	}
+	return 0;
+}

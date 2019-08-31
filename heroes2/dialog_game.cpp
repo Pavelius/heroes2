@@ -330,6 +330,7 @@ void gamei::newgame() {
 		//if(!game.setupmap())
 		//	return;
 		game.prepare();
+		playeri::prepare(game.difficult);
 		bsmeta<playeri>::elements[PlayerRed].adventure();
 	}
 }

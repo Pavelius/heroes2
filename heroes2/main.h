@@ -484,6 +484,7 @@ public:
 	bool					iscoastal() const;
 	static void				information(building_s v, kind_s k);
 	void					paint(const heroi* hero) const;
+	static void				paint(int x, int y, landscape_s tile, kind_s race, bool castle, bool shadow);
 	void					random(bool castle);
 	void					recruit(building_s building);
 	void					set(castle_flag_s v) { flags.add(v); }

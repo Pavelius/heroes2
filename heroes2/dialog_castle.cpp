@@ -235,7 +235,7 @@ void castlei::build() {
 		status({21, height - 16, 21 + getwidth(SMALLBAR, 0), height - 1});
 		image(0, 0, CASLWIND, 0);
 		// hide captain options
-		drawable::paint_castle(460, 5, Dirt, race, false, false);
+		paint(460, 5, Dirt, race, false, false);
 		if(true) {
 			auto p = getname();
 			text(440 + (635 - 440 - textw(p)) / 2, 2, p);

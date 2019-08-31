@@ -60,14 +60,6 @@ struct buttoni {
 	unsigned char			hilite;
 	unsigned char			pressed;
 };
-struct drawable : point, pvar {
-	void					border() const;
-	int						getlevel() const;
-	void					getrect(rect& rc) const;
-	int						getzpos() const;
-	void					paint() const;
-	static void				paint_castle(int x, int y, landscape_s tile, kind_s race, bool town, bool shadow);
-};
 struct picture {
 	res_s					res;
 	unsigned char			frame;
@@ -224,6 +216,7 @@ int							getresult();
 int							getwidth(res_s id, int n);
 void						hexagon(int x, int y, unsigned char m);
 void						hexagonf(int x, int y, unsigned char intense);
+void						imagb(int x, int y, unsigned short value);
 void						image(int x, int y, res_s res, int n, unsigned flags = 0, unsigned char* change = 0);
 void						image(int x, int y, monster_s res, int n, unsigned flags = 0, int mode= 1);
 void						image(int x, int y, hero_s res, bool large = true);

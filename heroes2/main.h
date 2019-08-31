@@ -161,7 +161,7 @@ enum map_object_s : unsigned char {
 	FirstObject = WaterChest, LastObject = WaterAltar,
 	// Standart landscape objects
 	Brush, Cactus, Cliff, Crack, Flowers, Hill, Hole, Lake, Mountains, Mushrooms, Rock, Trees, Volcano, Stream, Road,
-	RiverDeltaDown, Stumps, DiggingHole,
+	StreamDelta, Stumps, DiggingHole,
 	EmpthyObject,
 };
 enum tag_s : unsigned char {
@@ -383,6 +383,8 @@ struct moveablei {
 	short unsigned			index;
 	variant					element;
 	short unsigned			value;
+	player_s				player;
+	unsigned char			value2;
 };
 class heroi : public namei, public armyi {
 	kind_s					kind;

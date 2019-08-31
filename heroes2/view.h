@@ -60,9 +60,8 @@ struct buttoni {
 	unsigned char			hilite;
 	unsigned char			pressed;
 };
-struct drawable : point {
-	pvar					object;
-	//void					border() const;
+struct drawable : point, pvar {
+	int						getlevel() const;
 	void					paint() const;
 	static void				paint_castle(int x, int y, landscape_s tile, kind_s race, bool town, bool shadow);
 };
@@ -176,7 +175,26 @@ private:
 	void					box(int x, int y, res_s icn, int dy, int dx, int sbu, int sbd, int sbs, int sdbd, int sb, int bf, res_s iss) const;
 	void					flatbutton(int x, int y, res_s icn, int index, int command) const;
 };
-//
+struct shapei {
+	unsigned char			count;
+	point					size;
+	point					points[24];
+	unsigned char			animation[24];
+	unsigned char			content[24]; // 0 - shadow, 1 - passable, 2 - blocked
+	unsigned char			indecies[24];
+	point					offset;
+	unsigned char			zero;
+	unsigned char			initialized;
+};
+struct mapobjecti			{
+	res_s					res;
+	map_object_s			object;
+	shapei&					shape;
+	unsigned char			first;
+	unsigned char			last;
+	static const mapobjecti* find(res_s res, unsigned char frame);
+	static void				initialize();
+};
 bool						ask(const char* format, const variantcol* footer = 0, unsigned count = 0);
 void						breakmodal(int result);
 void						button(int x, int y, res_s res, const cmd& ev, const buttoni& decor, int key = 0, const char* tips = 0);
@@ -204,6 +222,7 @@ void						image(int x, int y, monster_s res, int n, unsigned flags = 0, int mode
 void						image(int x, int y, hero_s res, bool large = true);
 void						image(int x, int y, skill_s res, int level);
 int							image(int x, int y, int width, const costi& e);
+void						imags(int x, int y, unsigned short value, unsigned short index);
 void						imagt(int x, int y, res_s res, int n, int mode);
 void						image(const rect& rc, res_s id, int frame, const char* title, const char* tips);
 void						image(const rect& rc, resource_s id, int count, const char* tips);

@@ -429,8 +429,8 @@ void gamei::updatebase() {
 	}
 }
 
-void add_moveable(short unsigned index, variant v, short unsigned quantity = 0);
-void add_object(unsigned short index, unsigned char object, unsigned char frame, unsigned char quantity);
+moveablei* add_moveable(short unsigned index, variant v, short unsigned quantity = 0);
+moveablei* add_object(unsigned short index, unsigned char object, unsigned char frame, unsigned char quantity);
 
 void gamei::prepare() {
 	generator generate;

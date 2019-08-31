@@ -2,17 +2,7 @@
 
 using namespace draw;
 
-struct shapei {
-	unsigned char	count;
-	point			size;
-	point			points[24];
-	unsigned char	animation[24];
-	unsigned char	content[24]; // 0 - shadow, 1 - passable, 2 - blocked
-	unsigned char	indecies[24];
-	point			offset;
-	unsigned char	zero;
-	unsigned char	initialized;
-};
+//
 static shapei sh1x1 = {1, {1, 1}, {{0, 0}}, {0}, {2}};
 static shapei sh1x1a6 = {1, {1, 1}, {{0, 0}}, {6}, {2}};
 static shapei sh1x1a11 = {1, {1, 1}, {{0, 0}}, {11}, {2}};
@@ -92,447 +82,452 @@ static shapei sh7x4 = {22, {7, 4}, {{-2, -3}, {-1, -3}, {0, -3}, {-3, -2}, {-2, 
 //
 static shapei sh8x3 = {24, {8, 3}, {{-4, -1}, {-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {3, -1}, {-4, 0}, {-3, 0}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}, {2, 0}, {3, 0}, {-4, 1}, {-3, 1}, {-2, 1}, {-1, 1}, {0, 1}, {1, 1}, {2, 1}, {3, 1}}};
 static shapei sh8x5a10 = {23, {8, 5}, {{0, -4}, {1, -4}, {2, -4}, {-1, -3}, {0, -3}, {1, -3}, {2, -3}, {3, -3}, {-3, -2}, {0, -2}, {1, -2}, {2, -2}, {-4, -1}, {-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {-1, 0}, {0, 0}, {1, 0}, {2, 0}}, {14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 0, 0, 0, 0, 0, 0, 0}};
-// Monster animation
-static const unsigned char monster_animation_cicle[] = {
-	1, 2, 1, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	3, 4, 5, 4, 3, 0,
-	0, 0, 0, 0,
-};
-// Monster another animation
-static const unsigned char monster_animation_cicl1[] = {
-	1, 2, 1, 0,
-	3, 4, 5, 4, 3, 0,
-};
-// Map object description
-struct mapitemi {
-	map_object_s	object;
-	shapei&			shape;
-	unsigned char	first;
-	unsigned char	last;
-};
-static mapitemi grass[] = {{AbandoneMine, sh4x2}, // Haunted mine
-{Hole, sh2x1bk},
-{Crack, sh4x2d1},
-{Crack, sh3x3},
-{Crack, sh2x2bk},
-{Rock, sh3x1},
-{Rock, sh3x1},
-{Rock, sh3x2u1r1}, // Big boulder
-{Rock, sh2x1}, // Big 
-{Rock, sh1x1},
-{Rock, sh2x1},
-{Rock, sh2x1},
-{Rock, sh2x1},
-{Rock, sh2x1},
-{Lake, sh5x3},
-{Flowers, sh1x1}, // Flower
-{Lake, sh4x2}, // Lake
-{Lake, sh3x1}, // Lake
-{Hill, sh3x1}, // Hill
-{Trees, sh4x2u1},
-{Trees, sh3x2u1},
-{Trees, sh2x2J},
-{Brush, sh4x1}, // Brush flowers
-{Brush, sh4x1}, // Brush
-{Brush, sh3x1}, // Brush small
-{Brush, sh3x1}, // Brush small flowers
-{Brush, sh3x1}, // Brush small to up
-{Brush, sh2x1}, // Single brush
-{Flowers, sh4x1}, // Flowers red
-{Flowers, sh4x2u1}, // Flowers red
-{Flowers, sh4x1}, // Flowers red another
-{Flowers, sh4x1}, // Flowers blue
-{Flowers, sh3x2u1}, // Flowers blue
-{Flowers, sh1x1}, // Flowers tiny
-{Flowers, sh3x1}, // Flowers
-{Flowers, sh2x1}, // Flowers
-{Flowers, sh2x1}, // Flowers to up
-{Flowers, sh2x1}, // Flowers white
-{Flowers, sh2x1}, // Flowers ultraviolet
-{Hill, sh2x1}, // Hill
-};
-static mapitemi grass2[] = {{HillFort, sh3x2u1},
-{HalflingHole, sh4x1},
-{DiggingHole, sh1x1},
-{Cliff, sh2x1},
-{Cliff, sh2x1},
-{Cliff, sh3x1},
-{SpriteHouse, sh4x2u2},
-{WindMill, sh4x3u2a3},
-{ArcherHouse, sh3x2u2a5},
-{GoblinHut, sh2x1},
-{PeasantHut, sh3x2u2a5},
-{Oracle, sh3x2},
-{Obelisk, sh2x2J},
-};
-static mapitemi dirt[] = {{AbandoneMine, sh5x2},
-{Hole, sh2x1},
-{Hill, sh2x1},
-{Hill, sh3x1},
-{Crack, sh2x1},
-{Crack, sh2x1},
-{Crack, sh2x1},
-{Lake, sh8x3},
-{Lake, sh5x2},
-{Lake, sh2x1},
-{Brush, sh3x1},
-{Brush, sh3x1},
-{Brush, sh3x1},
-{Brush, sh2x1},
-{Brush, sh2x1},
-{Flowers, sh3x1},
-{Flowers, sh3x1},
-{Flowers, sh3x1},
-{Flowers, sh3x1},
-{Flowers, sh2x1},
-{Flowers, sh1x1},
-{Flowers, sh2x1},
-{Flowers, sh1x1},
-{Flowers, sh1x1},
-{Rock, sh3x1},
-{Rock, sh3x2},
-{Rock, sh3x1},
-{Rock, sh2x1},
-{Rock, sh1x1},
-{Flowers, sh1x1},
-{Flowers, sh2x1},
-{Flowers, sh2x1},
-{EmpthyObject, sh2x1},
-{EmpthyObject, sh1x1},
-{Trees, sh3x2},
-{Trees, sh3x2u1},
-{Trees, sh2x2J},
-{Mushrooms, sh3x1},
-{HillFort, sh3x2u1},
-{HalflingHole, sh4x1},
-{DiggingHole, sh1x1},
-{Cliff, sh2x1},
-{Cliff, sh2x1},
-{Cliff, sh2x1},
-{SpriteCity, sh4x2u2},
-{WindMill, sh4x3u2a3},
-{Oracle, sh3x2},
-{Obelisk, sh2x2J},
-};
-static mapitemi snow[] = {{Hole, sh2x1}, // Hole in Earth
-{CentautCave, sh2x1},
-{CampFire, sh1x1a6},
-{DiggingHole, sh1x1}, // Digging
-{LeanTo, sh2x1},
-{Cliff, sh2x1},
-{Cliff, sh2x1},
-{Cliff, sh3x1},
-{Rock, sh2x1},
-{Rock, sh3x2u1},
-{Rock, sh1x1},
-{Rock, sh2x1},
-{Rock, sh2x1},
-{Rock, sh3x1},
-{Rock, sh2x1},
-{Rock, sh2x1},
-{EmpthyObject, sh2x1}, // Wood (пеньки)
-{EmpthyObject, sh1x1}, // Wood (пеньки)
-{EmpthyObject, sh1x1}, // Grass
-{EmpthyObject, sh1x1}, // Grass
-{EmpthyObject, sh1x1}, // Grass
-{Trees, sh3x2u1},
-{Trees, sh4x2u1},
-{Trees, sh2x2J},
-{Trees, sh3x2u1},
-{Trees, sh2x2J},
-{Trees, sh2x2J},
-{Trees, sh2x2J},
-{Trees, sh2x2J},
-{Trees, sh2x2J},
-{Lake, sh5x2r1},
-{Lake, sh3x1},
-{Lake, sh3x1},
-{WindMill, sh4x3u2a3},
-{ThatchedHut, sh2x2J},
-{Obelisk, sh2x2J},
-{Sign, sh2x1},
-{AlchemyLab, sh4x2а6},
-{Graveyard, sh3x1},
-{WaterWheel, sh3x3u1r1a6},
-{MagicWell, sh2x2J},
-{EmpthyObject, sh4x2},
-{Graveyard, sh4x2},
-};
-static mapitemi desert[] = {{EmpthyObject, sh2x1}, // Hole in Earth
-{Trees, sh2x1}, // Tree
-{Trees, sh2x2J}, // Tree
-{Trees, sh2x2J}, // Tree
-{Trees, sh2x2J}, // Tree
-{Hill, sh3x1}, // Hill
-{Hill, sh3x1}, // Hill
-{Trees, sh4x1}, // Tree
-{Trees, sh2x1}, // Tree
-{Trees, sh2x1}, // Tree
-{EmpthyObject, sh2x1},
-{EmpthyObject, sh2x1},
-{Cactus, sh1x1}, // Cactus
-{Cactus, sh1x1}, // Cactus
-{Cactus, sh2x1}, // Cactus
-{Cactus, sh2x1}, // Cactuses
-{Cactus, sh2x2J}, // Cactuses
-{Cactus, sh1x1}, // Cactuses
-{Cactus, sh2x1}, // Cactuses
-{Cactus, sh2x2J}, // Cactuses
-{Cactus, sh2x2J}, // Cactuses
-{Cactus, sh1x1}, // Cactuses
-{Cactus, sh2x1}, // Cactuses
-{Cactus, sh2x1}, // Cactuses
-{CampFire, sh2x1a6},
-{EmpthyObject, sh1x1},
-{DesertTent, sh3x2u1},
-{EmpthyObject, sh2x2J},
-{Pyramid, sh3x2},
-{DeadSkeleton, sh2x1},
-{Sphinx, sh3x2u1r1},
-{CityDead, sh5x2},
-{Excavation, sh3x1},
-{Obelisk, sh2x2J},
-{EmpthyObject, sh3x2u1},
-{Hole, sh3x1},
-{EmpthyObject, sh3x2u1},
-{Sign, sh2x1},
-{Graveyard, sh3x1},
-{Mines, sh4x2},
-};
-static mapitemi water[] = {{Bottle, sh1x1a11},
-{WaterChest, sh2x1a6},
-{EmpthyObject, sh1x1a6}, // Error?
-{EmpthyObject, sh3x2u1}, // Error?
-{EmpthyObject, sh2x1a6}, // Woods
-{WaterBoatStation, sh3x2a6}, // Map crafter woods
-{EmpthyObject, sh3x1a6}, // Водросли
-{EmpthyObject, sh2x1a6}, // Водросли
-{EmpthyObject, sh1x1a6}, // Утопабщий
-{Rock, sh3x2a15}, // Птицы
-{EmpthyObject, sh2x1},
-{EmpthyObject, sh2x1},
-{EmpthyObject, sh2x1a6},
-{EmpthyObject, sh3x2a3},
-{ShipWreck, sh3x2u1a6},
-};
-static mapitemi water2[] = {{Rock, sh2x2J},
-{ShipWreck, sh3x3r1a6},
-{Boat, sh1x1},
-};
-static mapitemi swamp[] = {{WitchHut, sh3x3u2u2a6},
-{Rock, sh2x1},
-{EmpthyObject, sh3x1}, // Herbs
-{Xanadu, sh5x3u2a6},
-{Mushrooms, sh3x1},
-{DiggingHole, sh1x1},
-{Lake, sh7x3r1},
-{Lake, sh4x2},
-{Lake, sh4x3u1r1},
-{Flowers, sh2x1},
-{Flowers, sh3x1},
-{Flowers, sh2x1},
-{Flowers, sh4x1},
-{Flowers, sh2x1},
-{EmpthyObject, sh2x1},// Мох
-{Sign, sh1x1},
-{EmpthyObject, sh5x2u1}, // Заводь
-{EmpthyObject, sh3x1}, // Заводь
-{EmpthyObject, sh3x1}, // Заводь
-{EmpthyObject, sh3x1}, // Заводь
-{EmpthyObject, sh2x1}, // Кушинка
-{Trees, sh3x3u1d1}, // Дерево
-{Trees, sh3x2u1}, // Дерево
-{Trees, sh3x2u1}, // Дерево
-{EmpthyObject, sh2x1}, // Трава
-{EmpthyObject, sh4x1}, // Трава
-{EmpthyObject, sh3x1}, // Трава
-{EmpthyObject, sh1x1}, // Трава
-{EmpthyObject, sh2x1}, // Кувшинка
-{EmpthyObject, sh2x1}, // Кувшинка
-{EmpthyObject, sh1x1}, // Кувшинка
-{EmpthyObject, sh2x1}, // Камыш
-{EmpthyObject, sh2x1}, // Камыш
-{EmpthyObject, sh2x1}, // Камыш (сверху)
-{EmpthyObject, sh2x1}, // Лилии
-{EmpthyObject, sh1x1}, // Лилии
-{Rock, sh2x1},
-{Rock, sh2x1},
-{Rock, sh3x2u2},
-{Rock, sh1x1},
-{EmpthyObject, sh3x1}, // Кувшинка
-{Obelisk, sh2x2J},
-};
-static mapitemi wasteland[] = {{ArtesianSpring, sh3x2u1},
-{EmpthyObject, sh2x1}, // Hole
-{Trees, sh3x2u1}, // Пальмы
-{Cactus, sh2x2J},
-{Brush, sh2x1},
-{EmpthyObject, sh1x1}, // Череп рогатого скота
-{Rock, sh1x1},
-{Rock, sh3x2u1r1},
-{Rock, sh3x1},
-{Rock, sh3x2u1},
-{Rock, sh2x1},
-{Rock, sh3x1},
-{Rock, sh3x1},
-{Rock, sh3x1},
-{Rock, sh2x1},
-{Rock, sh2x2J},
-{Rock, sh2x2J},
-{Rock, sh2x2J},
-{Rock, sh2x2J},
-{EmpthyObject, sh2x1}, // Засохшая трава
-{EmpthyObject, sh4x3}, // Трещина
-{EmpthyObject, sh1x1}, // Digging
-{EmpthyObject, sh1x1}, // Засохшая трава
-{EmpthyObject, sh1x1}, // Засохшая трава
-{Wagon, sh2x1},
-{EmpthyObject, sh6x3u1a10},
-{TrollBridge, sh4x2},
-{EmpthyObject, sh3x2u2a10}, // Торговый порт
-{EmpthyObject, sh4x2u1},
-{EmpthyObject, sh3x2}, // Трещина
-{EmpthyObject, sh2x3}, // Трещина
-{EmpthyObject, sh3x1}, // Трещина
-{Obelisk, sh2x2J},
-{SawMill, sh4x2},
-};
-static mapitemi lava[] = {{EmpthyObject, sh2x1}, // Hole
-{EmpthyObject, sh4x2}, // Куча камней
-{EmpthyObject, sh2x1}, // Error???
-{EmpthyObject, sh2x3}, // Stones
-{EmpthyObject, sh2x2J}, // Stones and lava
-{EmpthyObject, sh3x2u1}, // Stones and lava
-{EmpthyObject, sh1x1}, // Digg
-{Lake, sh6x2}, // Fire Lake
-{Lake, sh3x2}, // Fire Lake
-{Lake, sh4x2}, // Fire Lake
-{EmpthyObject, sh2x2}, // Lava
-{EmpthyObject, sh2x2J}, // Lava
-{EmpthyObject, sh2x2}, // Lava
-{EmpthyObject, sh3x2r1}, // Lava
-{EmpthyObject, sh3x2r1}, // Lava
-{Volcano, sh2x2},
-{EmpthyObject, sh2x2Ja9}, // Steam
-{Obelisk, sh2x2J},
-{DemonCave, sh3x2u1},
-{Sign, sh2x1},
-{SawMill, sh4x2},
-};
-static mapitemi lava2[] = {{Volcano, sh5x3a6},
-{Volcano, sh5x3a4},
-};
-static mapitemi lava3[] = {{Volcano, sh8x5a10},
-};
-static mapitemi trees[] = {{Trees, sh4x3r1d1},
-{Trees, sh4x3u1b1},
-{Trees, sh4x2r1d1},
-{Trees, sh4x2u1b1},
-{Trees, sh2x1},
-{Trees, sh2x1},
-};
-static mapitemi mountains[] = {{Mountains, sh6x4r1d2},
-{Mountains, sh6x4u1b2},
-{Mountains, sh4x3r1d1},
-{Mountains, sh4x3u1b1},
-{Mountains, sh4x2r1d1},
-{Mountains, sh4x2u1b1},
-{Mines, sh5x2},
-};
-static mapitemi mountains2[] = {{Mountains, sh6x4r1d2},
-{Mountains, sh6x4u1b2},
-{Mountains, sh6x3r1d2},
-{Mountains, sh6x3u1b2},
-{Mountains, sh4x3r1d1},
-{Mountains, sh4x3u1b1},
-{Mountains, sh4x2r1d1},
-{Mountains, sh4x2u1b1},
-{Mines, sh5x2},
-};
-static mapitemi multiobj[] = {{Trees, sh2x2J},
-{Trees, sh2x1},
-{PeasantHut, sh3x2u2a9},
-{Fort, sh4x3u2r1d1a9},
-{Gazebo, sh2x2J},
-{Flowers, sh3x1},
-{DoctorHut, sh3x2u2},
-{MercenaryCamp, sh3x1},
-{Ruins, sh2x1},
-{Shrine2, sh2x1},
-{Shrine3, sh2x1},
-{Shrine1, sh2x1},
-{Idol, sh2x1},
-{StandingStones, sh3x1},
-{Temple, sh2x2},
-{TradingPost, sh3x2u2a5v2},
-{SpriteHouse, sh2x2J},
-{ThatchedHut, sh2x1},
-{TreeKnowledge, sh3x3u1u1},
-{CampFire, sh2x1a6},
-};
-static mapitemi multiobj2[] = {{RiverDeltaDown, sh3x3u1r1},
-{RiverDeltaDown, sh3x3d1b1},
-{Fountain, sh2x1},
-{Stumps, sh1x1},
-{Stumps, sh2x1},
-{Stumps, sh1x1},
-{AlchemyLab, sh4x2а6},
-{DragonCity, sh7x4},
-{Graveyard, sh3x1}, // Not usable
-{LitghHouse, sh3x3u2m1},
-{SawMill, sh4x2}, // On brown dirt
-{WaterWheel, sh3x3u1r1a6},
-{Sign, sh2x1},
-{Teleporter, sh2x1},
-{Teleporter, sh2x2J},
-{Teleporter, sh2x2J},
-{RogueCamp, sh4x2а6_rogcmp},
-{EmpthyObject, sh6x4}, // Error ??
-{MagicWell, sh2x1},
-{Event, sh1x1},
-{MagicWell, sh2x1},
-{FreemanFoundry, sh3x2u1a6v2},
-{MagicGarden, sh2x1},
-{MagicGarden, sh1x1a6}, // Lephrechaunt here
-{WatchTower, sh3x2u2},
-{Graveyard, sh4x2},
-{SawMill, sh4x2}, // Green grass
-};
 
-static struct mapobjectset {
-	int			tile;
-	res_s		icn;
-	int			count;
-	mapitemi*	objects;
-} mapobjectsets[] = {{Grass, OBJNGRAS, sizeof(grass) / sizeof(grass[0]), grass},
-{Grass, OBJNGRA2, sizeof(grass2) / sizeof(grass2[0]), grass2},
-{Dirt, OBJNDIRT, sizeof(dirt) / sizeof(dirt[0]), dirt},
-{Snow, OBJNSNOW, sizeof(snow) / sizeof(snow[0]), snow},
-{Desert, OBJNDSRT, sizeof(desert) / sizeof(desert[0]), desert},
-{Sea, OBJNWATR, sizeof(water) / sizeof(water[0]), water},
-{Sea, OBJNWAT2, sizeof(water2) / sizeof(water2[0]), water2},
-{Swamp, OBJNSWMP, sizeof(swamp) / sizeof(swamp[0]), swamp},
-{Waste, OBJNCRCK, sizeof(wasteland) / sizeof(wasteland[0]), wasteland},
-{Lava, OBJNLAVA, sizeof(lava) / sizeof(lava[0]), lava},
-{Lava, OBJNLAV2, sizeof(lava2) / sizeof(lava2[0]), lava2},
-{Lava, OBJNLAV3, sizeof(lava3) / sizeof(lava3[0]), lava3},
-{Trees, TREDECI, sizeof(trees) / sizeof(trees[0]), trees},
-{Trees, TREFALL, sizeof(trees) / sizeof(trees[0]), trees},
-{Trees, TREJNGL, sizeof(trees) / sizeof(trees[0]), trees},
-{Trees, TREEVIL, sizeof(trees) / sizeof(trees[0]), trees},
-{Trees, TREFIR, sizeof(trees) / sizeof(trees[0]), trees},
-{Trees, TRESNOW, sizeof(trees) / sizeof(trees[0]), trees},
-{Mountains, MTNDIRT, sizeof(mountains2) / sizeof(mountains2[0]), mountains2},
-{Mountains, MTNCRCK, sizeof(mountains2) / sizeof(mountains2[0]), mountains2},
-{Mountains, MTNDSRT, sizeof(mountains) / sizeof(mountains[0]), mountains},
-{Mountains, MTNGRAS, sizeof(mountains) / sizeof(mountains[0]), mountains},
-{Mountains, MTNLAVA, sizeof(mountains) / sizeof(mountains[0]), mountains},
-{Mountains, MTNMULT, sizeof(mountains) / sizeof(mountains[0]), mountains},
-{Mountains, MTNSNOW, sizeof(mountains) / sizeof(mountains[0]), mountains},
-{Mountains, MTNSWMP, sizeof(mountains) / sizeof(mountains[0]), mountains},
-{EmpthyObject, OBJNMULT, sizeof(multiobj) / sizeof(multiobj[0]), multiobj},
-{EmpthyObject, OBJNMUL2, sizeof(multiobj2) / sizeof(multiobj2[0]), multiobj2},
+mapobjecti bsmeta<mapobjecti>::elements[] = {{OBJNGRAS, AbandoneMine, sh4x2}, // Haunted mine
+{OBJNGRAS, Hole, sh2x1bk},
+{OBJNGRAS, Crack, sh4x2d1},
+{OBJNGRAS, Crack, sh3x3},
+{OBJNGRAS, Crack, sh2x2bk},
+{OBJNGRAS, Rock, sh3x1},
+{OBJNGRAS, Rock, sh3x1},
+{OBJNGRAS, Rock, sh3x2u1r1}, // Big boulder
+{OBJNGRAS, Rock, sh2x1}, // Big 
+{OBJNGRAS, Rock, sh1x1},
+{OBJNGRAS, Rock, sh2x1},
+{OBJNGRAS, Rock, sh2x1},
+{OBJNGRAS, Rock, sh2x1},
+{OBJNGRAS, Rock, sh2x1},
+{OBJNGRAS, Lake, sh5x3},
+{OBJNGRAS, Flowers, sh1x1}, // Flower
+{OBJNGRAS, Lake, sh4x2}, // Lake
+{OBJNGRAS, Lake, sh3x1}, // Lake
+{OBJNGRAS, Hill, sh3x1}, // Hill
+{OBJNGRAS, Trees, sh4x2u1},
+{OBJNGRAS, Trees, sh3x2u1},
+{OBJNGRAS, Trees, sh2x2J},
+{OBJNGRAS, Brush, sh4x1}, // Brush flowers
+{OBJNGRAS, Brush, sh4x1}, // Brush
+{OBJNGRAS, Brush, sh3x1}, // Brush small
+{OBJNGRAS, Brush, sh3x1}, // Brush small flowers
+{OBJNGRAS, Brush, sh3x1}, // Brush small to up
+{OBJNGRAS, Brush, sh2x1}, // Single brush
+{OBJNGRAS, Flowers, sh4x1}, // Flowers red
+{OBJNGRAS, Flowers, sh4x2u1}, // Flowers red
+{OBJNGRAS, Flowers, sh4x1}, // Flowers red another
+{OBJNGRAS, Flowers, sh4x1}, // Flowers blue
+{OBJNGRAS, Flowers, sh3x2u1}, // Flowers blue
+{OBJNGRAS, Flowers, sh1x1}, // Flowers tiny
+{OBJNGRAS, Flowers, sh3x1}, // Flowers
+{OBJNGRAS, Flowers, sh2x1}, // Flowers
+{OBJNGRAS, Flowers, sh2x1}, // Flowers to up
+{OBJNGRAS, Flowers, sh2x1}, // Flowers white
+{OBJNGRAS, Flowers, sh2x1}, // Flowers ultraviolet
+{OBJNGRAS, Hill, sh2x1}, // Hill
+{OBJNGRA2, HillFort, sh3x2u1},
+{OBJNGRA2, HalflingHole, sh4x1},
+{OBJNGRA2, DiggingHole, sh1x1},
+{OBJNGRA2, Cliff, sh2x1},
+{OBJNGRA2, Cliff, sh2x1},
+{OBJNGRA2, Cliff, sh3x1},
+{OBJNGRA2, SpriteHouse, sh4x2u2},
+{OBJNGRA2, WindMill, sh4x3u2a3},
+{OBJNGRA2, ArcherHouse, sh3x2u2a5},
+{OBJNGRA2, GoblinHut, sh2x1},
+{OBJNGRA2, PeasantHut, sh3x2u2a5},
+{OBJNGRA2, Oracle, sh3x2},
+{OBJNGRA2, Obelisk, sh2x2J},
+{OBJNDIRT, AbandoneMine, sh5x2},
+{OBJNDIRT, Hole, sh2x1},
+{OBJNDIRT, Hill, sh2x1},
+{OBJNDIRT, Hill, sh3x1},
+{OBJNDIRT, Crack, sh2x1},
+{OBJNDIRT, Crack, sh2x1},
+{OBJNDIRT, Crack, sh2x1},
+{OBJNDIRT, Lake, sh8x3},
+{OBJNDIRT, Lake, sh5x2},
+{OBJNDIRT, Lake, sh2x1},
+{OBJNDIRT, Brush, sh3x1},
+{OBJNDIRT, Brush, sh3x1},
+{OBJNDIRT, Brush, sh3x1},
+{OBJNDIRT, Brush, sh2x1},
+{OBJNDIRT, Brush, sh2x1},
+{OBJNDIRT, Flowers, sh3x1},
+{OBJNDIRT, Flowers, sh3x1},
+{OBJNDIRT, Flowers, sh3x1},
+{OBJNDIRT, Flowers, sh3x1},
+{OBJNDIRT, Flowers, sh2x1},
+{OBJNDIRT, Flowers, sh1x1},
+{OBJNDIRT, Flowers, sh2x1},
+{OBJNDIRT, Flowers, sh1x1},
+{OBJNDIRT, Flowers, sh1x1},
+{OBJNDIRT, Rock, sh3x1},
+{OBJNDIRT, Rock, sh3x2},
+{OBJNDIRT, Rock, sh3x1},
+{OBJNDIRT, Rock, sh2x1},
+{OBJNDIRT, Rock, sh1x1},
+{OBJNDIRT, Flowers, sh1x1},
+{OBJNDIRT, Flowers, sh2x1},
+{OBJNDIRT, Flowers, sh2x1},
+{OBJNDIRT, EmpthyObject, sh2x1},
+{OBJNDIRT, EmpthyObject, sh1x1},
+{OBJNDIRT, Trees, sh3x2},
+{OBJNDIRT, Trees, sh3x2u1},
+{OBJNDIRT, Trees, sh2x2J},
+{OBJNDIRT, Mushrooms, sh3x1},
+{OBJNDIRT, HillFort, sh3x2u1},
+{OBJNDIRT, HalflingHole, sh4x1},
+{OBJNDIRT, DiggingHole, sh1x1},
+{OBJNDIRT, Cliff, sh2x1},
+{OBJNDIRT, Cliff, sh2x1},
+{OBJNDIRT, Cliff, sh2x1},
+{OBJNDIRT, SpriteCity, sh4x2u2},
+{OBJNDIRT, WindMill, sh4x3u2a3},
+{OBJNDIRT, Oracle, sh3x2},
+{OBJNDIRT, Obelisk, sh2x2J},
+{OBJNSNOW, Hole, sh2x1}, // Hole in Earth
+{OBJNSNOW, CentautCave, sh2x1},
+{OBJNSNOW, CampFire, sh1x1a6},
+{OBJNSNOW, DiggingHole, sh1x1}, // Digging
+{OBJNSNOW, LeanTo, sh2x1},
+{OBJNSNOW, Cliff, sh2x1},
+{OBJNSNOW, Cliff, sh2x1},
+{OBJNSNOW, Cliff, sh3x1},
+{OBJNSNOW, Rock, sh2x1},
+{OBJNSNOW, Rock, sh3x2u1},
+{OBJNSNOW, Rock, sh1x1},
+{OBJNSNOW, Rock, sh2x1},
+{OBJNSNOW, Rock, sh2x1},
+{OBJNSNOW, Rock, sh3x1},
+{OBJNSNOW, Rock, sh2x1},
+{OBJNSNOW, Rock, sh2x1},
+{OBJNSNOW, EmpthyObject, sh2x1}, // Wood (пеньки)
+{OBJNSNOW, EmpthyObject, sh1x1}, // Wood (пеньки)
+{OBJNSNOW, EmpthyObject, sh1x1}, // Grass
+{OBJNSNOW, EmpthyObject, sh1x1}, // Grass
+{OBJNSNOW, EmpthyObject, sh1x1}, // Grass
+{OBJNSNOW, Trees, sh3x2u1},
+{OBJNSNOW, Trees, sh4x2u1},
+{OBJNSNOW, Trees, sh2x2J},
+{OBJNSNOW, Trees, sh3x2u1},
+{OBJNSNOW, Trees, sh2x2J},
+{OBJNSNOW, Trees, sh2x2J},
+{OBJNSNOW, Trees, sh2x2J},
+{OBJNSNOW, Trees, sh2x2J},
+{OBJNSNOW, Trees, sh2x2J},
+{OBJNSNOW, Lake, sh5x2r1},
+{OBJNSNOW, Lake, sh3x1},
+{OBJNSNOW, Lake, sh3x1},
+{OBJNSNOW, WindMill, sh4x3u2a3},
+{OBJNSNOW, ThatchedHut, sh2x2J},
+{OBJNSNOW, Obelisk, sh2x2J},
+{OBJNSNOW, Sign, sh2x1},
+{OBJNSNOW, AlchemyLab, sh4x2а6},
+{OBJNSNOW, Graveyard, sh3x1},
+{OBJNSNOW, WaterWheel, sh3x3u1r1a6},
+{OBJNSNOW, MagicWell, sh2x2J},
+{OBJNSNOW, EmpthyObject, sh4x2},
+{OBJNSNOW, Graveyard, sh4x2},
+{OBJNDSRT, EmpthyObject, sh2x1}, // Hole in Earth
+{OBJNDSRT, Trees, sh2x1}, // Tree
+{OBJNDSRT, Trees, sh2x2J}, // Tree
+{OBJNDSRT, Trees, sh2x2J}, // Tree
+{OBJNDSRT, Trees, sh2x2J}, // Tree
+{OBJNDSRT, Hill, sh3x1}, // Hill
+{OBJNDSRT, Hill, sh3x1}, // Hill
+{OBJNDSRT, Trees, sh4x1}, // Tree
+{OBJNDSRT, Trees, sh2x1}, // Tree
+{OBJNDSRT, Trees, sh2x1}, // Tree
+{OBJNDSRT, EmpthyObject, sh2x1},
+{OBJNDSRT, EmpthyObject, sh2x1},
+{OBJNDSRT, Cactus, sh1x1}, // Cactus
+{OBJNDSRT, Cactus, sh1x1}, // Cactus
+{OBJNDSRT, Cactus, sh2x1}, // Cactus
+{OBJNDSRT, Cactus, sh2x1}, // Cactuses
+{OBJNDSRT, Cactus, sh2x2J}, // Cactuses
+{OBJNDSRT, Cactus, sh1x1}, // Cactuses
+{OBJNDSRT, Cactus, sh2x1}, // Cactuses
+{OBJNDSRT, Cactus, sh2x2J}, // Cactuses
+{OBJNDSRT, Cactus, sh2x2J}, // Cactuses
+{OBJNDSRT, Cactus, sh1x1}, // Cactuses
+{OBJNDSRT, Cactus, sh2x1}, // Cactuses
+{OBJNDSRT, Cactus, sh2x1}, // Cactuses
+{OBJNDSRT, CampFire, sh2x1a6},
+{OBJNDSRT, EmpthyObject, sh1x1},
+{OBJNDSRT, DesertTent, sh3x2u1},
+{OBJNDSRT, EmpthyObject, sh2x2J},
+{OBJNDSRT, Pyramid, sh3x2},
+{OBJNDSRT, DeadSkeleton, sh2x1},
+{OBJNDSRT, Sphinx, sh3x2u1r1},
+{OBJNDSRT, CityDead, sh5x2},
+{OBJNDSRT, Excavation, sh3x1},
+{OBJNDSRT, Obelisk, sh2x2J},
+{OBJNDSRT, EmpthyObject, sh3x2u1},
+{OBJNDSRT, Hole, sh3x1},
+{OBJNDSRT, EmpthyObject, sh3x2u1},
+{OBJNDSRT, Sign, sh2x1},
+{OBJNDSRT, Graveyard, sh3x1},
+{OBJNDSRT, Mines, sh4x2},
+{OBJNWATR, Bottle, sh1x1a11},
+{OBJNWATR, WaterChest, sh2x1a6},
+{OBJNWATR, EmpthyObject, sh1x1a6}, // Error?
+{OBJNWATR, EmpthyObject, sh3x2u1}, // Error?
+{OBJNWATR, EmpthyObject, sh2x1a6}, // Woods
+{OBJNWATR, WaterBoatStation, sh3x2a6}, // Map crafter woods
+{OBJNWATR, EmpthyObject, sh3x1a6}, // Водросли
+{OBJNWATR, EmpthyObject, sh2x1a6}, // Водросли
+{OBJNWATR, EmpthyObject, sh1x1a6}, // Утопабщий
+{OBJNWATR, Rock, sh3x2a15}, // Птицы
+{OBJNWATR, EmpthyObject, sh2x1},
+{OBJNWATR, EmpthyObject, sh2x1},
+{OBJNWATR, EmpthyObject, sh2x1a6},
+{OBJNWATR, EmpthyObject, sh3x2a3},
+{OBJNWATR, ShipWreck, sh3x2u1a6},
+{OBJNWAT2, Rock, sh2x2J},
+{OBJNWAT2, ShipWreck, sh3x3r1a6},
+{OBJNWAT2, Boat, sh1x1},
+{OBJNSWMP, WitchHut, sh3x3u2u2a6},
+{OBJNSWMP, Rock, sh2x1},
+{OBJNSWMP, EmpthyObject, sh3x1}, // Herbs
+{OBJNSWMP, Xanadu, sh5x3u2a6},
+{OBJNSWMP, Mushrooms, sh3x1},
+{OBJNSWMP, DiggingHole, sh1x1},
+{OBJNSWMP, Lake, sh7x3r1},
+{OBJNSWMP, Lake, sh4x2},
+{OBJNSWMP, Lake, sh4x3u1r1},
+{OBJNSWMP, Flowers, sh2x1},
+{OBJNSWMP, Flowers, sh3x1},
+{OBJNSWMP, Flowers, sh2x1},
+{OBJNSWMP, Flowers, sh4x1},
+{OBJNSWMP, Flowers, sh2x1},
+{OBJNSWMP, EmpthyObject, sh2x1},// Мох
+{OBJNSWMP, Sign, sh1x1},
+{OBJNSWMP, EmpthyObject, sh5x2u1}, // Заводь
+{OBJNSWMP, EmpthyObject, sh3x1}, // Заводь
+{OBJNSWMP, EmpthyObject, sh3x1}, // Заводь
+{OBJNSWMP, EmpthyObject, sh3x1}, // Заводь
+{OBJNSWMP, EmpthyObject, sh2x1}, // Кушинка
+{OBJNSWMP, Trees, sh3x3u1d1}, // Дерево
+{OBJNSWMP, Trees, sh3x2u1}, // Дерево
+{OBJNSWMP, Trees, sh3x2u1}, // Дерево
+{OBJNSWMP, EmpthyObject, sh2x1}, // Трава
+{OBJNSWMP, EmpthyObject, sh4x1}, // Трава
+{OBJNSWMP, EmpthyObject, sh3x1}, // Трава
+{OBJNSWMP, EmpthyObject, sh1x1}, // Трава
+{OBJNSWMP, EmpthyObject, sh2x1}, // Кувшинка
+{OBJNSWMP, EmpthyObject, sh2x1}, // Кувшинка
+{OBJNSWMP, EmpthyObject, sh1x1}, // Кувшинка
+{OBJNSWMP, EmpthyObject, sh2x1}, // Камыш
+{OBJNSWMP, EmpthyObject, sh2x1}, // Камыш
+{OBJNSWMP, EmpthyObject, sh2x1}, // Камыш (сверху)
+{OBJNSWMP, EmpthyObject, sh2x1}, // Лилии
+{OBJNSWMP, EmpthyObject, sh1x1}, // Лилии
+{OBJNSWMP, Rock, sh2x1},
+{OBJNSWMP, Rock, sh2x1},
+{OBJNSWMP, Rock, sh3x2u2},
+{OBJNSWMP, Rock, sh1x1},
+{OBJNSWMP, EmpthyObject, sh3x1}, // Кувшинка
+{OBJNSWMP, Obelisk, sh2x2J},
+{OBJNCRCK, ArtesianSpring, sh3x2u1},
+{OBJNCRCK, EmpthyObject, sh2x1}, // Hole
+{OBJNCRCK, Trees, sh3x2u1}, // Пальмы
+{OBJNCRCK, Cactus, sh2x2J},
+{OBJNCRCK, Brush, sh2x1},
+{OBJNCRCK, EmpthyObject, sh1x1}, // Череп рогатого скота
+{OBJNCRCK, Rock, sh1x1},
+{OBJNCRCK, Rock, sh3x2u1r1},
+{OBJNCRCK, Rock, sh3x1},
+{OBJNCRCK, Rock, sh3x2u1},
+{OBJNCRCK, Rock, sh2x1},
+{OBJNCRCK, Rock, sh3x1},
+{OBJNCRCK, Rock, sh3x1},
+{OBJNCRCK, Rock, sh3x1},
+{OBJNCRCK, Rock, sh2x1},
+{OBJNCRCK, Rock, sh2x2J},
+{OBJNCRCK, Rock, sh2x2J},
+{OBJNCRCK, Rock, sh2x2J},
+{OBJNCRCK, Rock, sh2x2J},
+{OBJNCRCK, EmpthyObject, sh2x1}, // Засохшая трава
+{OBJNCRCK, EmpthyObject, sh4x3}, // Трещина
+{OBJNCRCK, EmpthyObject, sh1x1}, // Digging
+{OBJNCRCK, EmpthyObject, sh1x1}, // Засохшая трава
+{OBJNCRCK, EmpthyObject, sh1x1}, // Засохшая трава
+{OBJNCRCK, Wagon, sh2x1},
+{OBJNCRCK, EmpthyObject, sh6x3u1a10},
+{OBJNCRCK, TrollBridge, sh4x2},
+{OBJNCRCK, EmpthyObject, sh3x2u2a10}, // Торговый порт
+{OBJNCRCK, EmpthyObject, sh4x2u1},
+{OBJNCRCK, EmpthyObject, sh3x2}, // Трещина
+{OBJNCRCK, EmpthyObject, sh2x3}, // Трещина
+{OBJNCRCK, EmpthyObject, sh3x1}, // Трещина
+{OBJNCRCK, Obelisk, sh2x2J},
+{OBJNCRCK, SawMill, sh4x2},
+{OBJNLAVA, EmpthyObject, sh2x1}, // Hole
+{OBJNLAVA, EmpthyObject, sh4x2}, // Куча камней
+{OBJNLAVA, EmpthyObject, sh2x1}, // Error???
+{OBJNLAVA, EmpthyObject, sh2x3}, // Stones
+{OBJNLAVA, EmpthyObject, sh2x2J}, // Stones and lava
+{OBJNLAVA, EmpthyObject, sh3x2u1}, // Stones and lava
+{OBJNLAVA, EmpthyObject, sh1x1}, // Digg
+{OBJNLAVA, Lake, sh6x2}, // Fire Lake
+{OBJNLAVA, Lake, sh3x2}, // Fire Lake
+{OBJNLAVA, Lake, sh4x2}, // Fire Lake
+{OBJNLAVA, EmpthyObject, sh2x2}, // Lava
+{OBJNLAVA, EmpthyObject, sh2x2J}, // Lava
+{OBJNLAVA, EmpthyObject, sh2x2}, // Lava
+{OBJNLAVA, EmpthyObject, sh3x2r1}, // Lava
+{OBJNLAVA, EmpthyObject, sh3x2r1}, // Lava
+{OBJNLAVA, Volcano, sh2x2},
+{OBJNLAVA, EmpthyObject, sh2x2Ja9}, // Steam
+{OBJNLAVA, Obelisk, sh2x2J},
+{OBJNLAVA, DemonCave, sh3x2u1},
+{OBJNLAVA, Sign, sh2x1},
+{OBJNLAVA, SawMill, sh4x2},
+{OBJNLAV2, Volcano, sh5x3a6},
+{OBJNLAV2, Volcano, sh5x3a4},
+{OBJNLAV3, Volcano, sh8x5a10},
+{TREDECI, Trees, sh4x3r1d1},
+{TREDECI, Trees, sh4x3u1b1},
+{TREDECI, Trees, sh4x2r1d1},
+{TREDECI, Trees, sh4x2u1b1},
+{TREDECI, Trees, sh2x1},
+{TREDECI, Trees, sh2x1},
+{TREFALL, Trees, sh4x3r1d1},
+{TREFALL, Trees, sh4x3u1b1},
+{TREFALL, Trees, sh4x2r1d1},
+{TREFALL, Trees, sh4x2u1b1},
+{TREFALL, Trees, sh2x1},
+{TREFALL, Trees, sh2x1},
+{TREJNGL, Trees, sh4x3r1d1},
+{TREJNGL, Trees, sh4x3u1b1},
+{TREJNGL, Trees, sh4x2r1d1},
+{TREJNGL, Trees, sh4x2u1b1},
+{TREJNGL, Trees, sh2x1},
+{TREJNGL, Trees, sh2x1},
+{TREEVIL, Trees, sh4x3r1d1},
+{TREEVIL, Trees, sh4x3u1b1},
+{TREEVIL, Trees, sh4x2r1d1},
+{TREEVIL, Trees, sh4x2u1b1},
+{TREEVIL, Trees, sh2x1},
+{TREEVIL, Trees, sh2x1},
+{TREFIR, Trees, sh4x3r1d1},
+{TREFIR, Trees, sh4x3u1b1},
+{TREFIR, Trees, sh4x2r1d1},
+{TREFIR, Trees, sh4x2u1b1},
+{TREFIR, Trees, sh2x1},
+{TREFIR, Trees, sh2x1},
+{TRESNOW, Trees, sh4x3r1d1},
+{TRESNOW, Trees, sh4x3u1b1},
+{TRESNOW, Trees, sh4x2r1d1},
+{TRESNOW, Trees, sh4x2u1b1},
+{TRESNOW, Trees, sh2x1},
+{TRESNOW, Trees, sh2x1},
+{MTNDIRT, Mountains, sh6x4r1d2},
+{MTNDIRT, Mountains, sh6x4u1b2},
+{MTNDIRT, Mountains, sh6x3r1d2},
+{MTNDIRT, Mountains, sh6x3u1b2},
+{MTNDIRT, Mountains, sh4x3r1d1},
+{MTNDIRT, Mountains, sh4x3u1b1},
+{MTNDIRT, Mountains, sh4x2r1d1},
+{MTNDIRT, Mountains, sh4x2u1b1},
+{MTNDIRT, Mines, sh5x2},
+{MTNCRCK, Mountains, sh6x4r1d2},
+{MTNCRCK, Mountains, sh6x4u1b2},
+{MTNCRCK, Mountains, sh6x3r1d2},
+{MTNCRCK, Mountains, sh6x3u1b2},
+{MTNCRCK, Mountains, sh4x3r1d1},
+{MTNCRCK, Mountains, sh4x3u1b1},
+{MTNCRCK, Mountains, sh4x2r1d1},
+{MTNCRCK, Mountains, sh4x2u1b1},
+{MTNCRCK, Mines, sh5x2},
+{MTNDSRT, Mountains, sh6x4r1d2},
+{MTNDSRT, Mountains, sh6x4u1b2},
+{MTNDSRT, Mountains, sh4x3r1d1},
+{MTNDSRT, Mountains, sh4x3u1b1},
+{MTNDSRT, Mountains, sh4x2r1d1},
+{MTNDSRT, Mountains, sh4x2u1b1},
+{MTNDSRT, Mines, sh5x2},
+{MTNGRAS, Mountains, sh6x4r1d2},
+{MTNGRAS, Mountains, sh6x4u1b2},
+{MTNGRAS, Mountains, sh4x3r1d1},
+{MTNGRAS, Mountains, sh4x3u1b1},
+{MTNGRAS, Mountains, sh4x2r1d1},
+{MTNGRAS, Mountains, sh4x2u1b1},
+{MTNGRAS, Mines, sh5x2},
+{MTNLAVA, Mountains, sh6x4r1d2},
+{MTNLAVA, Mountains, sh6x4u1b2},
+{MTNLAVA, Mountains, sh4x3r1d1},
+{MTNLAVA, Mountains, sh4x3u1b1},
+{MTNLAVA, Mountains, sh4x2r1d1},
+{MTNLAVA, Mountains, sh4x2u1b1},
+{MTNLAVA, Mines, sh5x2},
+{MTNMULT, Mountains, sh6x4r1d2},
+{MTNMULT, Mountains, sh6x4u1b2},
+{MTNMULT, Mountains, sh4x3r1d1},
+{MTNMULT, Mountains, sh4x3u1b1},
+{MTNMULT, Mountains, sh4x2r1d1},
+{MTNMULT, Mountains, sh4x2u1b1},
+{MTNMULT, Mines, sh5x2},
+{MTNSNOW, Mountains, sh6x4r1d2},
+{MTNSNOW, Mountains, sh6x4u1b2},
+{MTNSNOW, Mountains, sh4x3r1d1},
+{MTNSNOW, Mountains, sh4x3u1b1},
+{MTNSNOW, Mountains, sh4x2r1d1},
+{MTNSNOW, Mountains, sh4x2u1b1},
+{MTNSNOW, Mines, sh5x2},
+{MTNSWMP, Mountains, sh6x4r1d2},
+{MTNSWMP, Mountains, sh6x4u1b2},
+{MTNSWMP, Mountains, sh4x3r1d1},
+{MTNSWMP, Mountains, sh4x3u1b1},
+{MTNSWMP, Mountains, sh4x2r1d1},
+{MTNSWMP, Mountains, sh4x2u1b1},
+{MTNSWMP, Mines, sh5x2},
+{OBJNMULT, Trees, sh2x2J},
+{OBJNMULT, Trees, sh2x1},
+{OBJNMULT, PeasantHut, sh3x2u2a9},
+{OBJNMULT, Fort, sh4x3u2r1d1a9},
+{OBJNMULT, Gazebo, sh2x2J},
+{OBJNMULT, Flowers, sh3x1},
+{OBJNMULT, DoctorHut, sh3x2u2},
+{OBJNMULT, MercenaryCamp, sh3x1},
+{OBJNMULT, Ruins, sh2x1},
+{OBJNMULT, Shrine2, sh2x1},
+{OBJNMULT, Shrine3, sh2x1},
+{OBJNMULT, Shrine1, sh2x1},
+{OBJNMULT, Idol, sh2x1},
+{OBJNMULT, StandingStones, sh3x1},
+{OBJNMULT, Temple, sh2x2},
+{OBJNMULT, TradingPost, sh3x2u2a5v2},
+{OBJNMULT, SpriteHouse, sh2x2J},
+{OBJNMULT, ThatchedHut, sh2x1},
+{OBJNMULT, TreeKnowledge, sh3x3u1u1},
+{OBJNMULT, CampFire, sh2x1a6},
+{OBJNMUL2, StreamDelta, sh3x3u1r1},
+{OBJNMUL2, StreamDelta, sh3x3d1b1},
+{OBJNMUL2, Fountain, sh2x1},
+{OBJNMUL2, Stumps, sh1x1},
+{OBJNMUL2, Stumps, sh2x1},
+{OBJNMUL2, Stumps, sh1x1},
+{OBJNMUL2, AlchemyLab, sh4x2а6},
+{OBJNMUL2, DragonCity, sh7x4},
+{OBJNMUL2, Graveyard, sh3x1}, // Not usable
+{OBJNMUL2, LitghHouse, sh3x3u2m1},
+{OBJNMUL2, SawMill, sh4x2}, // On brown dirt
+{OBJNMUL2, WaterWheel, sh3x3u1r1a6},
+{OBJNMUL2, Sign, sh2x1},
+{OBJNMUL2, Teleporter, sh2x1},
+{OBJNMUL2, Teleporter, sh2x2J},
+{OBJNMUL2, Teleporter, sh2x2J},
+{OBJNMUL2, RogueCamp, sh4x2а6_rogcmp},
+{OBJNMUL2, EmpthyObject, sh6x4}, // Error ??
+{OBJNMUL2, MagicWell, sh2x1},
+{OBJNMUL2, Event, sh1x1},
+{OBJNMUL2, MagicWell, sh2x1},
+{OBJNMUL2, FreemanFoundry, sh3x2u1a6v2},
+{OBJNMUL2, MagicGarden, sh2x1},
+{OBJNMUL2, MagicGarden, sh1x1a6}, // Lephrechaunt here
+{OBJNMUL2, WatchTower, sh3x2u2},
+{OBJNMUL2, Graveyard, sh4x2},
+{OBJNMUL2, SawMill, sh4x2}, // Green grass
 };
 
 res_s draw::getres(unsigned char object) {
@@ -590,58 +585,52 @@ res_s draw::getres(unsigned char object) {
 	}
 }
 
-bool gamei::isresource(unsigned char object) {
-	return getres(object) == OBJNRSRC;
-}
-
-static void initialize_map_objects() {
+void mapobjecti::initialize() {
 	// Initialize shapes
-	for(auto& ts : mapobjectsets) {
-		int start_ex = 0;
-		for(int i = 0; i < ts.count; i++) {
-			if(ts.objects[i].shape.initialized)
-				continue;
-			auto& sh = ts.objects[i].shape;
-			auto index = 0;
-			auto mx = 0;
-			auto my = 0;
-			for(int i = 0; i < sh.count; i++) {
-				auto x = sh.points[i].x;
-				if(x < mx)
-					mx = x;
-				auto y = sh.points[i].y;
-				if(y < my)
-					my = y;
-				sh.indecies[i] = index;
-				if(sh.points[i].x == 0 && sh.points[i].y == 0)
-					sh.zero = index;
-				index += 1 + sh.animation[i];
-			}
-			sh.offset.x = mx;
-			sh.offset.y = my;
-			sh.initialized = 1;
+	for(auto& e : bsmeta<mapobjecti>::elements) {
+		auto& sh = e.shape;
+		if(sh.initialized)
+			continue;
+		auto start_ex = 0;
+		auto index = 0;
+		auto mx = 0;
+		auto my = 0;
+		for(int i = 0; i < sh.count; i++) {
+			auto x = sh.points[i].x;
+			if(x < mx)
+				mx = x;
+			auto y = sh.points[i].y;
+			if(y < my)
+				my = y;
+			sh.indecies[i] = index;
+			if(sh.points[i].x == 0 && sh.points[i].y == 0)
+				sh.zero = index;
+			index += 1 + sh.animation[i];
 		}
+		sh.offset.x = mx;
+		sh.offset.y = my;
+		sh.initialized = 1;
 	}
 	// Initialize map objects
-	for(auto& ts : mapobjectsets) {
-		int start_ex = 0;
-		for(int i = 0; i < ts.count; i++) {
-			ts.objects[i].first = start_ex;
-			auto& sh = ts.objects[i].shape;
-			ts.objects[i].last = ts.objects[i].first + sh.indecies[sh.count - 1] + sh.animation[sh.count - 1];
-			start_ex += sh.indecies[sh.count - 1] + 1 + sh.animation[sh.count - 1];
+	auto start_ex = 0;
+	res_s res = NoRes;
+	for(auto& e : bsmeta<mapobjecti>::elements) {
+		if(res != e.res) {
+			res = e.res;
+			start_ex = 0;
 		}
+		e.first = start_ex;
+		auto& sh = e.shape;
+		auto count = sh.indecies[sh.count - 1] + sh.animation[sh.count - 1];
+		e.last = e.first + count;
+		start_ex += count + 1;
 	}
 }
 
-static mapitemi* find_object(res_s icn, unsigned char frame) {
-	for(auto& ts : mapobjectsets) {
-		if(ts.icn != icn)
-			continue;
-		for(int i = 0; i < ts.count; i++) {
-			if(ts.objects[i].first <= frame && frame <= ts.objects[i].last)
-				return ts.objects + i;
-		}
+const mapobjecti* mapobjecti::find(res_s res, unsigned char frame) {
+	for(auto& e : bsmeta<mapobjecti>::elements) {
+		if(e.res == res && frame >= e.first && frame <= e.last)
+			return &e;
 	}
 	return 0;
 }
@@ -712,15 +701,6 @@ static mapitemi* find_object(res_s icn, unsigned char frame) {
 //}
 
 //struct mapobject : public drawable {
-//
-//	res::tokens		icn;
-//	tokens			type;
-//	short unsigned	index;
-//	short unsigned	count;
-//	mapobjectinfo*	info;
-//
-//	int getid() const override;
-//
 //	point getpos() const {
 //		auto x = map::i2x(index) * 32;
 //		auto y = map::i2y(index) * 32;
@@ -812,142 +792,6 @@ static mapitemi* find_object(res_s icn, unsigned char frame) {
 //
 //};
 
-static unsigned char getroad(unsigned char object, unsigned char index) {
-	switch(getres(object)) {
-		// from sprite road
-	case ROAD:
-		switch(index) {
-		case 0: case 4: case 5:case 13: case 26:
-			return SH(Up) | SH(Down);
-		case 2: case 21: case 28:
-			return SH(Left) | SH(Right);
-		case 17: case 29:
-			return SH(LeftUp) | SH(RightDown);
-		case 18: case 30:
-			return SH(RightUp) | SH(LeftDown);
-		case 3:
-			return SH(Up) | SH(Down) | SH(Left) | SH(Right);
-		case 6:
-			return SH(Up) | SH(Down) | SH(Right);
-		case 7:
-			return SH(Up) | SH(Right);
-		case 9:
-			return SH(Down) | SH(Right);
-		case 12:
-			return SH(Down) | SH(Left);
-		case 14:
-			return SH(Up) | SH(Down) | SH(Left);
-		case 16:
-			return SH(Up) | SH(Left);
-		case 19:
-			return SH(LeftUp) | SH(RightDown);
-		case 20:
-			return SH(RightUp) | SH(LeftDown);
-		default:
-			return 0;
-		}
-		// castle and tower (gate)
-	case OBJNTOWN:
-		if(13 == index ||
-			29 == index ||
-			45 == index ||
-			61 == index ||
-			77 == index ||
-			93 == index ||
-			109 == index ||
-			125 == index ||
-			141 == index ||
-			157 == index ||
-			173 == index ||
-			189 == index)
-			return SH(Up) | SH(Down);
-		return 0;
-		// castle lands (gate)
-	case OBJNTWBA:
-		if(7 == index ||
-			17 == index ||
-			27 == index ||
-			37 == index ||
-			47 == index ||
-			57 == index ||
-			67 == index ||
-			77 == index)
-			return SH(Up) | SH(Down);
-		return 0;
-	default:
-		return 0;
-	}
-}
-
-void add_moveable(short unsigned index, variant v, short unsigned quantity);
-
-void add_object(unsigned short index, unsigned char object, unsigned char frame, unsigned char quantity) {
-	static moveablei* last_object;
-	map_object_s type = EmpthyObject;
-	mapitemi* pi = 0;
-	auto icn = getres(object);
-	switch(icn) {
-	case OBJNTOWN: // Не будем добавлять города
-	case OBJNTWBA: // Не будем добавлять базу городов
-	case OBJNTWRD: // Не будем добалять случайные города
-		map::roads[index] = getroad(object, frame);
-		return;
-	case MINIHERO: // No heroes
-	case SHADOW32: // No heroes shadows
-	case FLAG32: // No player flags
-	case OBJNTWSH: // No towns and castles shadow
-	case OBJNARTI: // No artifacts tiles
-	case MONS32: // No monster images
-	case OBJNRSRC: // No resource images
-		return;
-	case OBJNMUL2:
-		if(frame == 163) // No event signal (used only in editor)
-			return;
-		pi = find_object(icn, frame);
-		break;
-	case EXTRAOVR:
-		if(last_object) {
-			// Abandone mine and Mountain Mines has overlay just after their objects
-			//assert((last_object->type == Mines) || (last_object->type == AbandoneMine));
-			//last_object->type = (tokens)(MineOre + frame);
-			//last_object->count = 0;
-		}
-		return;
-	case STREAM:
-		type = Stream;
-		quantity = frame;
-		break;
-	case ROAD:
-		type = Road;
-		quantity = frame;
-		map::roads[index] = getroad(object, frame);
-		break;
-	default:
-		pi = find_object(icn, frame);
-		//assert(pi);
-		break;
-	}
-	if(pi) {
-		// Skip all frame not zero frames
-		if((pi->first + pi->shape.zero) != frame)
-			return;
-		type = pi->object;
-		if(!type)
-			type = ResourceObject;
-	}
-	// А можно ли добавить новый объект?
-	//add_moveable(index, v);
-//	if(mapobjects.from + mapobjects.count >= mapobjects.to)
-//		return;
-//	auto& e = objects[mapobjects.count++];
-//	e.icn = icn;
-//	e.index = index;
-//	e.count = quantity;
-//	e.info = pi;
-//	e.type = type;
-//	last_object = &e;
-}
-
 //COMMAND(map_block) {
 //	// Другие объекты
 //	for(int i = 0; i < mapobjects.count; i++) {
@@ -1005,30 +849,3 @@ void add_object(unsigned short index, unsigned char object, unsigned char frame,
 //		}
 //	}
 //}
-//
-//int map::getobject(short unsigned index) {
-//	for(int i = 0; i < mapobjects.count; i++) {
-//		if(objects[i].index == index) {
-//			if(objects[i].type >= Volcano)
-//				continue;
-//			return FirstMapObject + i;
-//		}
-//	}
-//	return 0;
-//}
-//
-//static struct mapobject_drawable_plugin : public drawable::plugin {
-//	void selecting(drawable** result, rect screen, unsigned flags) override {
-//		if((flags&DWMask) != DWObjects)
-//			return;
-//		auto p = result;
-//		for(int i = 0; i < mapobjects.count; i++) {
-//			if(!objects[i].type)
-//				continue;
-//			if(!objects[i].getrect().intersect(screen))
-//				continue;
-//			*p++ = objects + i;
-//		}
-//		*p = 0;
-//	}
-//} drawable_plugin;

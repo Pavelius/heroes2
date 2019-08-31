@@ -191,16 +191,13 @@
     <ClCompile Include="map_objects.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
-    <ClCompile Include="map_moveable.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
     <ClCompile Include="generator.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
-    <ClCompile Include="drawable.cpp">
+    <ClCompile Include="landscape.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
-    <ClCompile Include="landscape.cpp">
+    <ClCompile Include="map_moveable.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
   </ItemGroup>

@@ -28,7 +28,7 @@ static unsigned select_drawables(const rect& rcmap, point camera, drawable* sour
 	auto pe = p + count;
 	for(unsigned i = 0; i < bsmeta<moveablei>::count; i++) {
 		auto& e = bsmeta<moveablei>::elements[i];
-		p->object = &e;
+		*(static_cast<pvar*>(p)) = &e;
 		p->x = map::i2x(e.index) * 32 - camera.x + 16;
 		p->y = map::i2y(e.index) * 32 - camera.y + 16;
 		if(!p->in(rc))
@@ -39,7 +39,7 @@ static unsigned select_drawables(const rect& rcmap, point camera, drawable* sour
 	for(unsigned i = 0; i < bsmeta<castlei>::count; i++) {
 		auto& e = bsmeta<castlei>::elements[i];
 		auto index = e.getpos();
-		p->object = &e;
+		*(static_cast<pvar*>(p)) = &e;
 		p->x = map::i2x(index) * 32 - 32 * 2 - camera.x;
 		p->y = map::i2y(index) * 32 - 32 * 3 - camera.y;
 		if(!p->in(rc))
@@ -51,7 +51,7 @@ static unsigned select_drawables(const rect& rcmap, point camera, drawable* sour
 		auto& e = bsmeta<heroi>::elements[i];
 		if(e.getpos() == Blocked)
 			continue;
-		p->object = &e;
+		*(static_cast<pvar*>(p)) = &e;
 		auto index = e.getpos();
 		p->x = map::i2x(index) * 32 - camera.x;
 		p->y = map::i2y(index) * 32 + 30 - camera.y;
@@ -63,8 +63,25 @@ static unsigned select_drawables(const rect& rcmap, point camera, drawable* sour
 	return p - source;
 }
 
+static int compare_drawables(const void* p1, const void* p2) {
+	auto& e1 = *((drawable*)p1);
+	auto& e2 = *((drawable*)p2);
+	auto v1 = e1.getlevel();
+	auto v2 = e2.getlevel();
+	if(v1 != v2)
+		return v1 - v2;
+	if(e1.y != e2.y)
+		return e1.y - e2.y;
+	return e1.x - e2.x;
+}
+
+static void normalize_drawables() {
+	qsort(drawables, drawables_count, sizeof(drawables[0]), compare_drawables);
+}
+
 static void update_drawables() {
 	drawables_count = select_drawables(rcmap, map::camera, drawables, sizeof(drawables) / sizeof(drawables[0]));
+	normalize_drawables();
 }
 
 static void information_hero() {
@@ -337,18 +354,18 @@ static void paint_objects(const rect& rcmap, point camera) {
 	for(unsigned i = 0; i < drawables_count; i++) {
 		auto& e = drawables[i];
 		e.paint();
-		switch(e.object.type) {
+		switch(e.type) {
 		case CastleVar:
-			if(e.object.castle->getpos() == hilite_index)
-				hilite_var = e.object;
+			if(e.castle->getpos() == hilite_index)
+				hilite_var = e;
 			break;
 		case Hero:
-			if(e.object.hero->getpos() == hilite_index)
-				hilite_var = e.object;
+			if(e.hero->getpos() == hilite_index)
+				hilite_var = e;
 			break;
 		case Moveable:
-			if(e.object.moveable->index == hilite_index)
-				hilite_var = e.object;
+			if(e.moveable->index == hilite_index)
+				hilite_var = e;
 			break;
 		}
 	}

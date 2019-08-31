@@ -81,7 +81,7 @@ int main() {
 	//return 0;
 	if(!draw::create("test", 190, false))
 		return -1;
-	mapobjecti::initialize();
+	drawobji::initialize();
 	main_menu();
 	return 0;
 }

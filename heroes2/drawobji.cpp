@@ -83,7 +83,7 @@ static shapei sh7x4 = {22, {7, 4}, {{-2, -3}, {-1, -3}, {0, -3}, {-3, -2}, {-2, 
 static shapei sh8x3 = {24, {8, 3}, {{-4, -1}, {-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {3, -1}, {-4, 0}, {-3, 0}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}, {2, 0}, {3, 0}, {-4, 1}, {-3, 1}, {-2, 1}, {-1, 1}, {0, 1}, {1, 1}, {2, 1}, {3, 1}}};
 static shapei sh8x5a10 = {23, {8, 5}, {{0, -4}, {1, -4}, {2, -4}, {-1, -3}, {0, -3}, {1, -3}, {2, -3}, {3, -3}, {-3, -2}, {0, -2}, {1, -2}, {2, -2}, {-4, -1}, {-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {-1, 0}, {0, 0}, {1, 0}, {2, 0}}, {14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 0, 0, 0, 0, 0, 0, 0}};
 
-mapobjecti bsmeta<mapobjecti>::elements[] = {{OBJNGRAS, AbandoneMine, sh4x2}, // Haunted mine
+drawobji bsmeta<drawobji>::elements[] = {{OBJNGRAS, AbandoneMine, sh4x2}, // Haunted mine
 {OBJNGRAS, Hole, sh2x1bk},
 {OBJNGRAS, Crack, sh4x2d1},
 {OBJNGRAS, Crack, sh3x3},
@@ -585,9 +585,9 @@ res_s draw::getres(unsigned char object) {
 	}
 }
 
-void mapobjecti::initialize() {
+void drawobji::initialize() {
 	// Initialize shapes
-	for(auto& e : bsmeta<mapobjecti>::elements) {
+	for(auto& e : bsmeta<drawobji>::elements) {
 		auto& sh = e.shape;
 		if(sh.initialized)
 			continue;
@@ -614,7 +614,7 @@ void mapobjecti::initialize() {
 	// Initialize map objects
 	auto start_ex = 0;
 	res_s res = NoRes;
-	for(auto& e : bsmeta<mapobjecti>::elements) {
+	for(auto& e : bsmeta<drawobji>::elements) {
 		if(res != e.res) {
 			res = e.res;
 			start_ex = 0;
@@ -627,8 +627,8 @@ void mapobjecti::initialize() {
 	}
 }
 
-const mapobjecti* mapobjecti::find(res_s res, unsigned char frame) {
-	for(auto& e : bsmeta<mapobjecti>::elements) {
+const drawobji* drawobji::find(res_s res, unsigned char frame) {
+	for(auto& e : bsmeta<drawobji>::elements) {
 		if(e.res == res && frame >= e.first && frame <= e.last)
 			return &e;
 	}

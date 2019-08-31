@@ -42,7 +42,7 @@ int playeri::getcastles() const {
 }
 
 int playeri::gettowns() const {
-	return getbuildings(Tent);
+	return getbuildings(NoBuilding) - getbuildings(Castle);
 }
 
 int playeri::getspies() const {

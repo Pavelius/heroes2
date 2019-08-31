@@ -70,8 +70,10 @@ static int compare_drawables(const void* p1, const void* p2) {
 	auto v2 = e2.getlevel();
 	if(v1 != v2)
 		return v1 - v2;
-	if(e1.y != e2.y)
-		return e1.y - e2.y;
+	v1 = e1.getzpos();
+	v2 = e2.getzpos();
+	if(v1 != v2)
+		return v1 - v2;
 	return e1.x - e2.x;
 }
 
@@ -232,8 +234,8 @@ static void paint_tiles(rect screen, point camera) {
 				hilite_var = map::gettile(index);
 				hilite_index = index;
 #ifdef _DEBUG
-				if(hilite_index == index)
-					rectb(rc, 0x10);
+//				if(hilite_index == index)
+//					rectb(rc, 0x10);
 #endif // _DEBUG
 			}
 		}
@@ -307,12 +309,20 @@ static void information_resource(int x, int y, resource_s id, const playeri* pla
 	text(x - draw::textw(temp) / 2, y, temp);
 }
 
+static void paint_value(int x, int y, int v) {
+	auto pf = font;
+	font = SMALFONT;
+	char temp[16]; zprint(temp, "%1i", v);
+	text(x - textw(temp)/2, y, temp);
+	font = pf;
+}
+
 static void paint_kindom(int x, int y, const playeri* player) {
 	state push;
 	font = SMALFONT;
 	image(x, y, RESSMALL, 0);
-	text(x + 26, y + 31, "1"); // castle
-	text(x + 78, y + 31, "0"); // town
+	paint_value(x + 26, y + 31, player->getcastles()); // castle
+	paint_value(x + 78, y + 31, player->gettowns()); // town
 	information_resource(x + 122, y + 31, Gold, player);
 	information_resource(x + 14, y + 61, Wood, player);
 	information_resource(x + 35, y + 61, Mercury, player);
@@ -372,8 +382,8 @@ void map::setcamera(short unsigned index) {
 static void paint_objects(const rect& rcmap, point camera) {
 	state push;
 	clipping = rcmap;
-	point p1, p2;
 	rect rc;
+	point p1, p2;
 	p1.x = map::i2x(hilite_index);
 	p1.y = map::i2y(hilite_index);
 	for(unsigned i = 0; i < drawables_count; i++) {
@@ -442,7 +452,7 @@ static void tips_info(bool show_resource_count, bool show_monster_count, bool sh
 			break;
 		}
 		break;
-	case CastleVar: sb.addn("Замок %1", hilite_var.castle->getname()); break;
+	case CastleVar: sb.addn("%1", hilite_var.castle->getname()); break;
 	case Hero: sb.addn("Герой %1", hilite_var.hero->getname()); break;
 	case Landscape: sb.addn(getstr(hilite_var.landscape)); break;
 	}

@@ -150,8 +150,9 @@ int playeri::getbuildings(building_s v) const {
 			continue;
 		if(e.getplayer() != this)
 			continue;
-		if(e.is(v))
-			result++;
+		if(v != NoBuilding && !e.is(v))
+			continue;
+		result++;
 	}
 	return result;
 }

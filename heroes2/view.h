@@ -64,6 +64,7 @@ struct drawable : point, pvar {
 	void					border() const;
 	int						getlevel() const;
 	void					getrect(rect& rc) const;
+	int						getzpos() const;
 	void					paint() const;
 	static void				paint_castle(int x, int y, landscape_s tile, kind_s race, bool town, bool shadow);
 };
@@ -188,13 +189,13 @@ struct shapei {
 	unsigned char			zero;
 	unsigned char			initialized;
 };
-struct mapobjecti			{
+struct drawobji			{
 	res_s					res;
 	map_object_s			object;
 	shapei&					shape;
 	unsigned char			first;
 	unsigned char			last;
-	static const mapobjecti* find(res_s res, unsigned char frame);
+	static const drawobji* find(res_s res, unsigned char frame);
 	static void				initialize();
 };
 bool						ask(const char* format, const variantcol* footer = 0, unsigned count = 0);

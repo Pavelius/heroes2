@@ -574,8 +574,8 @@ struct pvar : variant {
 		castlei*			castle;
 		heroi*				hero;
 		playeri*			player;
+		squadi*				squad;
 		moveablei*			moveable;
-		short unsigned		index;
 		int					value;
 	};
 	constexpr pvar() : variant(), value(0) {}

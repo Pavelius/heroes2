@@ -102,7 +102,7 @@ moveablei* add_moveable(short unsigned index, variant v, short unsigned quantity
 
 moveablei* add_object(unsigned short index, unsigned char object, unsigned char frame, unsigned char quantity) {
 	static moveablei* last_object;
-	const mapobjecti* pi = 0;
+	const drawobji* pi = 0;
 	auto icn = getres(object);
 	switch(icn) {
 	case OBJNTOWN: // Не будем добавлять города
@@ -121,7 +121,7 @@ moveablei* add_object(unsigned short index, unsigned char object, unsigned char 
 	case OBJNMUL2:
 		if(frame == 163) // No event signal (used only in editor)
 			return 0;
-		pi = mapobjecti::find(icn, frame);
+		pi = drawobji::find(icn, frame);
 		break;
 	case EXTRAOVR:
 		if(last_object) {
@@ -136,7 +136,7 @@ moveablei* add_object(unsigned short index, unsigned char object, unsigned char 
 		map::roads[index] = getroad(object, frame);
 		return add_moveable(index, Road, frame);
 	default:
-		pi = mapobjecti::find(icn, frame);
+		pi = drawobji::find(icn, frame);
 		//assert(pi);
 		break;
 	}
@@ -147,14 +147,14 @@ moveablei* add_object(unsigned short index, unsigned char object, unsigned char 
 	}
 	// В конце добави новый подвижный объект
 	if(pi) {
-		last_object = add_moveable(index, pi->object, pi - bsmeta<mapobjecti>::elements);
+		last_object = add_moveable(index, pi->object, pi - bsmeta<drawobji>::elements);
 		return last_object;
 	}
 	return 0;
 }
 
 void draw::imags(int x, int y, unsigned short value, unsigned short index) {
-	auto& e = bsmeta<mapobjecti>::elements[value];
+	auto& e = bsmeta<drawobji>::elements[value];
 	auto& sh = e.shape;
 	for(int i = 0; i < sh.count; i++) {
 		auto px = x + sh.points[i].x * 32;
@@ -347,18 +347,18 @@ void drawable::paint() const {
 				image(x, y, STREAM, moveable->value);
 				break;
 			case Mines:
-				imags(x, y, moveable->value, index);
+				imags(x, y, moveable->value, moveable->index);
 				if(moveable->player != RandomPlayer)
 					image(x + 6, y - 26, FLAG32, moveable->player);
 				image(x, y, EXTRAOVR, decode_extraovr[moveable->value2]);
 				break;
 			case SawMill:
-				imags(x, y, moveable->value, index);
+				imags(x, y, moveable->value, moveable->index);
 				if(moveable->player != RandomPlayer)
 					image(x + 12, y - 48, FLAG32, moveable->player);
 				break;
 			default:
-				imags(x, y, moveable->value, index);
+				imags(x, y, moveable->value, moveable->index);
 				break;
 			}
 			break;
@@ -373,7 +373,6 @@ void drawable::paint() const {
 		paint_castle(x - 32 * 2, y - 32 * 3,
 			map::gettile(castle->getpos()),
 			castle->getkind(), !castle->is(Castle), true);
-		border();
 		break;
 	default:
 		break;
@@ -384,7 +383,7 @@ void drawable::getrect(rect& rc) const {
 	rc.x1 = x;
 	rc.y1 = y;
 	if(type == Moveable && moveable->element.type == MapObject) {
-		auto& sh = bsmeta<mapobjecti>::elements[moveable->value].shape;
+		auto& sh = bsmeta<drawobji>::elements[moveable->value].shape;
 		rc.x1 += sh.offset.x * 32;
 		rc.y1 += sh.offset.y * 32;
 		rc.x2 += rc.x1 + sh.size.x * 32;
@@ -414,4 +413,16 @@ int	drawable::getlevel() const {
 		}
 	}
 	return 10;
+}
+
+int drawable::getzpos() const {
+	auto v = y;
+	if(type == Moveable && moveable->element.type == MapObject) {
+		switch(moveable->element.mapobject) {
+		case TreeKnowledge:
+			v += 33;
+			break;
+		}
+	}
+	return v;
 }

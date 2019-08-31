@@ -58,12 +58,13 @@ bool castlei::build(building_s building, bool confirm) {
 		if(message(temp, kind, building, cost, ButtonYesNo) != 1)
 			return false;
 	}
-	paint(0);
+	auto hero = heroi::find(getpos());
+	paint(hero);
 	screenshoot first;
 	player->getresources() -= cost;
 	set(building);
 	set(AlreadyMoved);
-	paint(0);
+	paint(hero);
 	screenshoot second;
 	first.blend(second);
 	return true;
@@ -236,7 +237,7 @@ void castlei::build() {
 		status({21, height - 16, 21 + getwidth(SMALLBAR, 0), height - 1});
 		image(0, 0, CASLWIND, 0);
 		// hide captain options
-		//castle(460, 5, Dirt, race, false);
+		drawable::paint_castle(460, 5, Dirt, race, false, false);
 		if(true) {
 			auto p = getname();
 			text(440 + (635 - 440 - textw(p)) / 2, 2, p);

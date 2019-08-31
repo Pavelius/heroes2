@@ -43,15 +43,7 @@ struct drawable : point, pvar {
 		return 10;
 	}
 	int	getzpos() const {
-		auto v = y;
-		if(type == Moveable && moveable->element.type == MapObject) {
-			switch(moveable->element.object) {
-			case TreeKnowledge:
-				v += 33;
-				break;
-			}
-		}
-		return v;
+		return y;
 	}
 	static int compare(const void* p1, const void* p2) {
 		auto& e1 = *((drawable*)p1);

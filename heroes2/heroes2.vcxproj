@@ -149,6 +149,7 @@
     <ClCompile Include="dialog_spellbook.cpp" />
     <ClCompile Include="dialog_tavern.cpp" />
     <ClCompile Include="dialog_theives.cpp" />
+    <ClCompile Include="dialog_viewer.cpp" />
     <ClCompile Include="dialog_well.cpp" />
     <ClCompile Include="difficult.cpp" />
     <ClCompile Include="draw_list.cpp" />

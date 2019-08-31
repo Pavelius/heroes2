@@ -215,5 +215,8 @@
     <ClCompile Include="string.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="dialog_viewer.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

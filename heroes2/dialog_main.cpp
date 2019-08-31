@@ -2,6 +2,8 @@
 
 using namespace draw;
 
+void object_view();
+
 static void test_message() {
 	setevil(true);
 	variantcol elements[] = {{DivineBreastPlate}, {Ore, 10}, {Wood, 10}};
@@ -69,7 +71,7 @@ static void main_menu() {
 		button(0, 0, BTNSHNGL, gamei::newgame, {1, 2, 3}, 0, "Начать новую одиночную или мультиплеер игру.");
 		button(0, 0, BTNSHNGL, dialog_palette, {5, 6, 7}, Ctrl + Alpha + 'L', "Загрузить ранее сохраненную игру.");
 		button(0, 0, BTNSHNGL, hightscore::show, {9, 10, 11});
-		button(0, 0, BTNSHNGL, test_message, {13, 14, 15});
+		button(0, 0, BTNSHNGL, object_view, {13, 14, 15});
 		button(0, 0, BTNSHNGL, new_game, {17, 18, 19});
 		//latern.painting({0, 0});
 		cursor(ADVMCO, 0);

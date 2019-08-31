@@ -32,7 +32,7 @@ static shapei sh3x2u1r1 = {4, {3, 2}, {{0, -1}, {-1, 0}, {0, 0}, {1, 0}}};
 static shapei sh3x2u2a10 = {4, {3, 2}, {{1, -1}, {-1, 0}, {0, 0}, {1, 0}}, {10, 0, 10, 0}};
 static shapei sh3x2u2a9 = {4, {3, 2}, {{1, -1}, {-1, 0}, {0, 0}, {1, 0}}, {9, 9, 9, 0}};
 static shapei sh3x3 = {9, {3, 3}, {{-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {0, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}}};
-static shapei sh3x3u1u1 = {7, {3, 3}, {{0, -1}, {1, -1}, {0, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}}};
+static shapei sh3x3tr = {7, {3, 3}, {{-1, -2}, {0, -2}, {-1, -1}, {0, -1}, {-2, 0}, {-1, 0}, {0, 0}}, {}, {0, 0, 0, 1, 0, 0, 2}};
 static shapei sh3x3u1r1 = {7, {3, 3}, {{0, 0}, {-1, 1}, {0, 1}, {1, 1}, {-1, 2}, {0, 2}, {1, 2}}};
 static shapei sh3x3d1b1 = {7, {3, 3}, {{-1, 0}, {0, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}, {0, 2}}};
 static shapei sh3x3u1d1 = {7, {3, 3}, {{0, -2}, {1, -2}, {-1, -1}, {0, -1}, {1, -1}, {0, 0}, {1, 0}}};
@@ -46,6 +46,8 @@ static shapei sh3x2u2a5v2 = {4, {3, 2}, {{0, -1}, {-2, 0}, {-1, 0}, {0, 0}}, {6,
 //
 static shapei sh4x1 = {4, {4, 1}, {{-2, 0}, {-1, 0}, {0, 0}, {1, 0}}};
 static shapei sh4x2 = {8, {4, 2}, {{-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}}, {0}, {0, 1, 1, 2, 0, 2, 2, 2}};
+static shapei sh4x2sm = {8, {4, 2}, {{-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}}, {0}, {0, 1, 1, 1, 2, 2, 2, 2}};
+static shapei sh4x2gr = {8, {4, 2}, {{-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}}, {0}, {0, 1, 1, 1, 0, 2, 2, 2}};
 static shapei sh4x2u1 = {7, {4, 2}, {{-1, -1}, {0, -1}, {1, -1}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}}};
 static shapei sh4x2r1 = {7, {4, 2}, {{-2, -1}, {-1, -1}, {0, -1}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}}};
 static shapei sh4x2u2 = {6, {4, 2}, {{0, -1}, {1, -1}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}}};
@@ -225,8 +227,8 @@ drawobji bsmeta<drawobji>::elements[] = {{OBJNGRAS, AbandoneMine, sh4x2}, // Hau
 {OBJNSNOW, Graveyard, sh3x1},
 {OBJNSNOW, WaterWheel, sh3x3u1r1a6},
 {OBJNSNOW, MagicWell, sh2x2J},
-{OBJNSNOW, EmpthyObject, sh4x2},
-{OBJNSNOW, Graveyard, sh4x2},
+{OBJNSNOW, SawMill, sh4x2sm},
+{OBJNSNOW, Graveyard, sh4x2gr},
 {OBJNDSRT, EmpthyObject, sh2x1}, // Hole in Earth
 {OBJNDSRT, Trees, sh2x1}, // Tree
 {OBJNDSRT, Trees, sh2x2J}, // Tree
@@ -360,7 +362,7 @@ drawobji bsmeta<drawobji>::elements[] = {{OBJNGRAS, AbandoneMine, sh4x2}, // Hau
 {OBJNCRCK, EmpthyObject, sh2x3}, // Трещина
 {OBJNCRCK, EmpthyObject, sh3x1}, // Трещина
 {OBJNCRCK, Obelisk, sh2x2J},
-{OBJNCRCK, SawMill, sh4x2},
+{OBJNCRCK, SawMill, sh4x2sm},
 {OBJNLAVA, EmpthyObject, sh2x1}, // Hole
 {OBJNLAVA, EmpthyObject, sh4x2}, // Куча камней
 {OBJNLAVA, EmpthyObject, sh2x1}, // Error???
@@ -381,7 +383,7 @@ drawobji bsmeta<drawobji>::elements[] = {{OBJNGRAS, AbandoneMine, sh4x2}, // Hau
 {OBJNLAVA, Obelisk, sh2x2J},
 {OBJNLAVA, DemonCave, sh3x2u1},
 {OBJNLAVA, Sign, sh2x1},
-{OBJNLAVA, SawMill, sh4x2},
+{OBJNLAVA, SawMill, sh4x2sm},
 {OBJNLAV2, Volcano, sh5x3a6},
 {OBJNLAV2, Volcano, sh5x3a4},
 {OBJNLAV3, Volcano, sh8x5a10},
@@ -499,7 +501,7 @@ drawobji bsmeta<drawobji>::elements[] = {{OBJNGRAS, AbandoneMine, sh4x2}, // Hau
 {OBJNMULT, TradingPost, sh3x2u2a5v2},
 {OBJNMULT, SpriteHouse, sh2x2J},
 {OBJNMULT, ThatchedHut, sh2x1},
-{OBJNMULT, TreeKnowledge, sh3x3u1u1},
+{OBJNMULT, TreeKnowledge, sh3x3tr},
 {OBJNMULT, CampFire, sh2x1a6},
 {OBJNMUL2, StreamDelta, sh3x3u1r1},
 {OBJNMUL2, StreamDelta, sh3x3d1b1},
@@ -511,7 +513,7 @@ drawobji bsmeta<drawobji>::elements[] = {{OBJNGRAS, AbandoneMine, sh4x2}, // Hau
 {OBJNMUL2, DragonCity, sh7x4},
 {OBJNMUL2, Graveyard, sh3x1}, // Not usable
 {OBJNMUL2, LitghHouse, sh3x3u2m1},
-{OBJNMUL2, SawMill, sh4x2}, // On brown dirt
+{OBJNMUL2, SawMill, sh4x2sm}, // On brown dirt
 {OBJNMUL2, WaterWheel, sh3x3u1r1a6},
 {OBJNMUL2, Sign, sh2x1},
 {OBJNMUL2, Teleporter, sh2x1},
@@ -526,8 +528,8 @@ drawobji bsmeta<drawobji>::elements[] = {{OBJNGRAS, AbandoneMine, sh4x2}, // Hau
 {OBJNMUL2, MagicGarden, sh2x1},
 {OBJNMUL2, MagicGarden, sh1x1a6}, // Lephrechaunt here
 {OBJNMUL2, WatchTower, sh3x2u2},
-{OBJNMUL2, Graveyard, sh4x2},
-{OBJNMUL2, SawMill, sh4x2}, // Green grass
+{OBJNMUL2, Graveyard, sh4x2gr},
+{OBJNMUL2, SawMill, sh4x2sm}, // Green grass
 };
 
 res_s draw::getres(unsigned char object) {
@@ -635,162 +637,57 @@ const drawobji* drawobji::find(res_s res, unsigned char frame) {
 	return 0;
 }
 
-//void tilesetsview() {
-//	auto index = 0;
-//	auto ts_index = 0;
-//	char temp[64];
-//	while(true) {
-//		auto x1 = 640 / 2 - 16;
-//		auto y1 = 480 / 2 - 16;
-//		if(ts_index < 0)
-//			ts_index = 0;
-//		else if(ts_index >= sizeof(mapobjectsets) / sizeof(mapobjectsets[0]))
-//			ts_index = sizeof(mapobjectsets) / sizeof(mapobjectsets[0]) - 1;
-//		auto& ts = mapobjectsets[ts_index];
-//		if(index > ts.count - 1)
-//			index = ts.count - 1;
-//		else if(index < 0)
-//			index = 0;
-//		auto icn = ts.icn;
-//		auto& e = ts.objects[index];
-//		auto& sh = e.shape;
-//		draw::rectf({0, 0, draw::width - 1, draw::height - 1}, 0x12);
-//		int e_count = sh.indecies[sh.count - 1] + 1 + sh.animation[sh.count - 1];
-//		szprint(temp, "object %1i/%5i (start=%2i, count=%3i, next=%4i)", index, e.first, e_count, e.first + e_count, ts.count);
-//		draw::text(0, 0, temp);
-//		point center = {0, 0};
-//		for(int i = 0; i < sh.count; i++) {
-//			auto px = x1 + sh.points[i].x * 32;
-//			auto py = y1 + sh.points[i].y * 32;
-//			auto frame = e.first + sh.indecies[i];
-//			if(sh.animation[i])
-//				draw::image(px, py, icn, frame + 1 + (draw::counter % sh.animation[i]));
-//			draw::image(px, py, icn, frame);
-//			if(sh.points[i].x == 0 && sh.points[i].y == 0) {
-//				center.x = px;
-//				center.y = py;
-//			}
-//			draw::rectb(px, py, px + 32, py + 32, 0xC);
-//			if(sh.content[i] == TypeBlock)
-//				draw::rectb(px + 1, py + 1, px + 32 - 1, py + 32 - 1, 0xBF);
-//		}
-//		int rx1 = x1 + sh.offset.x * 32;
-//		int ry1 = y1 + sh.offset.y * 32;
-//		//draw::rectb(rx1, ry1, rx1 + sh.size.x * 32, ry1 + sh.size.y * 32, 0xBF);
-//		draw::cursor(res::ADVMCO, 0);
-//		draw::rectb(center.x + 2, center.y + 2, center.x + 32 - 2, center.y + 32 - 2, 0x72);
-//		int id = draw::input();
-//		switch(id) {
-//		case KeyEscape:
-//		case Cancel:
-//			return;
-//		case KeyRight:
-//			index++;
-//			break;
-//		case KeyLeft:
-//			index--;
-//			break;
-//		case KeyUp:
-//			ts_index++;
-//			break;
-//		case KeyDown:
-//			ts_index--;
-//			break;
-//		}
-//	}
-//}
-
-//struct mapobject : public drawable {
-//	point getpos() const {
-//		auto x = map::i2x(index) * 32;
-//		auto y = map::i2y(index) * 32;
-//		if(type >= FirstMonster && type <= LastMonster) {
-//			x += 16;
-//			y += 30;
-//		}
-//		return{(short)x, (short)y};
-//	}
-//
-//	rect getrect() const override {
-//		auto pt = getpos();
-//		if(info) {
-//			short x1 = pt.x + info->shape.offset.x * 32;
-//			short y1 = pt.y + info->shape.offset.y * 32;
-//			return{x1, y1, x1 + info->shape.size.x * 32, y1 + info->shape.size.y * 32};
-//		} else
-//			return{pt.x - 32, pt.y - 32, pt.x + 32, pt.y + 32};
-//	}
-//
-//	point getzpos() const override {
-//		return getpos();
-//	}
-//
-//	void painting(point camera, unsigned flags) const override {
-//		auto pt = getpos() - camera;
-//		if(info) {
-//			auto& sh = info->shape;
-//			for(int i = 0; i < sh.count; i++) {
-//				auto px = pt.x + sh.points[i].x * 32;
-//				auto py = pt.y + sh.points[i].y * 32;
-//				auto frame = info->first + sh.indecies[i];
-//				if(sh.animation[i])
-//					draw::image(px, py, icn, frame + 1 + ((draw::counter + count) % sh.animation[i]));
-//				draw::image(px, py, icn, frame);
-//			}
-//			switch(type) {
-//			case MineOre:
-//			case MineGold:
-//			case MineSulfur:
-//			case MineCrystal:
-//			case MineGems:
-//				draw::image(pt.x, pt.y, res::EXTRAOVR, type - FirstMine);
-//				if(count)
-//					draw::image(pt.x + 6, pt.y - 26, res::FLAG32, count - FirstPlayer);
-//				break;
-//			case SawMill:
-//				if(count)
-//					draw::image(pt.x + 12, pt.y - 48, res::FLAG32, count - FirstPlayer);
-//				break;
-//			}
-//		} else if(type >= FirstResource && type <= LastResource) {
-//			static int decode_resource[LastResource - FirstResource + 1] = {13 / 2, 1 / 2, 3 / 2, 5 / 2, 7 / 2, 9 / 2, 11 / 2};
-//			auto id = decode_resource[type - FirstResource];
-//			draw::image(pt.x - 32, pt.y, res::OBJNRSRC, id * 2);
-//			draw::image(pt.x, pt.y, res::OBJNRSRC, id * 2 + 1);
-//		} else if(type >= FirstMonster && type <= LastMonster) {
-//			if(type >= MonsterRnd1)
-//				draw::image(pt.x, pt.y, res::MONS32, type - FirstMonster);
-//			else {
-//				draw::image(pt.x, pt.y, res::MINIMON, (type - FirstMonster) * 9);
-//				switch(bsget(type, AnimationType)) {
-//				case 1:
-//					draw::image(pt.x, pt.y, res::MINIMON, (type - FirstMonster) * 9
-//						+ 1 + monster_animation_cicl1[(draw::counter + index * index) % (sizeof(monster_animation_cicl1) / sizeof(monster_animation_cicl1[0]))]);
-//					break;
-//				default:
-//					draw::image(pt.x, pt.y, res::MINIMON, (type - FirstMonster) * 9
-//						+ 1 + monster_animation_cicle[(draw::counter + index * index) % (sizeof(monster_animation_cicle) / sizeof(monster_animation_cicle[0]))]);
-//					break;
-//				}
-//			}
-//		} else if(type >= FirstArtifact && type <= LastArtifact) {
-//			draw::image(pt.x - 32, pt.y, res::OBJNARTI, (type - FirstArtifact) * 2);
-//			draw::image(pt.x, pt.y, res::OBJNARTI, (type - FirstArtifact) * 2 + 1);
-//		} else if(type == TreasureChest) {
-//			draw::image(pt.x - 32, pt.y, res::OBJNRSRC, 18);
-//			draw::image(pt.x, pt.y, res::OBJNRSRC, 19);
-//		} else if(type == AncientLamp) {
-//			draw::image(pt.x - 32, pt.y, res::OBJNRSRC, 14);
-//			draw::image(pt.x, pt.y, res::OBJNRSRC, 15);
-//		} else
-//			draw::image(pt.x, pt.y, icn, count);
-//	}
-//
-//	int priority() const override {
-//		return getid();
-//	}
-//
-//};
+void object_view() {
+	char temp[64];
+	const int maximum_count = sizeof(bsmeta<drawobji>::elements) / sizeof(bsmeta<drawobji>::elements[0]);
+	auto index = 0;
+	while(ismodal()) {
+		auto x1 = 640 / 2 - 16;
+		auto y1 = 480 / 2 - 16;
+		if(index < 0)
+			index = 0;
+		else if(index >= maximum_count)
+			index = maximum_count - 1;
+		auto& e = bsmeta<drawobji>::elements[index];
+		auto icn = e.res;
+		auto& sh = e.shape;
+		rectf({0, 0, draw::width - 1, draw::height - 1}, 0x12);
+		int e_count = sh.indecies[sh.count - 1] + 1 + sh.animation[sh.count - 1];
+		zprint(temp, "%6 %1i/%5i (начало=%2i, к-во=%3i, следущий=%4i)", index, e.first, e_count, e.first + e_count, maximum_count, getstr(e.object));
+		text(0, 0, temp);
+		point center = {0, 0};
+		for(int i = 0; i < sh.count; i++) {
+			auto px = x1 + sh.points[i].x * 32;
+			auto py = y1 + sh.points[i].y * 32;
+			auto frame = e.first + sh.indecies[i];
+			if(sh.animation[i])
+				image(px, py, icn, frame + 1 + (draw::counter % sh.animation[i]));
+			image(px, py, icn, frame);
+			if(sh.points[i].x == 0 && sh.points[i].y == 0) {
+				center.x = px;
+				center.y = py;
+			}
+			switch(sh.content[i]) {
+			case 0: rectb({px + 1, py + 1, px + 31, py + 31}, 26); break;
+			case 1: rectb({px + 1, py + 1, px + 31, py + 31}, 10); break;
+			case 2: rectb({px + 1, py + 1, px + 31, py + 31}, 190); break;
+			}
+			if(px==x1 && py==y1)
+				rectb({px + 2, y1 + 2, px + 30, py + 30}, 75);
+		}
+		cursor(ADVMCO, 0);
+		domodal();
+		switch(hot::key) {
+		case KeyEscape:
+			buttoncancel();
+			break;
+		case KeyRight: index++; break;
+		case KeyLeft: index--; break;
+		case KeyUp: index+=10; break;
+		case KeyDown: index -= 10; break;
+		}
+	}
+}
 
 //COMMAND(map_block) {
 //	// Другие объекты

@@ -45,6 +45,7 @@ rect					draw::clipping = {0, 0, draw::width, draw::height};
 unsigned				draw::counter;
 eventproc				draw::domodal;
 res_s					draw::font = FONT;
+unsigned char*			draw::font_color;
 static const char*		skill_level_name[] = {"нет", "Базово", "Продвинуто", "Эксперт"};
 static rect             status_rect;
 static char             status_text[260];
@@ -61,6 +62,8 @@ bool                    hot::pressed;
 static bool				evil_interface;
 static bool				break_modal;
 static int				break_result;
+unsigned char			draw::font_yellow[256];
+unsigned char			draw::route_brown[256];
 // System driver
 bool					sys_create(const char* title, int milliseconds, bool fullscreen, unsigned char* bits, int width, int height); // Create system window
 int						sys_input(bool wait); // Wait for system input
@@ -617,7 +620,7 @@ void draw::text(int x, int y, const char* string, int count) {
 			x += spacewidth(id);
 		else {
 			ch = decode_ru[ch];
-			image(x, y, id, ch);
+			image(x, y, id, ch, 0, font_color);
 			x += getwidth(id, ch);
 		}
 	}
@@ -1446,4 +1449,20 @@ void draw::splitter(int x, int y, res_s res, int& value, int minimum, int maximu
 		current_border = maximum;
 		execute(increase, (int)&value);
 	}
+}
+
+static void createpal(unsigned char* pallette) {
+	for(auto i = 0; i < 256; i++)
+		pallette[i] = (unsigned char)i;
+}
+
+static void changepal(unsigned char* pallette, unsigned char start, unsigned count, unsigned char source) {
+	memcpy(pallette + start, pallette + source, count);
+}
+
+void draw::initialize() {
+	createpal(font_yellow);
+	changepal(font_yellow, 10, 16, 108);
+	createpal(route_brown);
+	changepal(route_brown, 85, 22, 37);
 }

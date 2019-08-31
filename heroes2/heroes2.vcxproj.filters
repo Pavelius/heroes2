@@ -209,5 +209,8 @@
     <ClCompile Include="drawobj.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="util.cpp">
+      <Filter>Утилиты</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

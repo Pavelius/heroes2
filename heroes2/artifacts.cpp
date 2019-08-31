@@ -11,7 +11,7 @@ artifacti bsmeta<artifacti>::elements[] = {{12, Knowledge, 4, "Ultimate Book of 
 {4, SpellPower, 3, "Arcane Necklace of Magic", "The %1 increases your spell power by %2i."},
 {2, SpellPower, 2, "Браслеты магии", "The %1 increases your spell power by %2i."},
 {2, SpellPower, 2, "Вольшебное кольцо силы", "The %1 increases your spell power by %2i."},
-{3, SpellPower, 3, "Witch's Broach of Magic", "The %1 increases your spell power by %2i."},
+{3, SpellPower, 3, "Witch's Broach of Magic", "The %1 increases your spell power by %2i.", "Рядом с останками сожжённой ведьмы лежит лежала красивая брошь с замысловатыми узорами. Вы осторожно подходите к обугленному трупу и кладёте брошь в свой рюкзак"},
 {1, MoraleStat, 1, "Медаль за смелось", "The %1 increases your morale."},
 {1, MoraleStat, 1, "Медаль за отвагу", "The %1 increases your morale."},
 {1, MoraleStat, 1, "Медаль за честь", "The %1 increases your morale."},

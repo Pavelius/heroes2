@@ -135,12 +135,16 @@ extern eventproc			domodal;
 const int					width = 640;
 const int					height = 480;
 extern res_s				font;
+extern unsigned char*		font_color;
+extern unsigned char		font_yellow[256];
+extern unsigned char		route_brown[256];
 //
 struct state {
-	constexpr state() : font(draw::font), clipping(draw::clipping) {}
-	~state() { draw::font = font; draw::clipping = clipping; }
+	constexpr state() : font(draw::font), font_color(draw::font_color), clipping(draw::clipping) {}
+	~state() { draw::font = font; draw::font_color = font_color; draw::clipping = clipping; }
 private:
 	res_s					font;
+	unsigned char*			font_color;
 	rect					clipping;
 };
 struct cmd {
@@ -230,6 +234,7 @@ void						imagt(int x, int y, res_s res, int n, int mode);
 void						image(const rect& rc, res_s id, int frame, const char* title, const char* tips);
 void						image(const rect& rc, resource_s id, int count, const char* tips);
 int							imagex(int x, int y, int width, const variantcol* source, unsigned count);
+void						initialize();
 res_s						isevil(res_s evil, res_s good);
 void						line(int x1, int y1, int x2, int y2, unsigned char m);
 void						message(const char* format);

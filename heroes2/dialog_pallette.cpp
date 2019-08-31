@@ -4,6 +4,12 @@ const int es = 16;
 
 using namespace draw;
 
+static void test_color(int x, int y, const char* format) {
+	state push;
+	font_color = font_yellow;
+	text(x, y, format);
+}
+
 void dialog_palette() {
 	while(ismodal()) {
 		image(0, 0, STONEBAK, 0);
@@ -23,6 +29,7 @@ void dialog_palette() {
 		auto x1 = x0 + 18 * es;
 		auto y1 = y0;
 		text(x1, y1, temp);
+		test_color(x1, y1 + 20, temp);
 		cursor(ADVMCO, 0);
 		domodal();
 	}

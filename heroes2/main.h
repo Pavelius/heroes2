@@ -376,6 +376,7 @@ struct artifacti {
 	int						level;
 	const char*				name;
 	const char*				description;
+	const char*				text;
 };
 class spellbooki {
 	static constexpr unsigned size = sizeof(unsigned);

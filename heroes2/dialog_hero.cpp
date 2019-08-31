@@ -78,7 +78,7 @@ void heroi::show(bool allow_change) const {
 			for(unsigned i = 0; i < sizeof(artifacts) / sizeof(artifacts[0]); i++) {
 				auto n = artifacts[i];
 				if(n) {
-					image(x, y, ARTIFACT, n);
+					image(x, y, ARTIFACT, n + 1);
 					if(mousein({x, y, x + dx, y + dy})) {
 						status("Артефакт %1", getstr(n));
 						if(hot::key == MouseLeft && hot::pressed && allow_change) {

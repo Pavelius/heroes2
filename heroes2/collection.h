@@ -39,6 +39,7 @@ template<typename T> struct bsmeta {
 };
 template<typename T> const char* getstr(const T v) { return bsmeta<T>::elements[v].name; }
 #define DECLENUM(e) template<> struct bsmeta<e##_s> : bsmeta<e##i> {}
+#define SH(v) (1<<v)
 #define assert_enum(e, last) static_assert(sizeof(bsmeta<e##i>::elements) / sizeof(bsmeta<e##i>::elements[0]) == last + 1, "Invalid count of " #e " elements");
 #define maptbl(t,i) t[(i>(sizeof(t)/sizeof(t[0])-1)) ? sizeof(t)/sizeof(t[0])-1: i]
 #define zendof(e) (e+sizeof(e)/sizeof(e[0]))

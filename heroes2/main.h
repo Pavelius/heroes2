@@ -5,7 +5,6 @@
 enum index_s : unsigned short {
 	Blocked = 0xFFFF,
 };
-
 enum kind_s : unsigned char {
 	Barbarian, Knight, Necromancer, Sorcerer, Warlock, Wizard,
 	RandomKind,
@@ -161,9 +160,8 @@ enum map_object_s : unsigned char {
 	FireAltar, AirAltar, EarthAltar, WaterAltar, // 0xFC-0xFF
 	FirstObject = WaterChest, LastObject = WaterAltar,
 	// Standart landscape objects
-	Brush, Cactus, Cliff, Crack, Flowers, Hill, Hole, Lake, Mountains, Mushrooms, Rock, Trees, Volcano,
-	RiverDeltaDown, Stumps,
-	DiggingHole,
+	Brush, Cactus, Cliff, Crack, Flowers, Hill, Hole, Lake, Mountains, Mushrooms, Rock, Trees, Volcano, Stream, Road,
+	RiverDeltaDown, Stumps, DiggingHole,
 	EmpthyObject,
 };
 enum tag_s : unsigned char {
@@ -472,6 +470,7 @@ public:
 	void					random(bool castle);
 	void					recruit(building_s building);
 	void					set(const playeri* v) { player = (v ? v->getid() : RandomPlayer); }
+	void					set(player_s v) { player = v; }
 	void					set(building_s v) { buildings.add(v); }
 	void					set(kind_s v) { kind = v; }
 	void					setpos(short unsigned v) { index = v; }
@@ -587,6 +586,7 @@ extern unsigned				day;
 extern unsigned char		flags[256 * 256];
 extern unsigned	char		height;
 extern unsigned	char		obelisc_count;
+extern unsigned	char		roads[256 * 256];
 extern unsigned short		tiles[256 * 256];
 extern unsigned char		width;
 //

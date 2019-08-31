@@ -1357,9 +1357,9 @@ void draw::quicktips(int x, int y, const char* format) {
 	font = SMALFONT;
 	auto sx = getwidth(res, 0);
 	auto sy = getheight(res, 0);
-	auto x1 = x - sx / 2 - 8;
-	auto y1 = y - sy / 2 + 8;
-	auto tw = sx - 13 - 20;
+	auto x1 = x - sx / 2 - 6;
+	auto y1 = y - sy / 2 + 6;
+	auto tw = sx - 13 - 24;
 	auto th = textf(tw, format);
 	if(x1 < 0)
 		x1 = 0;
@@ -1372,7 +1372,7 @@ void draw::quicktips(int x, int y, const char* format) {
 	while(ismodal()) {
 		screen.restore();
 		image(x1, y1, res, 0);
-		textf(x1 + 8 + (sx - tw) / 2, y1 - 8 + (sy - th) / 2, tw, format);
+		textf(x1 + 6 + (sx - tw) / 2, y1 - 6 + (sy - th) / 2, tw, format);
 		domodal();
 		if(hot::key == MouseRight || hot::key == MouseLeft || hot::key == MouseLeftDBL)
 			buttoncancel();

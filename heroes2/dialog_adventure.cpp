@@ -354,20 +354,34 @@ static void paint_objects(const rect& rcmap, point camera) {
 	}
 }
 
-static void tips_info() {
+static void tips_info(bool show_resource_count, bool show_monster_count, bool show_artifact_name) {
 	char temp[260]; stringbuilder sb(temp); temp[0] = 0;
 	//sb.add("%1i (%2i, %3i)", hilite_index, map::i2x(hilite_index), map::i2y(hilite_index));
 	switch(hilite_var.type) {
 	case Moveable:
 		switch(hilite_var.moveable->element.type) {
 		case Monster:
-			sb.addn("%1i %2", hilite_var.moveable->value, getstr(hilite_var.moveable->element.monster));
+			if(show_monster_count)
+				sb.addn("%1i %2",
+					hilite_var.moveable->value,
+					bsmeta<monsteri>::elements[hilite_var.moveable->element.monster].multiname);
+			else
+				sb.addn("%1 %-2",
+					armysizei::find(hilite_var.moveable->value)->name,
+					bsmeta<monsteri>::elements[hilite_var.moveable->element.monster].multiname);
 			break;
 		case Artifact:
-			sb.addn(getstr(hilite_var.moveable->element.artifact));
+			if(show_artifact_name)
+				sb.addn(getstr(hilite_var.moveable->element.artifact));
+			else
+				sb.addn("Артефакт");
 			break;
 		case Resource:
-			sb.addn(getstr(hilite_var.moveable->element.resource));
+			if(show_resource_count)
+				sb.addn("%1i %-2", hilite_var.moveable->value,
+					bsmeta<resourcei>::elements[hilite_var.moveable->element.resource].nameof);
+			else
+				sb.addn(getstr(hilite_var.moveable->element.resource));
 			break;
 		case MapObject:
 			switch(hilite_var.moveable->element.mapobject) {
@@ -386,6 +400,10 @@ static void tips_info() {
 	case Landscape: sb.addn(getstr(hilite_var.landscape)); break;
 	}
 	quicktips(hot::mouse.x, hot::mouse.y, temp);
+}
+
+static void tips_info() {
+	tips_info(true, false, true);
 }
 
 static void paint_screen(const playeri* player) {

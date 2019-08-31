@@ -812,125 +812,131 @@ static mapitemi* find_object(res_s icn, unsigned char frame) {
 //
 //};
 
-//static unsigned char getroad(unsigned char object, unsigned char index) {
-//	switch(res::map(object)) {
-//		// from sprite road
-//	case res::ROAD:
-//		if(0 == index || 4 == index || 5 == index || 13 == index || 26 == index)
-//			return map::Up | map::Down;
-//		else if(2 == index || 21 == index || 28 == index)
-//			return map::Left | map::Right;
-//		else if(17 == index || 29 == index)
-//			return map::LeftUp | map::RightDown;
-//		else if(18 == index || 30 == index)
-//			return map::RightUp | map::LeftDown;
-//		else if(3 == index)
-//			return map::Up | map::Down | map::Left | map::Right;
-//		else if(6 == index)
-//			return map::Up | map::Down | map::Right;
-//		else if(7 == index)
-//			return map::Up | map::Right;
-//		else if(9 == index)
-//			return map::Down | map::Right;
-//		else if(12 == index)
-//			return map::Down | map::Left;
-//		else if(14 == index)
-//			return map::Up | map::Down | map::Left;
-//		else if(16 == index)
-//			return map::Up | map::Left;
-//		else if(19 == index)
-//			return map::LeftUp | map::RightDown;
-//		else if(20 == index)
-//			return map::RightUp | map::LeftDown;
-//		return 0;
-//		// castle and tower (gate)
-//	case res::OBJNTOWN:
-//		if(13 == index ||
-//			29 == index ||
-//			45 == index ||
-//			61 == index ||
-//			77 == index ||
-//			93 == index ||
-//			109 == index ||
-//			125 == index ||
-//			141 == index ||
-//			157 == index ||
-//			173 == index ||
-//			189 == index)
-//			return map::Up | map::Down;
-//		return 0;
-//		// castle lands (gate)
-//	case res::OBJNTWBA:
-//		if(7 == index ||
-//			17 == index ||
-//			27 == index ||
-//			37 == index ||
-//			47 == index ||
-//			57 == index ||
-//			67 == index ||
-//			77 == index)
-//			return map::Up | map::Down;
-//		return 0;
-//	default:
-//		return 0;
-//	}
-//}
+static unsigned char getroad(unsigned char object, unsigned char index) {
+	switch(getres(object)) {
+		// from sprite road
+	case ROAD:
+		switch(index) {
+		case 0: case 4: case 5:case 13: case 26:
+			return SH(Up) | SH(Down);
+		case 2: case 21: case 28:
+			return SH(Left) | SH(Right);
+		case 17: case 29:
+			return SH(LeftUp) | SH(RightDown);
+		case 18: case 30:
+			return SH(RightUp) | SH(LeftDown);
+		case 3:
+			return SH(Up) | SH(Down) | SH(Left) | SH(Right);
+		case 6:
+			return SH(Up) | SH(Down) | SH(Right);
+		case 7:
+			return SH(Up) | SH(Right);
+		case 9:
+			return SH(Down) | SH(Right);
+		case 12:
+			return SH(Down) | SH(Left);
+		case 14:
+			return SH(Up) | SH(Down) | SH(Left);
+		case 16:
+			return SH(Up) | SH(Left);
+		case 19:
+			return SH(LeftUp) | SH(RightDown);
+		case 20:
+			return SH(RightUp) | SH(LeftDown);
+		default:
+			return 0;
+		}
+		// castle and tower (gate)
+	case OBJNTOWN:
+		if(13 == index ||
+			29 == index ||
+			45 == index ||
+			61 == index ||
+			77 == index ||
+			93 == index ||
+			109 == index ||
+			125 == index ||
+			141 == index ||
+			157 == index ||
+			173 == index ||
+			189 == index)
+			return SH(Up) | SH(Down);
+		return 0;
+		// castle lands (gate)
+	case OBJNTWBA:
+		if(7 == index ||
+			17 == index ||
+			27 == index ||
+			37 == index ||
+			47 == index ||
+			57 == index ||
+			67 == index ||
+			77 == index)
+			return SH(Up) | SH(Down);
+		return 0;
+	default:
+		return 0;
+	}
+}
 
-//void add_object(unsigned short index, unsigned char object, unsigned char frame, unsigned char quantity) {
-//	static mapobject* last_object = 0;
-//	tokens type = Empthy;
-//	mapitemi* pi = 0;
-//	auto icn = res::map(object);
-//	switch(icn) {
-//	case res::OBJNTOWN: // Не будем добавлять города
-//	case res::OBJNTWBA: // Не будем добавлять базу городов
-//	case res::OBJNTWRD: // No random towns and castles
-//		map::show::road[index] = getroad(object, frame);
-//		return;
-//	case res::MINIHERO: // No heroes
-//	case res::SHADOW32: // No heroes shadows
-//	case res::FLAG32: // No player flags
-//	case res::OBJNTWSH: // No towns and castles shadow
-//	case res::OBJNARTI: // No artifacts tiles
-//	case res::MONS32: // No monster images
-//	case res::OBJNRSRC: // No resource images
-//		return;
-//	case res::OBJNMUL2:
-//		if(frame == 163) // No event signal (used only in editor)
-//			return;
-//		pi = find_object(icn, frame);
-//		break;
-//	case res::EXTRAOVR:
-//		if(last_object) {
-//			// Abandone mine and Mountain Mines has overlay just after their objects
-//			assert((last_object->type == Mines) || (last_object->type == AbandoneMine));
-//			last_object->type = (tokens)(MineOre + frame);
-//			last_object->count = 0;
-//		}
-//		return;
-//	case res::STREAM:
-//		type = Stream;
-//		quantity = frame;
-//		break;
-//	case res::ROAD:
-//		type = Road;
-//		quantity = frame;
-//		map::show::road[index] = getroad(object, frame);
-//		break;
-//	default:
-//		pi = find_object(icn, frame);
-//		assert(pi);
-//		break;
-//	}
-//	if(pi) {
-//		// Skip all frame, tha are not zero point.
-//		if((pi->first + pi->shape.zero) != frame)
-//			return;
-//		type = pi->object;
-//		if(!type)
-//			type = Resource;
-//	}
-//	// А можно ли добавить новый объект?
+void add_moveable(short unsigned index, variant v, short unsigned quantity);
+
+void add_object(unsigned short index, unsigned char object, unsigned char frame, unsigned char quantity) {
+	static moveablei* last_object;
+	map_object_s type = EmpthyObject;
+	mapitemi* pi = 0;
+	auto icn = getres(object);
+	switch(icn) {
+	case OBJNTOWN: // Не будем добавлять города
+	case OBJNTWBA: // Не будем добавлять базу городов
+	case OBJNTWRD: // Не будем добалять случайные города
+		map::roads[index] = getroad(object, frame);
+		return;
+	case MINIHERO: // No heroes
+	case SHADOW32: // No heroes shadows
+	case FLAG32: // No player flags
+	case OBJNTWSH: // No towns and castles shadow
+	case OBJNARTI: // No artifacts tiles
+	case MONS32: // No monster images
+	case OBJNRSRC: // No resource images
+		return;
+	case OBJNMUL2:
+		if(frame == 163) // No event signal (used only in editor)
+			return;
+		pi = find_object(icn, frame);
+		break;
+	case EXTRAOVR:
+		if(last_object) {
+			// Abandone mine and Mountain Mines has overlay just after their objects
+			//assert((last_object->type == Mines) || (last_object->type == AbandoneMine));
+			//last_object->type = (tokens)(MineOre + frame);
+			//last_object->count = 0;
+		}
+		return;
+	case STREAM:
+		type = Stream;
+		quantity = frame;
+		break;
+	case ROAD:
+		type = Road;
+		quantity = frame;
+		map::roads[index] = getroad(object, frame);
+		break;
+	default:
+		pi = find_object(icn, frame);
+		//assert(pi);
+		break;
+	}
+	if(pi) {
+		// Skip all frame not zero frames
+		if((pi->first + pi->shape.zero) != frame)
+			return;
+		type = pi->object;
+		if(!type)
+			type = ResourceObject;
+	}
+	// А можно ли добавить новый объект?
+	//add_moveable(index, v);
 //	if(mapobjects.from + mapobjects.count >= mapobjects.to)
 //		return;
 //	auto& e = objects[mapobjects.count++];
@@ -940,7 +946,7 @@ static mapitemi* find_object(res_s icn, unsigned char frame) {
 //	e.info = pi;
 //	e.type = type;
 //	last_object = &e;
-//}
+}
 
 //COMMAND(map_block) {
 //	// Другие объекты

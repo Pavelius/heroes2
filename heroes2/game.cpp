@@ -229,7 +229,7 @@ static player_s mini2player(int index) {
 }
 
 static kind_s mini2type(int index) {
-	return kind_s(index % (Wizard+2));
+	return kind_s(index % (Wizard + 2));
 }
 
 bool gamei::load(const char* url) {
@@ -304,9 +304,6 @@ static int get(io::file& st) {
 	return r;
 }
 
-void add_object(unsigned short index, unsigned char object, unsigned char frame, unsigned char quantity) {
-}
-
 static void load_object(armyi& e, mp2::army& r) {
 	for(int i = 0; i < 5; i++) {
 		if(!r.count[i])
@@ -317,10 +314,18 @@ static void load_object(armyi& e, mp2::army& r) {
 }
 
 static void load_object(castlei& e, mp2::castle& r) {
-	auto pla = index2player(r.player);
+	auto player = index2player(r.player);
+	auto kind = index2race(r.race);
+	// race
+	if(kind == RandomKind) {
+		if(player == RandomPlayer)
+			kind = kind_s(xrand(Barbarian, Wizard));
+		else
+			kind = bsmeta<playeri>::elements[player].getkind();
+	}
+	e.set(player);
+	e.set(kind);
 	e.setname("Порталис");
-	e.set(bsmeta<playeri>::elements + pla);
-	e.set(index2race(r.race));
 	// custom building
 	if(r.has_buildings) {
 		// building
@@ -360,22 +365,21 @@ static void load_object(castlei& e, mp2::castle& r) {
 			e.set(MageGuild4);
 		if(r.magic_tower >= 5)
 			e.set(MageGuild5);
-	} else
+	} else {
 		e.set(Dwelving1);
+		if(d100() < 40)
+			e.set(Dwelving2);
+		else if(d100() < 60)
+			e.set(Well);
+		else
+			e.set(MarketPlace);
+	}
 	// custom troops
 	if(r.has_army)
 		load_object(e, r.army);
 	// captain
 	if(r.has_captain)
 		e.set(Captain);
-	// race
-	if(index2race(r.race) == RandomKind) {
-		//auto player = bsget(rec, Player);
-		//if(!player)
-		//	bsset(rec, Type, xrand(Barbarian, Wizard));
-		//else
-		//	bsset(rec, Type, bsget(player, Type));
-	}
 	// name
 	if(r.has_name)
 		zcpy(e.name, e.name, sizeof(e.name));
@@ -415,10 +419,10 @@ static void load_object(heroi& e, mp2::hero& r) {
 }
 
 void gamei::updatebase() {
-	for(auto i = FirstPlayer; i <= LastPlayer; i = player_s(i+1)) {
+	for(auto i = FirstPlayer; i <= LastPlayer; i = player_s(i + 1)) {
 		auto& e1 = bsmeta<playeri>::elements[i];
 		e1.set(this->types[i]);
-		if(this->races[i]==RandomKind)
+		if(this->races[i] == RandomKind)
 			e1.set(Knight);
 		else
 			e1.set(this->races[i]);
@@ -426,6 +430,7 @@ void gamei::updatebase() {
 }
 
 void add_moveable(short unsigned index, variant v, short unsigned quantity = 0);
+void add_object(unsigned short index, unsigned char object, unsigned char frame, unsigned char quantity);
 
 void gamei::prepare() {
 	generator generate;
@@ -690,7 +695,7 @@ void gamei::prepare() {
 	// Create start heroes if need
 	// Heroes must be valid race
 	if(start_hero) {
-		for(auto i = FirstPlayer; i <= LastPlayer; i = (player_s)(i+1)) {
+		for(auto i = FirstPlayer; i <= LastPlayer; i = (player_s)(i + 1)) {
 			auto& e = bsmeta<playeri>::elements[i];
 			if(!e)
 				continue;

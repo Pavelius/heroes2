@@ -191,6 +191,7 @@ void						buttoncancel();
 void						buttonok();
 bool						create(const char* title, unsigned milliseconds, bool fullscreen);
 int							dialog(int height, int* xpos = 0);
+void						extract(const char* fname, res_s id);
 void						edit(int x, int y, int width, int& value, int maximum = 100, int minimum = 0, const controli& up = {}, const controli& down = {}, const controli& max = {});
 void						execute(eventproc proc, int param = 0);
 bool						ismodal();

@@ -1,4 +1,5 @@
 #include "view.h"
+#include "io.h"
 
 using namespace draw;
 
@@ -69,6 +70,30 @@ static void test_font() {
 		return;
 }
 
+static unsigned get_file_count(const char* exclude_pattern, const char* include_pattern) {
+	unsigned count = 0;
+	for(auto i = FntBIGFONT; i < NoRes; i = res_s(i + 1)) {
+		auto p = getname(i);
+		if(exclude_pattern && stringbuilder::match(p, exclude_pattern))
+			continue;
+		if(include_pattern && !stringbuilder::match(p, include_pattern))
+			continue;
+		count++;
+	}
+	return count;
+}
+
+static void extract(const char* include_pattern, const char* exclude_pattern) {
+	for(auto i = FntBIGFONT; i < NoRes; i = res_s(i + 1)) {
+		auto p = getname(i);
+		if(exclude_pattern && stringbuilder::match(p, exclude_pattern))
+			continue;
+		if(include_pattern && !stringbuilder::match(p, include_pattern))
+			continue;
+		draw::extract("files", i);
+	}
+}
+
 void util_main() {
-	test_font();
+	//extract("*.BIN", 0);
 }

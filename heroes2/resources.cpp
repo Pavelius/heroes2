@@ -49,3 +49,15 @@ const char* draw::getname(res_s id) {
 	auto pn = (agg::namei*)((char*)heroes2_agg + e.offset + e.size);
 	return pn[id].name;
 }
+
+void draw::extract(const char* url, res_s id) {
+	auto pn = getname(id);
+	if(!pn)
+		return;
+	char temp[512]; zprint(temp, "%1/%2", url, pn);
+	io::file file(temp, StreamWrite);
+	if(!file)
+		return;
+	auto& e = heroes2_agg->records[id];
+	file.write((char*)heroes2_agg + e.offset, e.size);
+}

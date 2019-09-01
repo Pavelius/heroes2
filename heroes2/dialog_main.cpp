@@ -12,8 +12,8 @@ static void test_message() {
 	str.addh("Форт Месса");
 	str.addn("Во время посещения форта вы улучшили некоторые войска в своей армии.");
 	str.addsep('\n');
-	str.addi(BattleDwarf);
-	str.addi(OgreLord);
+	str.addi(EagleEye, 1);
+	str.addi(Archery, 3);
 	playeri::message(str);
 }
 

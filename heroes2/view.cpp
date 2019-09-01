@@ -1158,6 +1158,14 @@ void picture::set(const variant e, int value) {
 		res = res_s(PORT0000 + e.hero); frame = 0;
 		setsize();
 		break;
+	case Ability:
+		res = PRIMSKIL; frame = e.ability;
+		setsize(PRIMSKIL, 4);
+		break;
+	case Skill:
+		res = SECSKILL; frame = e.skill + 1;
+		setsize(SECSKILL, 15);
+		break;
 	default:
 		res = NoRes; frame = 0;
 		size.x = 0;
@@ -1263,6 +1271,20 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 			font = SMALFONT;
 			text(x + (size.x - textw(p)) / 2, y + 61, p);
 			font = pf;
+		}
+		break;
+	case Ability:
+		render(x, z, PRIMSKIL, 4);
+		render(x, z + 6, res, frame);
+		break;
+	case Skill:
+		render(x, z, SECSKILL, 15);
+		render(x, z+2, res, frame);
+		if(count) {
+			const char* p = getstr(element.skill);
+			text(x + (size.x - textw(p)) / 2, z + 6, p);
+			p = skill_level_name[count];
+			text(x + (size.x - textw(p)) / 2, z + 57, p);
 		}
 		break;
 	default:

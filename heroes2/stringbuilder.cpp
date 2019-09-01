@@ -332,6 +332,36 @@ void stringbuilder::addto(const char* s) {
 	add(s, map, "ó");
 }
 
+bool stringbuilder::match(const char* text, const char* s, const char* s2) {
+	if(!s2)
+		s2 = zend(s);
+	while(true) {
+		const char* d = text;
+		while(s < s2) {
+			if(*d == 0)
+				return false;
+			unsigned char c = *s;
+			if(c == '?') {
+				s++;
+				d++;
+			} else if(c == '*') {
+				s++;
+				if(s == s2)
+					return true;
+				while(*d) {
+					if(*d == *s)
+						break;
+					d++;
+				}
+			} else {
+				if(*d++ != *s++)
+					return false;
+			}
+		}
+		return true;
+	}
+}
+
 char* szprint(char* result, const char* result_maximum, const char* src, ...) {
 	stringbuilder e(result, result_maximum);
 	e.addv(src, xva_start(src));

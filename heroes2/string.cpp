@@ -6,11 +6,13 @@ struct iconi {
 	char			nm[3];
 };
 }
-static iconi icons[] = {{Artifact, "ar"},
+static iconi icons[] = {{Ability, "ab"},
+{Artifact, "ar"},
 {Building, "bd"},
 {Hero, "hr"},
 {Monster, "mn"},
 {Resource, "rs"},
+{Skill, "sk"},
 };
 
 const char* string::parse(const char* p, variantcol* source, unsigned& count) {

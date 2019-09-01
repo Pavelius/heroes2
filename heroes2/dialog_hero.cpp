@@ -86,8 +86,7 @@ void heroi::show(bool allow_change) const {
 							execute(open_artifact, i);
 						}
 					}
-				}
-				else
+				} else
 					image(x, y, ARTIFACT, 0);
 				x += dx;
 				if(x >= x2) {
@@ -96,9 +95,18 @@ void heroi::show(bool allow_change) const {
 				}
 			}
 		}
+		if(true) {
+			auto x = 512;
+			auto y = 36;
+			image(x + 8, y, HSICONS, 4);
+			image(x + 44, y, HSICONS, 3);
+			image(x, y + 50, HSICONS, 1);
+			image(x + 38, y + 50, HSICONS, 8);
+		}
 		image(49, 130, CREST, player);
 		armyi::paint(156, 130, this, allow_change);
-		button(5, 318, HSBTNS, dismiss_hero, {0, 0, 1}, Alpha + 'A', "Уволить героя");
+		if(allow_change)
+			button(5, 318, HSBTNS, dismiss_hero, {0, 0, 1}, Alpha + 'A', "Уволить героя");
 		button(603, 318, HSBTNS, buttoncancel, {2, 2, 3}, KeyEscape, "Закрыть окно");
 		domodal();
 	}

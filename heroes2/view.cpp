@@ -1155,7 +1155,8 @@ void picture::set(const variant e, int value) {
 		format = "%1i";
 		break;
 	case Hero:
-		res = res_s(PORT0000 + e.hero); frame = resources_frame[e.resource];
+		res = res_s(PORT0000 + e.hero); frame = 0;
+		setsize();
 		break;
 	default:
 		res = NoRes; frame = 0;

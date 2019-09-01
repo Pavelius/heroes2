@@ -441,6 +441,7 @@ public:
 	short unsigned			getmove() const { return index_move; }
 	int						getmpmax() const;
 	kind_s					getkind() const;
+	int						getlevel() const { return level; }
 	unsigned char			getportrait() const { return portrait; }
 	short unsigned			getpos() const { return index; }
 	int						getspmax() const;
@@ -509,7 +510,7 @@ public:
 	bool					isallow(monster_s v) const;
 	bool					iscoastal() const;
 	static void				information(building_s v, kind_s k);
-	void					paint(const heroi* hero) const;
+	void					paint() const;
 	static void				paint(int x, int y, landscape_s tile, kind_s race, bool castle, bool shadow);
 	void					random(bool castle);
 	void					recruit(building_s building);

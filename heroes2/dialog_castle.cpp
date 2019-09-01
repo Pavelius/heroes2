@@ -61,13 +61,12 @@ bool castlei::build(building_s building, bool confirm) {
 		if(!playeri::confirm(sb))
 			return false;
 	}
-	auto hero = heroi::find(getpos());
-	paint(hero);
+	paint();
 	screenshoot first;
 	player->getresources() -= cost;
 	set(building);
 	set(AlreadyMoved);
-	paint(hero);
+	paint();
 	screenshoot second;
 	first.blend(second);
 	return true;
@@ -201,9 +200,29 @@ void information_hero() {
 }
 
 static void hire_hero() {
+	auto castle = current_castle;
+	auto hero = (heroi*)hot::param;
+	auto player = castle->getplayer();
+	if(!player)
+		return;
+	if(true) {
+		string sb;
+		sb.addh("Нанять героя");
+		sb.addsep(); sb.addi(hero->getid());
+		sb.addn("%1 %2i уровня %3.\nАртефактов: %4i",
+			hero->getname(), hero->getlevel(), getstr(hero->getkind()), 0);
+		sb.addsep();
+		sb.addi(heroi::cost);
+		if(!player->confirm(sb))
+			return;
+	}
+	player->getresources() -= heroi::cost;
+	hero->set(player);
+	hero->setpos(castle->getpos());
+	hero->set(Up);
 }
 
-static void hireling(int x, int y, playeri* player, short unsigned index, heroi* hero) {
+static void hireling(int x, int y, castlei* castle, playeri* player, short unsigned index, heroi* hero) {
 	rect rc = {x, y, x + getwidth(PORT0000, 0), y + getheight(PORT0000, 0)};
 	auto hilite = mousein(rc);
 	auto& c1 = player->getresources();
@@ -222,8 +241,10 @@ static void hireling(int x, int y, playeri* player, short unsigned index, heroi*
 	} else {
 		if(hilite) {
 			status("Нанять героя");
-			if(hilite && hot::key == MouseLeft && hot::pressed)
+			if(hilite && hot::key == MouseLeft && hot::pressed) {
+				current_castle = castle;
 				execute(hire_hero, (int)hero);
+			}
 		}
 	}
 	if(hilite && hot::key == MouseRight && hot::pressed)
@@ -269,8 +290,8 @@ void castlei::build() {
 		building(293, 387, Moat, this);
 		captain(444, 165, this);
 		if(player) {
-			hireling(443, 260, player, getpos(), player->gethire(0));
-			hireling(443, 362, player, getpos(), player->gethire(1));
+			hireling(443, 260, this, player, getpos(), player->gethire(0));
+			hireling(443, 362, this, player, getpos(), player->gethire(1));
 			player->getresources().paint(552, 262);
 		}
 		button(553, 428, SWAPBTN, buttoncancel, {0, 0, 1}, KeyEscape, "Вернуться в город");

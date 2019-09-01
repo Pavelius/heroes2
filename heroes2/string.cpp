@@ -8,6 +8,7 @@ struct iconi {
 }
 static iconi icons[] = {{Artifact, "ar"},
 {Building, "bd"},
+{Hero, "hr"},
 {Monster, "mn"},
 {Resource, "rs"},
 };

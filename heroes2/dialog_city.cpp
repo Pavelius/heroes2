@@ -435,7 +435,8 @@ void castlei::paint_name() const {
 static void previous_town() {}
 static void next_town() {}
 
-void castlei::paint(const heroi* hero) const {
+void castlei::paint() const {
+	auto hero = heroi::find(getpos());
 	status({21, height - 16, 21 + getwidth(SMALLBAR, 0), height - 1});
 	button(0, height - 19, SMALLBAR, previous_town, {1, 1, 2}, KeyLeft, "Предыдущий город");
 	image(21, height - 19, SMALLBAR, 0);
@@ -461,9 +462,8 @@ building_s castlei::getupgrade(building_s v, kind_s k) {
 }
 
 void castlei::show() {
-	heroi* hero = heroi::find(getpos());
 	while(ismodal()) {
-		paint(hero);
+		paint();
 		domodal();
 	}
 }

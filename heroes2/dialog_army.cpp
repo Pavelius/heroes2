@@ -57,7 +57,7 @@ static void dismiss_unit() {
 	char temp[260];
 	zprint(temp, "¬ы действительно хотите распустить %1i %2?",
 		u->count, bsmeta<monsteri>::elements[u->unit].multiname);
-	if(ask(temp)) {
+	if(playeri::confirm(temp)) {
 		u->clear();
 		breakmodal(0);
 	}
@@ -294,7 +294,7 @@ bool playeri::recruit(monster_s unit, int& count, int maximum) {
 			{x1 + 205, y1 + 154, RECRUIT, 0, 0, 1},
 			{x1 + 205, y1 + 169, RECRUIT, 2, 2, 3},
 			{x1 + 230, y1 + 155, RECRUIT, 4, 4, 5});
-		picture mon; mon.set(unit);
+		picture mon; mon.set(unit, 0);
 		image(x1 + 80 - getwidth(mon.res, 0) / 2,
 			y1 + 100 - getheight(mon.res, 0) / 2,
 			mon.res, mon.frame, AFNoOffset);

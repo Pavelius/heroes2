@@ -23,7 +23,7 @@ public:
 	void				addn(const char* format, ...) { addx('\n', format, xva_start(format)); }
 	void				addof(const char* s);
 	void				adds(const char* format, ...) { addx(' ', format, xva_start(format)); }
-	void				addsep(char separator);
+	void				addsep(char separator = '\n');
 	void				addsz() { if(p < pe) *p++ = 0; }
 	void				addto(const char* s);
 	void				addv(const char* format, const char* format_param);

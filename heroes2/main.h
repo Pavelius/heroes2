@@ -188,7 +188,7 @@ enum spell_type_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Ability, Artifact, CastleVar, Hero, Index, Landscape, Object, Monster, Moveable,
+	Ability, Artifact, Building, CastleVar, Hero, Index, Landscape, Object, Monster, Moveable,
 	Player, Resource, Skill, Spell, Stat, Tag,
 };
 enum activity_s : unsigned char {
@@ -227,6 +227,7 @@ struct variant {
 	union {
 		ability_s			ability;
 		artifact_s			artifact;
+		building_s			building;
 		hero_s				hero;
 		landscape_s			landscape;
 		skill_s				skill;
@@ -241,6 +242,7 @@ struct variant {
 	constexpr variant(variant_s t, unsigned char v) : type(t), value(v) {}
 	constexpr variant(ability_s v) : type(Ability), ability(v) {}
 	constexpr variant(artifact_s v) : type(Artifact), artifact(v) {}
+	constexpr variant(building_s v) : type(Building), building(v) {}
 	constexpr variant(hero_s v) : type(Hero), hero(v) {}
 	constexpr variant(landscape_s v) : type(Landscape), landscape(v) {}
 	constexpr variant(object_s v) : type(Object), object(v) {}
@@ -268,7 +270,9 @@ struct costi {
 	bool operator<=(const costi& e) const;
 	bool operator>=(const costi& e) const;
 	void operator-=(const costi& e);
+	void operator+=(const costi& e);
 	costi operator*(int v);
+	void					add(resource_s id, int v) { data[id] += v; correct(); }
 	void					clear();
 	void					correct();
 	int						get(resource_s v) const { return data[v]; }
@@ -331,6 +335,7 @@ public:
 	constexpr explicit operator bool() const { return activity == Human || activity == Computer; }
 	void					adventure();
 	void					clear();
+	static bool				confirm(const char* format);
 	static void				endturn();
 	static void				initialize();
 	int						getadventurers() const;
@@ -347,6 +352,7 @@ public:
 	int						getspies() const;
 	int						gettowns() const;
 	void					marketplace();
+	static void				message(const char* format);
 	static void				prepare(difficult_s difficult);
 	void					quickmessage(const costi& cost, const char* format, ...);
 	static heroi*			randomhire(kind_s kind, kind_s excude_kind);
@@ -357,7 +363,7 @@ public:
 	void					sethire(int index);
 	void					setup(difficult_s id);
 	void					tavern();
-	void					tooltips(const char* format, ...);
+	static void				tooltips(const char* format);
 	void					thieves();
 	void					trade(resource_s rs, resource_s rt, int count, int market_count);
 };
@@ -443,6 +449,7 @@ public:
 	static void				initialize();
 	void					input(const playeri* player) const;
 	bool					interact(short unsigned index, const pvar& object);
+	bool					interact(moveablei& object);
 	bool					is(spell_s v) const { return spellbook.is(v); }
 	bool					isadventure() const { return index != Blocked; }
 	static unsigned			select(heroi** result, heroi** result_maximum, const playeri* player, kind_s kind, kind_s kind_exclude, bool include_special = false);
@@ -632,7 +639,9 @@ class string : public stringbuilder {
 public:
 	string() : stringbuilder(buffer) {}
 	void					addh(const char* format, ...);
-	void					addi(variant v, int value);
+	void					addi(variant v, int value = 0);
+	void					addi(const costi& v);
+	static const char*		parse(const char* p, variantcol* source, unsigned& count);
 };
 namespace map {
 extern point				camera;

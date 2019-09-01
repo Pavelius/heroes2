@@ -5,6 +5,9 @@ namespace {
 #pragma pack(push)
 #pragma pack(1)
 struct agg {
+	struct namei {
+		char			name[15];
+	};
 	struct record {
 		unsigned		crc;
 		unsigned		offset;
@@ -39,4 +42,10 @@ const void* draw::get(res_s id) {
 	if(!heroes2_agg)
 		return 0;
 	return (char*)heroes2_agg + heroes2_agg->records[id].offset;
+}
+
+const char* draw::getname(res_s id) {
+	auto& e = heroes2_agg->records[heroes2_agg->count - 1];
+	auto pn = (agg::namei*)((char*)heroes2_agg + e.offset + e.size);
+	return pn[id].name;
 }

@@ -51,6 +51,12 @@ void costi::operator-=(const costi& e) {
 	correct();
 }
 
+void costi::operator+=(const costi& e) {
+	for(auto i = 0; i <= Gems; i++)
+		data[i] += e.data[i];
+	correct();
+}
+
 int costi::mindiv(const costi& e) const {
 	int m = 0;
 	for(auto i = 0; i <= Gems; i++) {

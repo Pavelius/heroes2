@@ -855,7 +855,7 @@ void draw::image(const rect& rc, resource_s id, int count, const char* tips) {
 }
 
 static void show_tooltips() {
-	message(tooltips_text, RandomKind, NoBuilding, 0, 0, NoButtons);
+	message(tooltips_text, NoButtons);
 }
 
 void draw::tooltips(const char* header, const char* format, ...) {
@@ -1014,10 +1014,17 @@ int draw::textf(int x, int y, int width, const char* p) {
 			p += 2;
 			font_color = font_yellow;
 		}
-		auto c = textbc(p, width);
-		text(x, y, width, AlignCenter, p, c);
-		y += texth();
-		p += c;
+		if(p[0] == '$' && p[1] == '$') {
+			y += texth() / 2;
+			variantcol variants[32]; unsigned count;
+			p = string::parse(p, variants, count);
+			y += imagex(x, y, width, variants, count) + texth() / 2;
+		} else {
+			auto c = textbc(p, width);
+			text(x, y, width, AlignCenter, p, c);
+			y += texth();
+			p += c;
+		}
 		if(p != start && p[-1] == '\n')
 			font_color = 0;
 		p = zskipspcr(p);
@@ -1124,12 +1131,18 @@ void picture::setsize(res_s res, unsigned char frame) {
 	size.y = getheight(res, frame);
 }
 
-void picture::set(const variant e) {
+void picture::set(const variant e, int value) {
 	format = 0;
 	switch(e.type) {
 	case Artifact:
 		res = ARTIFACT; frame = e.artifact;
 		setsize(RESOURCE, 7);
+		break;
+	case Building:
+		res = getbuildings(kind_s(value));
+		frame = castlei::getframe(e.building);
+		setsize();
+		size.y = getheight(BLDGXTRA, 0);
 		break;
 	case Monster:
 		res = res_s(MONH0000 + e.monster - FirstMonster); frame = 0;
@@ -1183,7 +1196,7 @@ unsigned picture::getsize(unsigned count, int& width, int& height, int width_per
 static unsigned getsize(const variantcol* source, const variantcol* pe, int& width, int& height, int width_per_line) {
 	auto p = source;
 	while(p < pe) {
-		picture a; a.set(p->element);
+		picture a; a.set(p->element, p->count);
 		if(width_per_line && (width + a.size.x) > width_per_line)
 			break;
 		width += a.size.x;
@@ -1225,7 +1238,7 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 	switch(element.type) {
 	case Artifact:
 		render(x, z, RESOURCE, 7);
-		render(x, z + 6, res, frame);
+		render(x, z + 6, res, frame + 1);
 		break;
 	case Monster:
 		render(x, z + 6, STRIP, index_by_type(bsmeta<monsteri>::elements[element.monster].type));
@@ -1236,8 +1249,19 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 			draw::state push;
 			font = FONT;
 			auto w1 = draw::textw(temp);
-			auto x1 = x + (size.x - getwidth(STRIP, 12)) / 2;
-			text(x1 - textw(temp) - 4, y + h1 - texth() - 8, temp);
+			auto x1 = x + (size.x + getwidth(STRIP, 12)) / 2;
+			text(x1 - textw(temp) - 10, y + h1 - texth() - 8, temp);
+		}
+		break;
+	case Building:
+		render(x, z, BLDGXTRA, 0);
+		render(x, z + 2, res, frame);
+		if(true) {
+			auto p = getstr(element.building, kind_s(count));
+			auto pf = font;
+			font = SMALFONT;
+			text(x + (size.x - textw(p)) / 2, y + 61, p);
+			font = pf;
 		}
 		break;
 	default:
@@ -1262,7 +1286,7 @@ int draw::imagex(int x, int y, int width, const variantcol* source, unsigned cou
 		auto pe = source + line_count;
 		auto x1 = x + (width - w1) / 2;
 		for(auto p = source; p < pe; p++) {
-			picture a; a.set(p->element);
+			picture a; a.set(p->element, p->count);
 			a.paint(x1, y, h1, p->element, p->count);
 			x1 += a.size.x;
 		}
@@ -1292,7 +1316,7 @@ int draw::image(int x, int y, int width, const costi& source) {
 	//rectb({x, y, x + width, y + h}, 0x10);
 }
 
-int draw::message(const char* format, kind_s kind, building_s building, const variantcol* footer, unsigned footer_count, button_s mode) {
+int draw::message(const char* format, button_s mode) {
 	draw::screenshoot surface;
 	draw::state push;
 	font = FONT;
@@ -1304,30 +1328,11 @@ int draw::message(const char* format, kind_s kind, building_s building, const va
 	auto h1 = th;
 	if(mode != NoButtons)
 		h1 += getheight(ic1, 1) + 8;
-	if(footer)
-		h1 += getsize(footer, footer_count, dialog_width) + 8;
-	if(building != NoBuilding)
-		h1 += bld_h + 8;
 	while(ismodal()) {
 		surface.restore();
 		auto y2 = 0;
 		auto y1 = dialog(h1, &y2);
-		if(building != NoBuilding) {
-			auto bld_res = getbuildings(kind);
-			auto bld_index = castlei::getframe(building);
-			auto x = (width - bld_w) / 2;
-			image(x, y1, BLDGXTRA, 0);
-			image(x + 1, y1 + 1, bld_res, bld_index);
-			auto p = getstr(building, kind);
-			auto pf = font;
-			font = SMALFONT;
-			text((width - textw(p)) / 2, y1 + 60, p);
-			font = pf;
-			y1 += bld_h + 8;
-		}
-		y1 += textf((width - dialog_width) / 2, y1, dialog_width, format) + 8; // message text
-		if(footer && footer_count)
-			y1 += imagex((width - dialog_width) / 2, y1, dialog_width, footer, footer_count) + 8;
+		textf((width - dialog_width) / 2, y1, dialog_width, format);
 		y1 = y2 - getheight(ic1, 1);
 		switch(mode) {
 		case ButtonYesNo:
@@ -1349,18 +1354,16 @@ int draw::message(const char* format, kind_s kind, building_s building, const va
 	return getresult();
 }
 
-int draw::message(const char* format, kind_s kind, building_s building, const costi& cost, button_s mode) {
-	variantcol col[Gems - Gold + 1];
-	auto count = addcost(col, cost);
-	return message(format, kind, building, col, count, mode);
+void playeri::message(const char* format) {
+	draw::message(format, ButtonOK);
 }
 
-void draw::message(const char* format) {
-	message(format, RandomKind, NoBuilding, 0, 0, ButtonOK);
+bool playeri::confirm(const char* format) {
+	return draw::message(format, ButtonYesNo) != 0;
 }
 
-bool draw::ask(const char* format, const variantcol* footer, unsigned count) {
-	return message(format, RandomKind, NoBuilding, footer, count, ButtonYesNo) != 0;
+void playeri::tooltips(const char* format) {
+	draw::message(format, NoButtons);
 }
 
 void draw::quicktips(int x, int y, const char* format) {

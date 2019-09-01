@@ -120,7 +120,7 @@ bool gamei::choose() {
 	scenario_list.set(NoSize);
 	if(!scenario_list.source_count) {
 		scenario_list.release();
-		message("У вас нету ни одной карты. Попробуйте загрузить несколько из интернета.");
+		playeri::message("У вас нету ни одной карты. Попробуйте загрузить несколько из интернета.");
 		return false;
 	}
 	while(ismodal()) {

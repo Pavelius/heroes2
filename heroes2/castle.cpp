@@ -570,3 +570,29 @@ const char* getstr(building_s v, kind_s k) {
 	default: return "Нет названия";
 	}
 }
+
+void castlei::information(building_s v, kind_s k) {
+	auto p = getdescription(v, k);
+	if(!p)
+		return;
+	string sb;
+	sb.addi(v, k);
+	sb.addsep();
+	sb.add(p);
+	sb.addsep();
+	auto prerequisit = getprereqisit(v, k);
+	if(prerequisit.data) {
+		auto building_count = 0;
+		for(auto i = FirstBuilding; i < LastBuilding; i = (building_s)(i + 1)) {
+			if(!prerequisit.is(i))
+				continue;
+			if(building_count == 0)
+				sb.add("Необходимо построить:");
+			sb.addn(getstr(i, k));
+			building_count++;
+		}
+	}
+	sb.addsep();
+	sb.addi(getcost(v, k));
+	playeri::tooltips(sb);
+}

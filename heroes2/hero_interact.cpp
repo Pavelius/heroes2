@@ -12,8 +12,13 @@ static bool isonetime(object_s id) {
 	}
 }
 
+bool heroi::interact(moveablei& object) {
+	return true;
+}
+
 bool heroi::interact(short unsigned index, const pvar& object) {
-	resource_s resource;
+	costi cost;
+	auto player = getplayer();
 	switch(object.type) {
 	case Hero:
 		break;
@@ -22,7 +27,15 @@ bool heroi::interact(short unsigned index, const pvar& object) {
 	case Moveable:
 		switch(object.moveable->element.type) {
 		case Resource:
-			resource = object.moveable->element.resource;
+			cost.clear();
+			cost.add(object.moveable->element.resource, object.moveable->element.value);
+			if(player) {
+				player->getresources() += cost;
+				player->quickmessage(cost, "Вы нашли ресурс\n(%-1)",
+					getstr(object.moveable->element.resource));
+			}
+			return true;
+		case Artifact:
 			return true;
 		case Object:
 			return isonetime(object.moveable->element.object);

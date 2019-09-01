@@ -71,7 +71,7 @@ struct picture {
 	unsigned				getsize(unsigned count, int& width, int& height, int width_per_line) const;
 	void					paint(int x, int y, int h1, variant element, int count) const;
 	void					render(int x, int y, res_s res, int frame) const;
-	void					set(const variant id);
+	void					set(const variant id, int value);
 	void					setsize(res_s res, unsigned char frame);
 	void					setsize() { setsize(res, frame); }
 };
@@ -195,7 +195,6 @@ struct drawobji			{
 	static const drawobji* find(res_s res, unsigned char frame);
 	static void				initialize();
 };
-bool						ask(const char* format, const variantcol* footer = 0, unsigned count = 0);
 void						breakmodal(int result);
 void						button(int x, int y, res_s res, const cmd& ev, const buttoni& decor, int key = 0, const char* tips = 0);
 bool						buttonx(int x, int y, res_s res, void* source, const buttoni& decor, int key = 0, const char* tips = 0);
@@ -211,6 +210,7 @@ const icn::record*			get(res_s id, int n);
 rect						get(res_s id, int n, int x, int y, unsigned flags);
 res_s						getbuildings(kind_s v);
 int							getheight(res_s id, int n);
+const char*					getname(res_s id);
 res_s						getres(unsigned char object);
 int							getresult();
 int							getwidth(res_s id, int n);
@@ -230,9 +230,7 @@ int							imagex(int x, int y, int width, const variantcol* source, unsigned cou
 void						initialize();
 res_s						isevil(res_s evil, res_s good);
 void						line(int x1, int y1, int x2, int y2, unsigned char m);
-void						message(const char* format);
-int							message(const char* format, kind_s kind, building_s building, const variantcol* footer, unsigned footer_count, button_s mode);
-int							message(const char* format, kind_s kind, building_s building, const costi& cost, button_s mode);
+int							message(const char* format, button_s mode);
 bool						mousein(const rect& rc);
 void						pixel(int x, int y, unsigned char a);
 unsigned char*				ptr(int x, int y);

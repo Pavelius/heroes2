@@ -53,8 +53,12 @@ bool castlei::build(building_s building, bool confirm) {
 	auto cost = getcost(building, kind);
 	auto player = getplayer();
 	if(confirm) {
-		char temp[260]; zprint(temp, "Вы действительно хотите построить %1?", getstr(building, kind));
-		if(message(temp, kind, building, cost, ButtonYesNo) != 1)
+		string sb;
+		sb.addi(building, kind);
+		sb.addn("Вы действительно хотите построить %1?", getstr(building, kind));
+		sb.addsep();
+		sb.addi(cost);
+		if(!playeri::confirm(sb))
 			return false;
 	}
 	auto hero = heroi::find(getpos());

@@ -138,5 +138,5 @@ pvar map::find(short unsigned index) {
 		if(e.index == index)
 			return &e;
 	}
-	return pvar();
+	return gettile(index);
 }

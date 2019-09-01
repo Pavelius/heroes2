@@ -268,8 +268,13 @@ static void buildings_information() {
 	auto kind = current_castle->getkind();
 	auto building = (building_s)hot::param;
 	auto p = castlei::getdescription(building, kind);
-	if(p)
-		message(p, kind, building, 0, 0, ButtonOK);
+	if(p) {
+		string sb;
+		sb.addi(building, kind);
+		sb.addsep();
+		sb.add(p);
+		playeri::message(p);
+	}
 }
 
 static void buildings_tips() {
@@ -277,13 +282,6 @@ static void buildings_tips() {
 	auto kind = current_castle->getkind();
 	auto building = (building_s)hot::param;
 	current_castle->information(building, kind);
-}
-
-void castlei::information(building_s v, kind_s k) {
-	auto p = getdescription(v, k);
-	if(!p)
-		return;
-	message(p, k, v, 0, 0, NoButtons);
 }
 
 void castlei::paint_panorama(int x, int y) const {

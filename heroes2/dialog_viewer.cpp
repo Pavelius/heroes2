@@ -41,7 +41,9 @@ void object_view() {
 		auto& sh = e.shape;
 		rectf({0, 0, draw::width - 1, draw::height - 1}, 0x12);
 		int e_count = sh.indecies[sh.count - 1] + 1 + sh.animation[sh.count - 1];
-		zprint(temp, "%6 %1i/%5i (начало=%2i, к-во=%3i, следущий=%4i)", index, e.first, e_count, e.first + e_count, maximum_count, getstr(e.object));
+		auto rn = getname(e.res);
+		zprint(temp, "%6 %1i/%5i (start=%2i, count=%3i, next=%4i)",
+			index, e.first, e_count, e.first + e_count, maximum_count, getstr(e.object));
 		text(0, 0, temp);
 		point center = {0, 0};
 		for(int i = 0; i < sh.count; i++) {

@@ -636,7 +636,6 @@ extern unsigned	char		roads[256 * 256];
 extern unsigned short		tiles[256 * 256];
 extern unsigned char		width;
 //
-void						around(short unsigned index, map_flag_s v);
 void						clear();
 unsigned					getcost(short unsigned index);
 unsigned					getcost(short unsigned index, direction_s direct, unsigned pathfinding);

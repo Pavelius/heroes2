@@ -332,6 +332,12 @@ static void choose_castle() {
 	map::setcamera(current_var.castle->getpos());
 }
 
+static void route_path() {
+	auto hero = current_var.hero;
+	short unsigned index = hot::param;
+	map::walk(hero->getpos(), index);
+}
+
 static void standart_input() {
 	switch(hilite_var.type) {
 	case CastleVar:
@@ -346,6 +352,12 @@ static void standart_input() {
 		else
 			hilite_var.hero->input(current_player);
 		break;
+	}
+	if(hilite_index != Blocked && hot::key == MouseLeft && hot::pressed) {
+		auto c = map::getcost(hilite_index);
+		auto i = hilite_index;
+		if(current_var.type == Hero && c != 0 && (map::is(i, ActionTile) || !map::is(i, BlockedTile)))
+			execute(route_path, hilite_index);
 	}
 }
 
@@ -437,16 +449,16 @@ static void move_camera() {
 	correct_camera();
 }
 
-static void paint_tiles(rect screen, point camera) {
+static void paint_tiles() {
 	draw::state push;
-	draw::clipping = screen;
-	auto x2 = camera.x + screen.width();
-	auto y2 = camera.y + screen.height();
-	for(int y = camera.y; y < y2; y += 32) {
-		for(int x = camera.x; x < x2; x += 32) {
+	draw::clipping = rcmap;
+	auto x2 = map::camera.x + rcmap.width();
+	auto y2 = map::camera.y + rcmap.height();
+	for(int y = map::camera.y; y < y2; y += 32) {
+		for(int x = map::camera.x; x < x2; x += 32) {
 			int index = map::m2i(x / 32, y / 32);
-			auto x1 = x - camera.x + screen.x1;
-			auto y1 = y - camera.y + screen.y1;
+			auto x1 = x - map::camera.x + rcmap.x1;
+			auto y1 = y - map::camera.y + rcmap.y1;
 			imagt(x1, y1, TisGROUND32, map::tiles[index], map::flags[index] & 0x03);
 			const rect rc = {x1, y1, x1 + 31, y1 + 31};
 			if(mousein(rc)) {
@@ -647,7 +659,7 @@ void castlei::paint(int x, int y, landscape_s tile, kind_s race, bool castle, bo
 		image(x + ii * 32, y + 3 * 32, OBJNTOWN, index + 11 + ii);
 }
 
-static void paint_objects(const rect& rcmap, point camera) {
+static void paint_objects() {
 	state push;
 	clipping = rcmap;
 	for(unsigned i = 0; i < drawables_count; i++)
@@ -724,6 +736,8 @@ static void update_cursor() {
 		return;
 	auto i = hilite_index;
 	if(current_var.type == Hero) {
+		if(map::getcost(i) == 0)
+			return;
 		if(map::is(i, AttackTile) && (map::is(i, ActionTile) || !map::is(i, BlockedTile)))
 			setcursor(ADVMCO, 5);
 		else if(map::is(hilite_index, ActionTile)) {
@@ -742,6 +756,161 @@ static void update_cursor() {
 		setcursor(ADVMCO, 2);
 }
 
+static unsigned char routeindex(short unsigned from, short unsigned throught, short unsigned to, int mod) {
+	// ICN::ROUTE
+	// start index 1, 25, 49, 73, 97, 121 (size arrow path)
+	// 1 - from left to up+
+	// 9 - from down to up+
+	if(throught == to)
+		return 0;
+	unsigned char index = 1;
+	if(mod >= 200)
+		index = 121;
+	else if(mod >= 175)
+		index = 97;
+	else if(mod >= 150)
+		index = 73;
+	else if(mod >= 125)
+		index = 49;
+	else if(mod >= 100)
+		index = 25;
+	auto d = map::getdir(from, throught);
+	auto d1 = map::getdir(throught, to);
+	if(from == throught) {
+		switch(d) {
+		case Up:		index += 8; break;
+		case RightUp:	index += 17; break;
+		case Right:		index += 18; break;
+		case Left:		index += 6; break;
+		case LeftUp:	index += 7; break;
+		case LeftDown:	index += 5; break;
+		case RightDown:	index += 19; break;
+		default:		index = 0; break;
+		}
+	} else switch(d) {
+	case Up:
+		switch(d1) {
+		case Up:		index += 8; break;
+		case RightUp:	index += 17; break;
+		case Right:		index += 18; break;
+		case Left:		index += 6; break;
+		case LeftUp:	index += 7; break;
+		case LeftDown:	index += 5; break;
+		case RightDown:	index += 19; break;
+		default: 		index = 0; break;
+		}
+		break;
+	case RightUp:
+		switch(d1) {
+		case Up:		index += 0; break;
+		case RightUp:	index += 9; break;
+		case Right:		index += 18; break;
+		case RightDown:	index += 19; break;
+		case LeftUp:	index += 7; break;
+		case Down:		index += 20; break;
+		case Left:		index += 6; break;
+		default: 		index = 0; break;
+		}
+		break;
+	case Right:
+		switch(d1) {
+		case Up:		index += 0; break;
+		case Down:		index += 20; break;
+		case RightDown:	index += 19; break;
+		case Right:		index += 10; break;
+		case RightUp:	index += 1; break;
+		case LeftUp:	index += 7; break;
+		case LeftDown:	index += 21; break;
+		default: 		index = 0; break;
+		}
+		break;
+	case RightDown:
+		switch(d1) {
+		case RightUp:	index += 1; break;
+		case Right:		index += 2; break;
+		case RightDown:	index += 11; break;
+		case Down:		index += 20; break;
+		case LeftDown:	index += 21; break;
+		case Up:		index += 0; break;
+		case Left:		index += 22; break;
+		default: 		index = 0; break;
+		}
+		break;
+	case Down:
+		switch(d1) {
+		case Right:		index += 2; break;
+		case RightDown:	index += 3; break;
+		case Down:		index += 12; break;
+		case LeftDown:	index += 21; break;
+		case Left:		index += 22; break;
+		case LeftUp:	index += 16; break;
+		case RightUp:	index += 1; break;
+		default: 		index = 0; break;
+		}
+		break;
+	case LeftDown:
+		switch(d1) {
+		case RightDown:	index += 3; break;
+		case Down:		index += 4; break;
+		case LeftDown:	index += 13; break;
+		case Left:		index += 22; break;
+		case LeftUp:	index += 23; break;
+		case Up:		index += 16; break;
+		case Right:		index += 2; break;
+		default: 		index = 0; break;
+		}
+		break;
+	case Left:
+		switch(d1) {
+		case Up:		index += 16; break;
+		case Down:		index += 4; break;
+		case LeftDown:	index += 5; break;
+		case Left:		index += 14; break;
+		case LeftUp:	index += 23; break;
+		case RightUp:	index += 17; break;
+		case RightDown:	index += 3; break;
+		default: 		index = 0; break;
+		}
+		break;
+	case LeftUp:
+		switch(d1) {
+		case Up:		index += 16; break;
+		case RightUp:	index += 17; break;
+		case LeftDown:	index += 5; break;
+		case Left:		index += 6; break;
+		case LeftUp:	index += 15; break;
+		case Down:		index += 4; break;
+		case Right:		index += 18; break;
+		default: 		index = 0; break;
+		}
+		break;
+	default: index = 0; break;
+	}
+	return index;
+}
+
+static void paint_route() {
+	draw::state push;
+	draw::clipping = rcmap;
+	auto path = map::getpath();
+	if(!path)
+		return;
+	auto count = map::getpathcount();
+	if(!count)
+		return;
+	auto from = path[count - 1];
+	for(int i = count - 2; i >= 0; i--) {
+		int index = path[i];
+		int to = index;
+		if(i > 0)
+			to = path[i - 1];
+		auto x = map::i2x(index) * 32 - 12 - map::camera.x + rcmap.x1;
+		auto y = map::i2y(index) * 32 - map::camera.y + rcmap.y1;
+		draw::image(x, y, ROUTE, routeindex(from, index, to, 100));
+		from = index;
+	}
+}
+
 static void paint_screen() {
 	hilite_index = Blocked;
 	hilite_var.clear();
@@ -750,9 +919,10 @@ static void paint_screen() {
 	heroes.draw(481, 176, 56, 32);
 	castles.draw(553, 176, 56, 32);
 	paint_information(480, 320, current_player);
-	paint_tiles(rcmap, map::camera);
-	paint_objects(rcmap, map::camera);
+	paint_tiles();
+	paint_objects();
 	//paint_block(rcmap, map::camera);
+	paint_route();
 	update_cursor();
 	if(mousein(rcmap)) {
 		if(hot::key == MouseRight && hot::pressed)

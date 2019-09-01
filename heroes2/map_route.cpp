@@ -6,6 +6,10 @@ static unsigned short	path_push;
 static unsigned short	path_pop;
 static unsigned short	path_goal;
 static unsigned short	path_start;
+static const direction_s all_around[] = {
+	Left, Right, Up, Down,
+	LeftUp, LeftDown, RightUp, RightDown
+};
 
 static void gnext(int index, unsigned& level, short unsigned& pos) {
 	if(index == Blocked)
@@ -13,7 +17,7 @@ static void gnext(int index, unsigned& level, short unsigned& pos) {
 	auto nlevel = path[index];
 	if(!nlevel)
 		return;
-	if(nlevel <= level) {
+	if(nlevel < level) {
 		level = nlevel;
 		pos = index;
 	}
@@ -25,15 +29,6 @@ bool map::ispathable(short unsigned index) {
 
 bool map::isinteract(object_s v) {
 	return v <= LastObject;
-}
-
-void map::around(short unsigned index, map_flag_s v) {
-	static const direction_s direction[] = {
-		Left, Right, Up, Down,
-		LeftUp, LeftDown, RightUp, RightDown
-	};
-	for(auto a : direction)
-		set(to(index, a), v);
 }
 
 unsigned map::getcost(short unsigned index) {
@@ -186,7 +181,11 @@ static void update_map_flags(const playeri* player, bool ship_master) {
 				continue;
 			switch(e.element.type) {
 			case Monster:
-				map::around(e.index, AttackTile);
+				for(auto d : all_around) {
+					auto i = map::to(e.index, d);
+					map::set(i, BlockedTile);
+					map::set(i, AttackTile);
+				}
 				map::set(e.index, BlockedTile);
 				map::set(e.index, ActionTile);
 				map::set(e.index, AttackTile);

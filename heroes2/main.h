@@ -6,6 +6,9 @@
 enum index_s : unsigned short {
 	Blocked = 0xFFFF,
 };
+enum path_s : unsigned {
+	BlockedPath = 0xFFFFFFF0, ActionPath, AttackPath,
+};
 enum kind_s : unsigned char {
 	Barbarian, Knight, Necromancer, Sorcerer, Warlock, Wizard,
 	RandomKind,
@@ -181,7 +184,7 @@ enum spell_type_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Ability, Artifact, CastleVar, Hero, Index, Landscape, MapObject, Monster, Moveable,
+	Ability, Artifact, CastleVar, Hero, Index, Landscape, Object, Monster, Moveable,
 	Player, Resource, Skill, Spell, Stat, Tag,
 };
 enum activity_s : unsigned char {
@@ -206,7 +209,7 @@ enum direction_s : unsigned char {
 };
 enum armysize_s {
 	Few, Several, Pack, Lots, Horde, Throng, Swarm, Zounds, Legion
-}; 
+};
 enum landscape_s : unsigned char {
 	Beach, Desert, Dirt, Grass, Lava, Sea, Snow, Swamp, Waste,
 };
@@ -235,7 +238,7 @@ struct variant {
 	constexpr variant(artifact_s v) : type(Artifact), artifact(v) {}
 	constexpr variant(hero_s v) : type(Hero), hero(v) {}
 	constexpr variant(landscape_s v) : type(Landscape), landscape(v) {}
-	constexpr variant(object_s v) : type(MapObject), object(v) {}
+	constexpr variant(object_s v) : type(Object), object(v) {}
 	constexpr variant(monster_s v) : type(Monster), monster(v) {}
 	constexpr variant(resource_s v) : type(Resource), resource(v) {}
 	constexpr variant(skill_s v) : type(Skill), skill(v) {}
@@ -393,6 +396,9 @@ struct moveablei {
 	short unsigned			value;
 	player_s				player;
 	unsigned char			value2;
+	explicit constexpr operator bool() const { return index != Blocked; }
+	void					blockpath(unsigned* path) const;
+	void					clear();
 };
 class heroi : public namei, public armyi {
 	kind_s					kind;
@@ -428,6 +434,7 @@ public:
 	static void				initialize();
 	void					input(const playeri* player) const;
 	bool					is(spell_s v) const { return spellbook.is(v); }
+	bool					isadventure() const { return index != Blocked; }
 	static unsigned			select(heroi** result, heroi** result_maximum, const playeri* player, kind_s kind, kind_s kind_exclude, bool include_special = false);
 	void					set(direction_s v) { direction = v; }
 	void					set(skill_s id, int v) { skills[id] = v; }
@@ -626,18 +633,27 @@ extern unsigned	char		roads[256 * 256];
 extern unsigned short		tiles[256 * 256];
 extern unsigned char		width;
 //
-short unsigned				to(short unsigned i, direction_s d);
-//
+void						around(short unsigned index, unsigned m);
 void						clear();
-inline unsigned				getmonth() { return day / (7*4); }
+unsigned					getcost(short unsigned index);
+unsigned					getcost(short unsigned index, direction_s direct, unsigned pathfinding);
+direction_s					getdir(short unsigned from, short unsigned to);
+inline unsigned				getmonth() { return day / (7 * 4); }
+short unsigned*				getpath();
+unsigned					getpathcount();
 landscape_s					gettile(short unsigned index);
 inline unsigned				getweek() { return day / 7; }
 inline unsigned				getweekday() { return day % 7; }
 inline unsigned				getmonthweek() { return getweek() % 4; }
 inline int					i2x(short unsigned i) { return i % 256; }
 inline int					i2y(short unsigned i) { return i >> 8; }
+bool						ispathable(short unsigned index);
 inline unsigned short		m2i(int x, int y) { return (y << 8) + x; }
 void						setcamera(short unsigned index);
+short unsigned				to(short unsigned i, direction_s d);
+direction_s					to(direction_s f, direction_s d);
+void						walk(short unsigned start, short unsigned goal);
+void						wave(short unsigned start, int skill, int ship_master, const playeri* player);
 }
 const char*					getstr(building_s id, kind_s kind);
 DECLENUM(ability);

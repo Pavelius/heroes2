@@ -52,8 +52,10 @@ static shapei sh4x2u1 = {7, {4, 2}, {{-1, -1}, {0, -1}, {1, -1}, {-2, 0}, {-1, 0
 static shapei sh4x2r1 = {7, {4, 2}, {{-2, -1}, {-1, -1}, {0, -1}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}}};
 static shapei sh4x2u2 = {6, {4, 2}, {{0, -1}, {1, -1}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}}};
 static shapei sh4x2d1 = {7, {4, 2}, {{-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {0, 0}, {1, 0}}, {0}, {2, 2, 2, 2, 1, 2, 2}};
-static shapei sh4x2r1d1 = {6, {4, 2}, {{-1, -1}, {0, -1}, {1, -1}, {0, 0}, {1, 0}, {2, 0}}, {0}, {0, 2, 2, 0, 2, 2}};
-static shapei sh4x2u1b1 = {6, {4, 2}, {{0, -1}, {1, -1}, {2, -1}, {-1, 0}, {0, 0}, {1, 0}}, {0}, {0, 2, 2, 0, 2, 2}};
+static shapei sh4x2r1d1 = {6, {4, 2}, {{-2, -1}, {-1, -1}, {0, -1}, {-1, 0}, {0, 0}, {1, 0}}, {0}, {0, 2, 2, 0, 2, 2}};
+static shapei sh4x2t1 = {6, {4, 2}, {{-2, -1}, {-1, -1}, {0, -1}, {-1, 0}, {0, 0}, {1, 0}}, {0}, {0, 2, 2, 0, 2, 2}};
+static shapei sh4x2m1 = {6, {4, 2}, {{-1, -1}, {0, -1}, {1, -1}, {-2, 0}, {-1, 0}, {0, 0}}, {0}, {0, 2, 2, 0, 2, 2}};
+static shapei sh4x2t2 = {6, {4, 2}, {{-1, -1}, {0, -1}, {1, -1}, {-2, 0}, {-1, 0}, {0, 0}}, {0}, {0, 2, 2, 0, 2, 2}};
 static shapei sh4x2а6 = {8, {4, 2}, {{-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}}, {0, 0, 0, 0, 0, 0, 0, 6}};
 static shapei sh4x2а6_rogcmp = {8, {4, 2}, {{-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}}, {0, 0, 0, 0, 0, 0, 6, 0}};
 static shapei sh4x3 = {12, {4, 3}, {{-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}, {-2, 1}, {-1, 1}, {0, 1}, {1, 1}}};
@@ -77,7 +79,7 @@ static shapei sh6x3u1b2 = {15, {6, 3}, {{-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2
 static shapei sh6x3u1a10 = {17, {6, 3}, {{-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}, {2, 0}, {3, 0}, {-2, 1}, {-1, 1}, {0, 1}, {1, 1}, {2, 1}, {3, 1}}, {0, 0, 0, 0, 0, 10, 10, 10, 10, 10, 0, 0, 10, 10, 10, 10, 0}};
 static shapei sh6x4 = {24, {6, 4}, {{-3, -3}, {-2, -3}, {-1, -3}, {0, -3}, {1, -3}, {2, -3}, {-3, -2}, {-2, -2}, {-1, -2}, {0, -2}, {1, -2}, {2, -2}, {-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {-3, 0}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}, {2, 0}}};
 static shapei sh6x4r1d2 = {21, {6, 4}, {{-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {-3, 0}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}, {2, 0}, {-3, 1}, {-2, 1}, {-1, 1}, {0, 1}, {1, 1}, {2, 1}, {-1, 2}, {0, 2}, {1, 2}, {2, 2}}, {0}, {0, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 0, 2, 2, 2, 2, 2, 0, 2, 2, 2}};
-static shapei sh6x4u1b2 = {21, {6, 4}, {{-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {-3, 0}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}, {2, 0}, {-3, 1}, {-2, 1}, {-1, 1}, {0, 1}, {1, 1}, {2, 1}, {-3, 2}, {-2, 2}, {-1, 2}, {0, 2}}, {0}, {0, 1, 1, 1, 2, 0, 1, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0, 2, 2, 2}};
+static shapei sh6x4u1b2 = {21, {6, 4}, {{-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {-3, 0}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}, {2, 0}, {-3, 1}, {-2, 1}, {-1, 1}, {0, 1}, {1, 1}, {2, 1}, {-3, 2}, {-2, 2}, {-1, 2}, {0, 2}}, {0}, {0, 1, 1, 1, 1, 0, 1, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0, 2, 2, 2}};
 //
 static shapei sh7x3r1 = {20, {7, 3}, {{-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {-3, 0}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}, {2, 0}, {3, 0}, {-3, 1}, {-2, 1}, {-1, 1}, {0, 1}, {1, 1}, {2, 1}, {3, 1}}};
 static shapei sh7x4 = {22, {7, 4}, {{-2, -3}, {-1, -3}, {0, -3}, {-3, -2}, {-2, -2}, {-1, -2}, {0, -2}, {1, -2}, {-5, -1}, {-4, -1}, {-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {-5, 0}, {-4, 0}, {-3, 0}, {-2, 0}, {-1, 0}, {0, 0}, {1, 0}}};
@@ -389,38 +391,38 @@ drawobji bsmeta<drawobji>::elements[] = {{OBJNGRAS, AbandoneMine, sh4x2}, // Hau
 {OBJNLAV3, Volcano, sh8x5a10},
 {TREDECI, Trees, sh4x3r1d1},
 {TREDECI, Trees, sh4x3u1b1},
-{TREDECI, Trees, sh4x2r1d1},
-{TREDECI, Trees, sh4x2u1b1},
+{TREDECI, Trees, sh4x2t1},
+{TREDECI, Trees, sh4x2t2},
 {TREDECI, Trees, sh2x1},
 {TREDECI, Trees, sh2x1},
 {TREFALL, Trees, sh4x3r1d1},
 {TREFALL, Trees, sh4x3u1b1},
-{TREFALL, Trees, sh4x2r1d1},
-{TREFALL, Trees, sh4x2u1b1},
+{TREFALL, Trees, sh4x2t1},
+{TREFALL, Trees, sh4x2t2},
 {TREFALL, Trees, sh2x1},
 {TREFALL, Trees, sh2x1},
 {TREJNGL, Trees, sh4x3r1d1},
 {TREJNGL, Trees, sh4x3u1b1},
-{TREJNGL, Trees, sh4x2r1d1},
-{TREJNGL, Trees, sh4x2u1b1},
+{TREJNGL, Trees, sh4x2t1},
+{TREJNGL, Trees, sh4x2t2},
 {TREJNGL, Trees, sh2x1},
 {TREJNGL, Trees, sh2x1},
 {TREEVIL, Trees, sh4x3r1d1},
 {TREEVIL, Trees, sh4x3u1b1},
-{TREEVIL, Trees, sh4x2r1d1},
-{TREEVIL, Trees, sh4x2u1b1},
+{TREEVIL, Trees, sh4x2t1},
+{TREEVIL, Trees, sh4x2t2},
 {TREEVIL, Trees, sh2x1},
 {TREEVIL, Trees, sh2x1},
 {TREFIR, Trees, sh4x3r1d1},
 {TREFIR, Trees, sh4x3u1b1},
-{TREFIR, Trees, sh4x2r1d1},
-{TREFIR, Trees, sh4x2u1b1},
+{TREFIR, Trees, sh4x2t1},
+{TREFIR, Trees, sh4x2t2},
 {TREFIR, Trees, sh2x1},
 {TREFIR, Trees, sh2x1},
 {TRESNOW, Trees, sh4x3r1d1},
 {TRESNOW, Trees, sh4x3u1b1},
-{TRESNOW, Trees, sh4x2r1d1},
-{TRESNOW, Trees, sh4x2u1b1},
+{TRESNOW, Trees, sh4x2t1},
+{TRESNOW, Trees, sh4x2t2},
 {TRESNOW, Trees, sh2x1},
 {TRESNOW, Trees, sh2x1},
 {MTNDIRT, Mountains, sh6x4r1d2},
@@ -430,7 +432,7 @@ drawobji bsmeta<drawobji>::elements[] = {{OBJNGRAS, AbandoneMine, sh4x2}, // Hau
 {MTNDIRT, Mountains, sh4x3r1d1},
 {MTNDIRT, Mountains, sh4x3u1b1},
 {MTNDIRT, Mountains, sh4x2r1d1},
-{MTNDIRT, Mountains, sh4x2u1b1},
+{MTNDIRT, Mountains, sh4x2m1},
 {MTNDIRT, Mines, sh5x2},
 {MTNCRCK, Mountains, sh6x4r1d2},
 {MTNCRCK, Mountains, sh6x4u1b2},
@@ -439,49 +441,49 @@ drawobji bsmeta<drawobji>::elements[] = {{OBJNGRAS, AbandoneMine, sh4x2}, // Hau
 {MTNCRCK, Mountains, sh4x3r1d1},
 {MTNCRCK, Mountains, sh4x3u1b1},
 {MTNCRCK, Mountains, sh4x2r1d1},
-{MTNCRCK, Mountains, sh4x2u1b1},
+{MTNCRCK, Mountains, sh4x2m1},
 {MTNCRCK, Mines, sh5x2},
 {MTNDSRT, Mountains, sh6x4r1d2},
 {MTNDSRT, Mountains, sh6x4u1b2},
 {MTNDSRT, Mountains, sh4x3r1d1},
 {MTNDSRT, Mountains, sh4x3u1b1},
 {MTNDSRT, Mountains, sh4x2r1d1},
-{MTNDSRT, Mountains, sh4x2u1b1},
+{MTNDSRT, Mountains, sh4x2m1},
 {MTNDSRT, Mines, sh5x2},
 {MTNGRAS, Mountains, sh6x4r1d2},
 {MTNGRAS, Mountains, sh6x4u1b2},
 {MTNGRAS, Mountains, sh4x3r1d1},
 {MTNGRAS, Mountains, sh4x3u1b1},
 {MTNGRAS, Mountains, sh4x2r1d1},
-{MTNGRAS, Mountains, sh4x2u1b1},
+{MTNGRAS, Mountains, sh4x2m1},
 {MTNGRAS, Mines, sh5x2},
 {MTNLAVA, Mountains, sh6x4r1d2},
 {MTNLAVA, Mountains, sh6x4u1b2},
 {MTNLAVA, Mountains, sh4x3r1d1},
 {MTNLAVA, Mountains, sh4x3u1b1},
 {MTNLAVA, Mountains, sh4x2r1d1},
-{MTNLAVA, Mountains, sh4x2u1b1},
+{MTNLAVA, Mountains, sh4x2m1},
 {MTNLAVA, Mines, sh5x2},
 {MTNMULT, Mountains, sh6x4r1d2},
 {MTNMULT, Mountains, sh6x4u1b2},
 {MTNMULT, Mountains, sh4x3r1d1},
 {MTNMULT, Mountains, sh4x3u1b1},
 {MTNMULT, Mountains, sh4x2r1d1},
-{MTNMULT, Mountains, sh4x2u1b1},
+{MTNMULT, Mountains, sh4x2m1},
 {MTNMULT, Mines, sh5x2},
 {MTNSNOW, Mountains, sh6x4r1d2},
 {MTNSNOW, Mountains, sh6x4u1b2},
 {MTNSNOW, Mountains, sh4x3r1d1},
 {MTNSNOW, Mountains, sh4x3u1b1},
 {MTNSNOW, Mountains, sh4x2r1d1},
-{MTNSNOW, Mountains, sh4x2u1b1},
+{MTNSNOW, Mountains, sh4x2m1},
 {MTNSNOW, Mines, sh5x2},
 {MTNSWMP, Mountains, sh6x4r1d2},
 {MTNSWMP, Mountains, sh6x4u1b2},
 {MTNSWMP, Mountains, sh4x3r1d1},
 {MTNSWMP, Mountains, sh4x3u1b1},
 {MTNSWMP, Mountains, sh4x2r1d1},
-{MTNSWMP, Mountains, sh4x2u1b1},
+{MTNSWMP, Mountains, sh4x2m1},
 {MTNSWMP, Mines, sh5x2},
 {OBJNMULT, Trees, sh2x2J},
 {OBJNMULT, Trees, sh2x1},
@@ -531,6 +533,7 @@ drawobji bsmeta<drawobji>::elements[] = {{OBJNGRAS, AbandoneMine, sh4x2}, // Hau
 {OBJNMUL2, Graveyard, sh4x2gr},
 {OBJNMUL2, SawMill, sh4x2sm}, // Green grass
 };
+unsigned bsmeta<drawobji>::count = sizeof(bsmeta<drawobji>::elements) / sizeof(bsmeta<drawobji>::elements[0]);
 
 res_s draw::getres(unsigned char object) {
 	switch(object) {
@@ -635,58 +638,6 @@ const drawobji* drawobji::find(res_s res, unsigned char frame) {
 			return &e;
 	}
 	return 0;
-}
-
-void object_view() {
-	char temp[64];
-	const int maximum_count = sizeof(bsmeta<drawobji>::elements) / sizeof(bsmeta<drawobji>::elements[0]);
-	auto index = 0;
-	while(ismodal()) {
-		auto x1 = 640 / 2 - 16;
-		auto y1 = 480 / 2 - 16;
-		if(index < 0)
-			index = 0;
-		else if(index >= maximum_count)
-			index = maximum_count - 1;
-		auto& e = bsmeta<drawobji>::elements[index];
-		auto icn = e.res;
-		auto& sh = e.shape;
-		rectf({0, 0, draw::width - 1, draw::height - 1}, 0x12);
-		int e_count = sh.indecies[sh.count - 1] + 1 + sh.animation[sh.count - 1];
-		zprint(temp, "%6 %1i/%5i (начало=%2i, к-во=%3i, следущий=%4i)", index, e.first, e_count, e.first + e_count, maximum_count, getstr(e.object));
-		text(0, 0, temp);
-		point center = {0, 0};
-		for(int i = 0; i < sh.count; i++) {
-			auto px = x1 + sh.points[i].x * 32;
-			auto py = y1 + sh.points[i].y * 32;
-			auto frame = e.first + sh.indecies[i];
-			if(sh.animation[i])
-				image(px, py, icn, frame + 1 + (draw::counter % sh.animation[i]));
-			image(px, py, icn, frame);
-			if(sh.points[i].x == 0 && sh.points[i].y == 0) {
-				center.x = px;
-				center.y = py;
-			}
-			switch(sh.content[i]) {
-			case 0: rectb({px + 1, py + 1, px + 31, py + 31}, 26); break;
-			case 1: rectb({px + 1, py + 1, px + 31, py + 31}, 10); break;
-			case 2: rectb({px + 1, py + 1, px + 31, py + 31}, 190); break;
-			}
-			if(px==x1 && py==y1)
-				rectb({px + 2, y1 + 2, px + 30, py + 30}, 75);
-		}
-		cursor(ADVMCO, 0);
-		domodal();
-		switch(hot::key) {
-		case KeyEscape:
-			buttoncancel();
-			break;
-		case KeyRight: index++; break;
-		case KeyLeft: index--; break;
-		case KeyUp: index+=10; break;
-		case KeyDown: index -= 10; break;
-		}
-	}
 }
 
 //COMMAND(map_block) {

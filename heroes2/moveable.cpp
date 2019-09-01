@@ -11,34 +11,20 @@ static unsigned char getroad(unsigned char object, unsigned char index) {
 		// from sprite road
 	case ROAD:
 		switch(index) {
-		case 0: case 4: case 5:case 13: case 26:
-			return SH(Up) | SH(Down);
-		case 2: case 21: case 28:
-			return SH(Left) | SH(Right);
-		case 17: case 29:
-			return SH(LeftUp) | SH(RightDown);
-		case 18: case 30:
-			return SH(RightUp) | SH(LeftDown);
-		case 3:
-			return SH(Up) | SH(Down) | SH(Left) | SH(Right);
-		case 6:
-			return SH(Up) | SH(Down) | SH(Right);
-		case 7:
-			return SH(Up) | SH(Right);
-		case 9:
-			return SH(Down) | SH(Right);
-		case 12:
-			return SH(Down) | SH(Left);
-		case 14:
-			return SH(Up) | SH(Down) | SH(Left);
-		case 16:
-			return SH(Up) | SH(Left);
-		case 19:
-			return SH(LeftUp) | SH(RightDown);
-		case 20:
-			return SH(RightUp) | SH(LeftDown);
-		default:
-			return 0;
+		case 0: case 4: case 5:case 13: case 26: return SH(Up) | SH(Down);
+		case 2: case 21: case 28: return SH(Left) | SH(Right);
+		case 17: case 29: return SH(LeftUp) | SH(RightDown);
+		case 18: case 30: return SH(RightUp) | SH(LeftDown);
+		case 3: return SH(Up) | SH(Down) | SH(Left) | SH(Right);
+		case 6: return SH(Up) | SH(Down) | SH(Right);
+		case 7: return SH(Up) | SH(Right);
+		case 9: return SH(Down) | SH(Right);
+		case 12: return SH(Down) | SH(Left);
+		case 14: return SH(Up) | SH(Down) | SH(Left);
+		case 16: return SH(Up) | SH(Left);
+		case 19: return SH(LeftUp) | SH(RightDown);
+		case 20: return SH(RightUp) | SH(LeftDown);
+		default: return 0;
 		}
 		// castle and tower (gate)
 	case OBJNTOWN:
@@ -68,8 +54,7 @@ static unsigned char getroad(unsigned char object, unsigned char index) {
 			77 == index)
 			return SH(Up) | SH(Down);
 		return 0;
-	default:
-		return 0;
+	default: return 0;
 	}
 }
 
@@ -153,6 +138,12 @@ moveablei* add_object(unsigned short index, unsigned char object, unsigned char 
 	return 0;
 }
 
+void moveablei::clear() {
+	memset(this, 0, sizeof(*this));
+	index = Blocked;
+	player = RandomPlayer;
+}
+
 void draw::imags(int x, int y, unsigned short value, unsigned short index) {
 	auto& e = bsmeta<drawobji>::elements[value];
 	auto& sh = e.shape;
@@ -186,4 +177,21 @@ void draw::imagb(int x, int y, unsigned short value) {
 
 bool gamei::isresource(unsigned char object) {
 	return getres(object) == OBJNRSRC;
+}
+
+void moveablei::blockpath(unsigned* path) const {
+	auto& e = bsmeta<drawobji>::elements[value];
+	auto& sh = e.shape;
+	auto x = map::i2x(index);
+	auto y = map::i2y(index);
+	for(int i = 0; i < sh.count; i++) {
+		if(sh.content[i] != 2)
+			continue;
+		auto px = x + sh.points[i].x;
+		auto py = y + sh.points[i].y;
+		if(px < 0 || px >= map::width || py < 0 || py >= map::height)
+			continue;
+		auto index = map::m2i(x, y);
+		path[index] = BlockedPath;
+	}
 }

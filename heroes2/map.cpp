@@ -87,3 +87,20 @@ short unsigned map::to(short unsigned i, direction_s d) {
 		return i;
 	}
 }
+
+direction_s map::to(direction_s f, direction_s d) {
+	switch(d) {
+	case Down:
+		switch(f) {
+		case Left: return Right;
+		case Right: return Left;
+		case Down: return Up;
+		case LeftUp: return RightDown;
+		case RightDown: return LeftUp;
+		case RightUp: return LeftDown;
+		case LeftDown: return RightUp;
+		default: return Down;
+		}
+	default: return f;
+	}
+}

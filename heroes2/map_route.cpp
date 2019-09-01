@@ -1,0 +1,291 @@
+#include "main.h"
+
+static unsigned			path[256 * 256];
+static unsigned short	path_stack[256 * 256];
+static unsigned short	path_push;
+static unsigned short	path_pop;
+static unsigned short	path_goal;
+static unsigned short	path_start;
+
+static void gnext(int index, unsigned& level, short unsigned& pos) {
+	if(index == Blocked)
+		return;
+	auto nlevel = path[index];
+	if(!nlevel)
+		return;
+	if(nlevel <= level) {
+		level = nlevel;
+		pos = index;
+	}
+}
+
+bool map::ispathable(short unsigned index) {
+	return path[index] < BlockedPath;
+}
+
+void map::around(short unsigned index, unsigned m) {
+	static const direction_s direction[] = {
+		Left, Right, Up, Down,
+		LeftUp, LeftDown, RightUp, RightDown
+	};
+	for(auto a : direction) {
+		auto i = to(index, a);
+		if(i != Blocked && path[i] < m && path[i] != BlockedPath)
+			path[i] = m;
+	}
+}
+
+unsigned map::getcost(short unsigned index) {
+	if(index == Blocked)
+		return BlockedPath;
+	return path[index];
+}
+
+unsigned map::getcost(short unsigned index, direction_s direct, unsigned pathfinding) {
+	//         none   basc   advd   expr
+	// Desert  2.00   1.75   1.50   1.00
+	// Snow    1.75   1.50   1.25   1.00
+	// Swamp   1.75   1.50   1.25   1.00
+	// Cracked 1.25   1.00   1.00   1.00
+	// Beach   1.25   1.00   1.00   1.00
+	// Lava    1.00   1.00   1.00   1.00
+	// Dirt    1.00   1.00   1.00   1.00
+	// Grass   1.00   1.00   1.00   1.00
+	// Water   1.00   1.00   1.00   1.00
+	// Road    0.75   0.75   0.75   0.75
+	//if(map::isroad(index, direct))
+	//	return 75;
+	unsigned result = 100;
+	switch(gettile(index)) {
+	case Desert:
+		switch(pathfinding) {
+		case 3:	break;
+		case 2:	result += 50; break;
+		case 1:	result += 75; break;
+		default: result += 100; break;
+		}
+		break;
+	case Snow:
+	case Swamp:
+		switch(pathfinding) {
+		case 3:	break;
+		case 2:	result += 25; break;
+		case 1:	result += 50; break;
+		default: result += 75; break;
+		}
+		break;
+	case Waste:
+	case Beach:
+		result += (pathfinding == 0) ? 25 : 0;
+		break;
+	default: break;
+	}
+	switch(direct) {
+	case RightDown:
+	case RightUp:
+	case LeftDown:
+	case LeftUp:
+		result += result * 55 / 100;
+	}
+	return result;
+}
+
+static unsigned getcost2(short unsigned from, direction_s d, unsigned pathfinding) {
+	const auto c1 = map::getcost(from, d, pathfinding); // penalty: for [cur] out
+	const auto c2 = map::getcost(map::to(from, d), map::to(d, Down), pathfinding); // penalty: for [tmp] in
+	return (c1 + c2) >> 1;
+}
+
+static void snode(unsigned short from, direction_s d, unsigned from_cost, int skill) {
+	auto index = map::to(from, d);
+	if(index == Blocked)
+		return;
+	auto cost = from_cost + getcost2(from, d, skill);
+	if(path[index] >= BlockedPath)
+		return;
+	auto a = path[index];
+	if(a != 0 && cost >= a)
+		return;
+	path_stack[path_push++] = index;
+	path[index] = cost;
+}
+
+direction_s map::getdir(short unsigned from, short unsigned to) {
+	static const direction_s orientations[25] = {
+		LeftUp, LeftUp, Up, RightUp, RightUp,
+		LeftUp, LeftUp, Up, RightUp, RightUp,
+		Left, Left, Right, Right, Right,
+		LeftDown, LeftDown, Down, RightDown, RightDown,
+		LeftDown, LeftDown, Down, RightDown, RightDown
+	};
+	auto dx = i2x(to) - i2x(from);
+	auto dy = i2y(to) - i2y(from);
+	auto div = imax(iabs(dx), iabs(dy));
+	if(!div)
+		return Right; //default
+	if(div > 3)
+		div /= 2;
+	int ax = dx / div;
+	int ay = dy / div;
+	return orientations[(ay + 2) * 5 + ax + 2];
+}
+
+// First, make wave and see what cell on map is passable
+void map::wave(short unsigned start, int skill, int ship_master, const playeri* player) {
+	static point block_castle[] = {{-1, -1}, {0, -1}, {1, -1}, {-2, 0}, {-1, 0}, {1, 0}, {2, 0}};
+	path_push = 0;
+	path_pop = 0;
+	memset(path, 0, sizeof(path));
+	if(start == Blocked)
+		return;
+	if(ship_master) {
+	} else {
+		// Block all water part
+		for(int y = 0; y < height; y++) {
+			for(int x = 0; x < width; x++) {
+				auto i = m2i(x, y);
+				if(gettile(i) == Water)
+					path[i] = BlockedPath;
+			}
+		}
+		// Block all heroes parts
+		for(auto i = FirstHero; i <= LastHero; i = hero_s(i+1)) {
+			auto& e = bsmeta<heroi>::elements[i];
+			if(!e.isadventure())
+				continue;
+			auto index = e.getpos();
+			if(player && e.getplayer()!=player)
+				path[index] = AttackPath;
+			else
+				path[index] = BlockedPath;
+		}
+		// Block all known castle parts
+		for(unsigned i = 0; i < bsmeta<castlei>::count; i++) {
+			auto& e = bsmeta<castlei>::elements[i];
+			auto index = e.getpos();
+			auto x = i2x(index);
+			auto y = i2y(index);
+			for(auto pt : block_castle) {
+				auto x1 = x + pt.x;
+				auto y1 = y + pt.y;
+				if(y1 < 0 || y1 >= height)
+					continue;
+				if(x1 < 0 || x1 >= width)
+					continue;
+				auto i1 = m2i(x1, y1);
+				path[i1] = BlockedPath;
+			}
+			path[index] = ActionPath;
+		}
+		// Block overland part
+		for(unsigned i = 0; i < bsmeta<moveablei>::count; i++) {
+			auto& e = bsmeta<moveablei>::elements[i];
+			if(!e)
+				continue;
+			switch(e.element.type) {
+			case Monster:
+				map::around(e.index, AttackPath);
+				path[e.index] = AttackPath;
+				break;
+			case Object:
+				switch(e.element.object) {
+				case TreasureChest:
+				case AncientLamp:
+					path[e.index] = ActionPath;
+					break;
+				default:
+					e.blockpath(path);
+					break;
+				}
+				break;
+			}
+		}
+	}
+	path_stack[path_push++] = start;
+	path[start] = 1;
+	while(path_push != path_pop) {
+		auto pos = path_stack[path_pop++];
+		auto cost = path[pos];
+		if(cost >= BlockedPath - 1024)
+			break;
+		snode(pos, Left, cost, skill);
+		snode(pos, Right, cost, skill);
+		snode(pos, Up, cost, skill);
+		snode(pos, Down, cost, skill);
+		snode(pos, LeftUp, cost, skill);
+		snode(pos, LeftDown, cost, skill);
+		snode(pos, RightUp, cost, skill);
+		snode(pos, RightDown, cost, skill);
+	}
+	path_pop = 0;
+	path_push = 0;
+	path_goal = Blocked;
+	path_start = start;
+}
+
+// Second calculate path to any cell on map use wave result
+void map::walk(short unsigned start, short unsigned goal) {
+	path_push = 0;
+	path_goal = Blocked;
+	auto pos = goal;
+	unsigned level = BlockedPath;
+	path_stack[path_push++] = goal;
+	while(pos != start) {
+		auto n = pos;
+		gnext(to(pos, Left), level, n);
+		gnext(to(pos, Right), level, n);
+		gnext(to(pos, Up), level, n);
+		gnext(to(pos, Down), level, n);
+		gnext(to(pos, LeftDown), level, n);
+		gnext(to(pos, LeftUp), level, n);
+		gnext(to(pos, RightDown), level, n);
+		gnext(to(pos, RightUp), level, n);
+		if(pos == n)
+			return;
+		pos = n;
+		path_stack[path_push++] = n;
+		level = path[pos];
+	}
+	path_goal = goal;
+}
+
+short unsigned* map::getpath() {
+	return path_stack;
+}
+
+unsigned map::getpathcount() {
+	return path_push;
+}
+
+//void game::moveto() {
+//	if(path_push < 2)
+//		return;
+//	while(path_push - 1) {
+//		auto from = bsget(hero, Index);
+//		auto to = path_stack[path_push - 2];
+//		auto d = map::orient(from, to);
+//		unsigned mp = bsget(hero, MovePoints);
+//		auto mc = movecost2(from, d, bsget(hero, SkillPathfinding));
+//		if(mp < mc)
+//			return;
+//		if(d != map::Center)
+//			bsset(hero, Direction, d);
+//		bsset(hero, MovePoints, mp - mc);
+//		//
+//		if(map::show::type[to] == TypeAction) {
+//			bsset(hero, MoveTo, -1);
+//			path_push = 0;
+//			auto object = bsfind(FirstCastle, Index, to);
+//			if(!object)
+//				object = map::getobject(to);
+//			if(object)
+//				game::interact(to, object, hero, player);
+//			return;
+//		} else {
+//			bsset(hero, Index, to);
+//			path_push--;
+//		}
+//		// Interactive show movement
+//		show::adventure::move(from, to, hero, player);
+//	}
+//}

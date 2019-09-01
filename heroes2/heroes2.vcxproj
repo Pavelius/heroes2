@@ -161,8 +161,9 @@
     <ClCompile Include="level.cpp" />
     <ClCompile Include="luck.cpp" />
     <ClCompile Include="map.cpp" />
-    <ClCompile Include="map_moveable.cpp" />
+    <ClCompile Include="moveable.cpp" />
     <ClCompile Include="drawobj.cpp" />
+    <ClCompile Include="map_route.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="morale.cpp" />
     <ClCompile Include="player.cpp" />

@@ -32,7 +32,7 @@ struct drawable : point, pvar {
 		}
 	}
 	int	getlevel() const {
-		if(type == Moveable && moveable->element.type == MapObject) {
+		if(type == Moveable && moveable->element.type == Object) {
 			switch(moveable->element.object) {
 			case Road: return 3;
 			case Lake: case Cliff: case Hole: return 2;
@@ -43,6 +43,10 @@ struct drawable : point, pvar {
 		return 10;
 	}
 	int	getzpos() const {
+		if(type == Moveable && moveable->element.type == Object) {
+			if(moveable->element.object==TreeKnowledge)
+				return y+1;
+		}
 		return y;
 	}
 	static int compare(const void* p1, const void* p2) {
@@ -61,7 +65,7 @@ struct drawable : point, pvar {
 	void getrect(rect& rc) const {
 		rc.x1 = x;
 		rc.y1 = y;
-		if(type == Moveable && moveable->element.type == MapObject) {
+		if(type == Moveable && moveable->element.type == Object) {
 			auto& sh = bsmeta<drawobji>::elements[moveable->value].shape;
 			rc.x1 += sh.offset.x * 32;
 			rc.y1 += sh.offset.y * 32;
@@ -188,7 +192,7 @@ struct drawable : point, pvar {
 				image(x - 32, y, OBJNARTI, i);
 				image(x, y, OBJNARTI, i + 1);
 				break;
-			case MapObject:
+			case Object:
 				switch(moveable->element.object) {
 				case TreasureChest:
 					image(x - 32, y, OBJNRSRC, 18);
@@ -689,7 +693,7 @@ static void tips_info(bool show_resource_count, bool show_monster_count, bool sh
 			else
 				sb.addn(getstr(hilite_var.moveable->element.resource));
 			break;
-		case MapObject:
+		case Object:
 			sb.addn(getstr(hilite_var.moveable->element.object));
 			break;
 		}

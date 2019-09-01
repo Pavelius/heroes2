@@ -416,8 +416,8 @@ static struct heroc : public list {
 			auto p = data[index];
 			image(x + 4, y + 5, PORTXTRA, 0);
 			image(x - 1, y, MINIPORT, p->getportrait());
-			image(x + 4, y + 5, MOBILITY, imin(1000 / 100, 25));
-			image(x + 43, y + 5, MANA, imin(20 / 5, 25));
+			image(x + 4, y + 5, MOBILITY, imin(p->get(MovePoints) / 100, 25));
+			image(x + 43, y + 5, MANA, imin(p->get(SpellPoints) / 5, 25));
 			if(current_var.hero == p)
 				rectb({x - 1, y, x + 54, y + 31}, 214);
 			if(mousein({x, y, x + 54, y + 31}))
@@ -892,13 +892,17 @@ static unsigned char routeindex(short unsigned from, short unsigned throught, sh
 static void paint_route() {
 	draw::state push;
 	draw::clipping = rcmap;
+	if(current_var.type != Hero)
+		return;
 	auto path = map::getpath();
 	if(!path)
 		return;
 	auto count = map::getpathcount();
 	if(!count)
 		return;
+	auto hero = current_var.hero;
 	auto from = path[count - 1];
+	auto mp = hero->get(MovePoints);
 	for(int i = count - 2; i >= 0; i--) {
 		int index = path[i];
 		int to = index;
@@ -906,7 +910,14 @@ static void paint_route() {
 			to = path[i - 1];
 		auto x = map::i2x(index) * 32 - 12 - map::camera.x + rcmap.x1;
 		auto y = map::i2y(index) * 32 - map::camera.y + rcmap.y1;
-		draw::image(x, y, ROUTE, routeindex(from, index, to, 100));
+		int c = map::getcost(from, to, hero->get(Pathfinding));
+		unsigned char* change = 0;
+		if(mp>c)
+			image(x, y, ROUTE, routeindex(from, index, to, 100), 0, change);
+		else
+			image(x, y, ROUTE, routeindex(from, index, to, 100), 0, route_brown);
+		if(mp>0)
+			mp -= c;
 		from = index;
 	}
 }

@@ -1474,5 +1474,5 @@ void draw::initialize() {
 	createpal(font_yellow);
 	changepal(font_yellow, 10, 16, 108);
 	createpal(route_brown);
-	changepal(route_brown, 85, 22, 37);
+	changepal(route_brown, 85, 22, 42);
 }

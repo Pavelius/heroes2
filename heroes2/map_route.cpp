@@ -92,6 +92,12 @@ static unsigned getcost2(short unsigned from, direction_s d, unsigned pathfindin
 	return (c1 + c2) >> 1;
 }
 
+unsigned map::getcost(short unsigned from, short unsigned to, unsigned pathfinding) {
+	const auto c1 = map::getcost(from, map::getdir(from, to), pathfinding); // penalty: for [cur] out
+	const auto c2 = map::getcost(to, map::getdir(to, from), pathfinding); // penalty: for [tmp] in
+	return (c1 + c2) >> 1;
+}
+
 static void snode(unsigned short from, direction_s d, unsigned from_cost, int skill) {
 	auto index = map::to(from, d);
 	if(index == Blocked)

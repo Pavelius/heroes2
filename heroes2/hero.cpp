@@ -82,9 +82,13 @@ heroi bsmeta<heroi>::elements[CaptainWizard + 1];
 const costi	heroi::cost = {{2500}};
 
 void heroi::initialize() {
-	for(auto i = 0; i <= CaptainWizard; i++) {
+	for(auto i = 0; i <= CaptainWizard; i++)
 		bsmeta<heroi>::elements[i].clear();
-	}
+}
+
+void heroi::refresh() {
+	abilities[SpellPoints] = getmaximum(SpellPoints);
+	abilities[MovePoints] = getmaximum(MovePoints);
 }
 
 void heroi::clear() {
@@ -109,6 +113,7 @@ void heroi::clear() {
 	player = RandomPlayer;
 	portrait = getid();
 	index = Blocked;
+	refresh();
 }
 
 playeri* heroi::getplayer() const {
@@ -124,6 +129,8 @@ int heroi::get(ability_s v) const {
 	case Defence:
 	case SpellPower:
 	case Knowledge:
+	case SpellPoints:
+	case MovePoints:
 		return abilities[v];
 	case MoraleStat:
 		r = skills[Leadership];
@@ -134,6 +141,14 @@ int heroi::get(ability_s v) const {
 		return skills[Luck];
 	default:
 		return 0;
+	}
+}
+
+int	heroi::getmaximum(ability_s v) const {
+	switch(v) {
+	case SpellPoints: return get(Knowledge) * 10;
+	case MovePoints: return 1000;
+	default: return 0;
 	}
 }
 

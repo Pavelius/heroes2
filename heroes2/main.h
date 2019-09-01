@@ -15,6 +15,7 @@ enum kind_s : unsigned char {
 };
 enum ability_s : unsigned char {
 	Attack, Defence, SpellPower, Knowledge,
+	MovePoints, SpellPoints,
 	LuckStat, MoraleStat, Speed,
 	DamageMin, DamageMax,
 	HitPoints, HitPointsMax,
@@ -365,7 +366,7 @@ struct abilityi {
 struct kindi {
 	const char*				name;
 	const char*				name_abbr;
-	unsigned char			abilities[4];
+	unsigned short			abilities[4];
 	skill_s					skills[2];
 	monster_s				units[2];
 	spell_s					spell;
@@ -406,15 +407,13 @@ struct moveablei {
 class heroi : public namei, public armyi {
 	kind_s					kind;
 	unsigned char			level;
-	short unsigned			spell_points;
-	short unsigned			move_points;
 	short unsigned			index;
 	short unsigned			index_move;
 	unsigned char			portrait;
 	player_s				player;
 	unsigned				experience;
 	artifact_s				artifacts[14];
-	unsigned char			abilities[Knowledge + 1];
+	unsigned short			abilities[SpellPoints + 1];
 	unsigned char			skills[LastSkill + 1];
 	spellbooki				spellbook;
 	direction_s				direction;
@@ -431,6 +430,7 @@ public:
 	int						getcost(spell_s v) const;
 	direction_s				getdirection() const { return direction; }
 	hero_s					getid() const { return hero_s(this - bsmeta<heroi>::elements); }
+	int						getmaximum(ability_s v) const;
 	kind_s					getkind() const;
 	unsigned char			getportrait() const { return portrait; }
 	short unsigned			getpos() const { return index; }
@@ -438,6 +438,7 @@ public:
 	void					input(const playeri* player) const;
 	bool					is(spell_s v) const { return spellbook.is(v); }
 	bool					isadventure() const { return index != Blocked; }
+	void					refresh();
 	static unsigned			select(heroi** result, heroi** result_maximum, const playeri* player, kind_s kind, kind_s kind_exclude, bool include_special = false);
 	void					set(direction_s v) { direction = v; }
 	void					set(skill_s id, int v) { skills[id] = v; }
@@ -639,6 +640,7 @@ extern unsigned char		width;
 void						clear();
 unsigned					getcost(short unsigned index);
 unsigned					getcost(short unsigned index, direction_s direct, unsigned pathfinding);
+unsigned					getcost(short unsigned from, short unsigned to, unsigned pathfinding);
 direction_s					getdir(short unsigned from, short unsigned to);
 inline unsigned				getmonth() { return day / (7 * 4); }
 short unsigned*				getpath();

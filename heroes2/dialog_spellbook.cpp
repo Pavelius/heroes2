@@ -91,7 +91,7 @@ void heroi::showbook(spell_type_s original_mode) {
 			if(current_page > 0)
 				execute(prev_page, (int)&current_page);
 		}
-		zprint(temp, "%1i", spell_points);
+		zprint(temp, "%1i", get(SpellPoints));
 		text(x1 + 125 + 18 - draw::textw(temp) / 2, y1 + 308, temp);
 		y1 += 23;
 		x1 += 46;
@@ -128,7 +128,7 @@ void heroi::showbook(spell_type_s original_mode) {
 			draw::image(rc.x1 + (cw1 - getwidth(SPELLS, spr)) / 2, rc.y1 + (cw2 - getheight(SPELLS, spr)) / 2, SPELLS, spr, AFNoOffset);
 			zprint(temp, "%1 (%2i)", getstr(sid), cost);
 			textm(rc.x1, rc.y1 + cw2 + 1, cw1, AlignCenter, temp);
-			if(spell_points >= cost) {
+			if(get(SpellPoints) >= cost) {
 				if(draw::mousein(rc)) {
 					if(hot::key == MouseLeft && hot::pressed)
 						execute(cast_spell);

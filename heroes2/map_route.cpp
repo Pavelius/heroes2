@@ -141,7 +141,7 @@ static void clear_map_flags() {
 	}
 }
 
-static void update_map_flags(const playeri* player, bool ship_master) {
+static void update_map_flags(bool ship_master) {
 	static point block_castle[] = {{-1, -1}, {0, -1}, {1, -1}, {-2, 0}, {-1, 0}, {1, 0}, {2, 0}};
 	if(ship_master) {
 	} else {
@@ -160,8 +160,7 @@ static void update_map_flags(const playeri* player, bool ship_master) {
 				continue;
 			auto index = e.getpos();
 			map::set(index, BlockedTile);
-			if(player && e.getplayer() != player)
-				map::set(index, AttackTile);
+			map::set(index, ActionTile);
 		}
 		// Block all known castle parts
 		for(unsigned i = 0; i < bsmeta<castlei>::count; i++) {
@@ -235,13 +234,13 @@ static void update_cost() {
 }
 
 // First, make wave and see what cell on map is passable
-void map::wave(short unsigned start, int skill, int ship_master, const playeri* player) {
+void map::wave(short unsigned start, int skill, int ship_master) {
 	path_push = 0;
 	path_pop = 0;
 	if(start == Blocked)
 		return;
 	clear_map_flags();
-	update_map_flags(player, ship_master);
+	update_map_flags(ship_master);
 	update_cost();
 	path_stack[path_push++] = start;
 	path[start] = 1;
@@ -266,13 +265,13 @@ void map::wave(short unsigned start, int skill, int ship_master, const playeri* 
 }
 
 // Second calculate path to any cell on map use wave result
-void map::walk(short unsigned start, short unsigned goal) {
+void map::route(short unsigned goal) {
 	path_push = 0;
 	path_goal = Blocked;
 	auto pos = goal;
 	unsigned level = BlockedPath;
 	path_stack[path_push++] = goal;
-	while(pos != start) {
+	while(pos != path_start) {
 		auto n = pos;
 		gnext(to(pos, Left), level, n);
 		gnext(to(pos, Right), level, n);
@@ -295,39 +294,15 @@ short unsigned* map::getpath() {
 	return path_stack;
 }
 
-unsigned map::getpathcount() {
+int map::getpathcount() {
 	return path_push;
 }
 
-//void game::moveto() {
-//	if(path_push < 2)
-//		return;
-//	while(path_push - 1) {
-//		auto from = bsget(hero, Index);
-//		auto to = path_stack[path_push - 2];
-//		auto d = map::orient(from, to);
-//		unsigned mp = bsget(hero, MovePoints);
-//		auto mc = movecost2(from, d, bsget(hero, SkillPathfinding));
-//		if(mp < mc)
-//			return;
-//		if(d != map::Center)
-//			bsset(hero, Direction, d);
-//		bsset(hero, MovePoints, mp - mc);
-//		//
-//		if(map::show::type[to] == TypeAction) {
-//			bsset(hero, MoveTo, -1);
-//			path_push = 0;
-//			auto object = bsfind(FirstCastle, Index, to);
-//			if(!object)
-//				object = map::getobject(to);
-//			if(object)
-//				game::interact(to, object, hero, player);
-//			return;
-//		} else {
-//			bsset(hero, Index, to);
-//			path_push--;
-//		}
-//		// Interactive show movement
-//		show::adventure::move(from, to, hero, player);
-//	}
-//}
+void map::removestep() {
+	if(path_push)
+		path_push--;
+}
+
+void map::clearpath() {
+	path_push = 0;
+}

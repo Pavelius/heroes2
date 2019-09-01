@@ -255,4 +255,5 @@ int							textf(int width, const char* string);
 int							texth();
 int							texth(const char* string, int width);
 int							textw(const char* string, int count = -1);
+void						updatescreen();
 }

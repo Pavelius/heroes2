@@ -155,6 +155,7 @@
     <ClCompile Include="draw_list.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="generator.cpp" />
+    <ClCompile Include="hero_interact.cpp" />
     <ClCompile Include="indexes.cpp" />
     <ClCompile Include="kind.cpp" />
     <ClCompile Include="landscape.cpp" />

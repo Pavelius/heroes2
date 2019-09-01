@@ -221,5 +221,8 @@
     <ClCompile Include="moveable.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="hero_interact.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

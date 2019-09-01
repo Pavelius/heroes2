@@ -221,6 +221,7 @@ enum castle_flag_s : unsigned char {
 	AlreadyMoved,
 };
 class heroi;
+struct pvar;
 struct variant {
 	variant_s				type;
 	union {
@@ -428,23 +429,30 @@ public:
 	int						get(ability_s v) const;
 	int						get(skill_s v) const { return skills[v]; }
 	int						getcost(spell_s v) const;
+	unsigned				getcost(short unsigned from, short unsigned to) const;
 	direction_s				getdirection() const { return direction; }
 	hero_s					getid() const { return hero_s(this - bsmeta<heroi>::elements); }
-	int						getmaximum(ability_s v) const;
+	short unsigned			getmove() const { return index_move; }
+	int						getmpmax() const;
 	kind_s					getkind() const;
 	unsigned char			getportrait() const { return portrait; }
 	short unsigned			getpos() const { return index; }
+	int						getspmax() const;
+	int						getsprefresh() const;
+	void					moveto();
 	static void				initialize();
 	void					input(const playeri* player) const;
+	bool					interact(short unsigned index, const pvar& object);
 	bool					is(spell_s v) const { return spellbook.is(v); }
 	bool					isadventure() const { return index != Blocked; }
-	void					refresh();
 	static unsigned			select(heroi** result, heroi** result_maximum, const playeri* player, kind_s kind, kind_s kind_exclude, bool include_special = false);
+	void					set(ability_s id, int v);
 	void					set(direction_s v) { direction = v; }
 	void					set(skill_s id, int v) { skills[id] = v; }
 	void					set(spell_s id) { spellbook.set(id); }
 	void					set(playeri* v) { if(v) player = v->getid(); else player = RandomPlayer; }
 	void					set(player_s v) { player = v; }
+	void					setmove(short unsigned i) { index_move = i; }
 	void					setportrait(unsigned char i) { portrait = i; }
 	void					setpos(short unsigned i) { index = i; }
 	void					show(bool allow_change = true) const;
@@ -601,7 +609,6 @@ struct pvar : variant {
 	template<class T> constexpr pvar(const T v) : variant(v) {}
 	constexpr pvar(castlei* v) : variant(CastleVar, 0), castle(v) {}
 	constexpr pvar(heroi* v) : variant(Hero, 0), hero(v) {}
-	constexpr pvar(playeri* v) : variant(Player, 0), player(v) {}
 	constexpr pvar(moveablei* v) : variant(Moveable, 0), moveable(v) {}
 	constexpr bool operator==(const pvar& e) const { return type == e.type && value == e.value; }
 	constexpr explicit operator bool() const { return type != NoVariant; }
@@ -638,13 +645,15 @@ extern unsigned short		tiles[256 * 256];
 extern unsigned char		width;
 //
 void						clear();
+void						clearpath();
+pvar						find(short unsigned index);
 unsigned					getcost(short unsigned index);
 unsigned					getcost(short unsigned index, direction_s direct, unsigned pathfinding);
 unsigned					getcost(short unsigned from, short unsigned to, unsigned pathfinding);
 direction_s					getdir(short unsigned from, short unsigned to);
 inline unsigned				getmonth() { return day / (7 * 4); }
 short unsigned*				getpath();
-unsigned					getpathcount();
+int							getpathcount();
 landscape_s					gettile(short unsigned index);
 inline unsigned				getweek() { return day / 7; }
 inline unsigned				getweekday() { return day % 7; }
@@ -655,12 +664,13 @@ bool						is(short unsigned index, map_flag_s v);
 bool						isinteract(object_s v);
 bool						ispathable(short unsigned index);
 inline unsigned short		m2i(int x, int y) { return (y << 8) + x; }
+void						removestep();
+void						route(short unsigned goal);
 void						set(short unsigned index, map_flag_s v);
 void						setcamera(short unsigned index);
 short unsigned				to(short unsigned i, direction_s d);
 direction_s					to(direction_s f, direction_s d);
-void						walk(short unsigned start, short unsigned goal);
-void						wave(short unsigned start, int skill, int ship_master, const playeri* player);
+void						wave(short unsigned start, int skill, int ship_master);
 }
 const char*					getstr(building_s id, kind_s kind);
 DECLENUM(ability);

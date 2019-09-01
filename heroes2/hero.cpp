@@ -86,11 +86,6 @@ void heroi::initialize() {
 		bsmeta<heroi>::elements[i].clear();
 }
 
-void heroi::refresh() {
-	abilities[SpellPoints] = getmaximum(SpellPoints);
-	abilities[MovePoints] = getmaximum(MovePoints);
-}
-
 void heroi::clear() {
 	auto& d = hero_data[getid()];
 	memset(this, 0, sizeof(*this));
@@ -113,7 +108,9 @@ void heroi::clear() {
 	player = RandomPlayer;
 	portrait = getid();
 	index = Blocked;
-	refresh();
+	index_move = Blocked;
+	abilities[SpellPoints] = getspmax();
+	abilities[MovePoints] = getmpmax();
 }
 
 playeri* heroi::getplayer() const {
@@ -144,12 +141,12 @@ int heroi::get(ability_s v) const {
 	}
 }
 
-int	heroi::getmaximum(ability_s v) const {
-	switch(v) {
-	case SpellPoints: return get(Knowledge) * 10;
-	case MovePoints: return 1000;
-	default: return 0;
-	}
+int	heroi::getspmax() const {
+	return get(Knowledge) * 10;
+}
+
+int	heroi::getmpmax() const {
+	return 1000;
 }
 
 void heroi::add(artifact_s id) {
@@ -203,4 +200,18 @@ heroi* heroi::find(short unsigned index) {
 			return &e;
 	}
 	return 0;
+}
+
+unsigned heroi::getcost(short unsigned from, short unsigned to) const {
+	return map::getcost(from, to, get(Pathfinding));
+}
+
+void heroi::set(ability_s id, int v) {
+	if(id >= sizeof(abilities) / sizeof(abilities[0]))
+		return;
+	abilities[id] = v;
+}
+
+int	heroi::getsprefresh() const {
+	return get(Mysticism) + 1;
 }

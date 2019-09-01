@@ -1476,3 +1476,7 @@ void draw::initialize() {
 	createpal(route_brown);
 	changepal(route_brown, 85, 22, 42);
 }
+
+void draw::updatescreen() {
+	sys_input(false);
+}

@@ -24,6 +24,16 @@ void playeri::endturn() {
 		if(!e)
 			continue;
 	}
+	for(unsigned i = FirstHero; i <= LastHero; i = hero_s(i+1)) {
+		auto& e = bsmeta<heroi>::elements[i];
+		if(!e.isadventure())
+			continue;
+		auto v0 = e.get(SpellPoints);
+		auto v1 = e.getspmax();
+		if(v0 < v1)
+			e.set(SpellPoints, imax(0, imin(v0 + e.getsprefresh(), v1)));
+		e.set(MovePoints, e.getmpmax());
+	}
 	map::day++;
 }
 

@@ -116,3 +116,27 @@ void map::set(short unsigned index, map_flag_s v) {
 		return;
 	flags[index] |= (4 << v);
 }
+
+pvar map::find(short unsigned index) {
+	if(index == Blocked)
+		return pvar();
+	// Heroes
+	for(auto i = FirstHero; i <= LastHero; i = (hero_s)(i+1)) {
+		auto& e = bsmeta<heroi>::elements[i];
+		if(e.getpos() == index)
+			return &e;
+	}
+	// Castles
+	for(unsigned i = 0; i <= bsmeta<castlei>::count; i++) {
+		auto& e = bsmeta<castlei>::elements[i];
+		if(e.getpos() == index)
+			return &e;
+	}
+	// Moveables
+	for(unsigned i = 0; i <= bsmeta<moveablei>::count; i++) {
+		auto& e = bsmeta<moveablei>::elements[i];
+		if(e.index == index)
+			return &e;
+	}
+	return pvar();
+}

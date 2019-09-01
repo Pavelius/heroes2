@@ -194,12 +194,6 @@ void moveablei::blockpath(unsigned* path) const {
 		auto index = map::m2i(px, py);
 		map::set(index, BlockedTile);
 	}
-	if(map::isinteract(element.object)) {
-		auto px = x + sh.points[sh.zero].x;
-		auto py = y + sh.points[sh.zero].y;
-		if(!(px < 0 || px >= map::width || py < 0 || py >= map::height)) {
-			auto index = map::m2i(px, py);
-			map::set(index, ActionTile);
-		}
-	}
+	if(map::isinteract(element.object))
+		map::set(index, ActionTile);
 }

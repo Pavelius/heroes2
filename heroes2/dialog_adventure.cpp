@@ -321,7 +321,7 @@ static void choose_hero() {
 		return;
 	info_type = ObjectInfo;
 	map::setcamera(current_var.hero->getpos());
-	map::wave(current_var.hero->getpos(), current_var.hero->get(Pathfinding), 0, current_var.hero->getplayer());
+	map::wave(current_var.hero->getpos(), current_var.hero->get(Pathfinding), 0);
 }
 
 static void choose_castle() {
@@ -334,8 +334,15 @@ static void choose_castle() {
 
 static void route_path() {
 	auto hero = current_var.hero;
+	auto move = hero->getmove();
 	short unsigned index = hot::param;
-	map::walk(hero->getpos(), index);
+	if(index == Blocked)
+		return;
+	if(index != move) {
+		map::route(index);
+		hero->setmove(index);
+	} else
+		hero->moveto();
 }
 
 static void standart_input() {
@@ -965,4 +972,63 @@ void playeri::adventure() {
 		standart_input();
 		domodal();
 	}
+}
+
+void heroi::moveto() {
+	if(map::getpathcount() < 2)
+		return;
+	auto stack = map::getpath();
+	auto interactive = true;
+	while((map::getpathcount() - 1)>0) {
+		auto pi = map::getpathcount();
+		auto from = getpos();
+		auto to = stack[pi - 2];
+		auto d = map::getdir(from, to);
+		auto mp = get(MovePoints);
+		auto mc = (int)getcost(from, to);
+		if(mp < mc)
+			break;
+		set(d);
+		abilities[MovePoints] -= mc;
+		if(map::is(to, ActionTile) || map::is(to, AttackTile)) {
+			setmove(Blocked);
+			map::clearpath();
+			map::setcamera(getpos());
+			paint_screen();
+			updatescreen();
+			auto object = map::find(to);
+			if(object) {
+				auto discard = interact(to, object);
+				if(discard) {
+					auto applied = false;
+					screenshoot first;
+					if(object.type == Moveable) {
+						object.moveable->clear();
+						applied = true;
+					} else if(object.type == Hero) {
+						object.hero->setpos(Blocked);
+						applied = true;
+					}
+					if(applied) {
+						update_lists();
+						update_drawables();
+						paint_screen();
+						screenshoot second;
+						first.blend(second);
+					}
+				}
+				break;
+			}
+		} else {
+			setpos(to);
+			map::removestep();
+		}
+		if(interactive) {
+			update_lists();
+			map::setcamera(getpos());
+			paint_screen();
+			updatescreen();
+		}
+	}
+	map::wave(getpos(), get(Pathfinding), 0);
 }

@@ -113,6 +113,18 @@ static monsteran monsters[] = {{PEASANT, {1, 4}, {5, 8}, /*Fly*/{0, 0}, {0, 0}, 
 void animation::set(res_s res, unsigned char frame) {
 	this->res = res;
 	this->frame = frame;
+	pos.x = pos.y = 0;
+	start = frame; count = 1;
+	wait = 0;
+	flags = 0;
+	switch(this->res) {
+	case ADVMCO:
+		if(frame != 0) {
+			pos.x = -draw::getwidth(res, frame)/2;
+			pos.y = -draw::getheight(res, frame)/2;
+		}
+		break;
+	}
 }
 
 void animation::set(monster_s id, action_s a, int param) {

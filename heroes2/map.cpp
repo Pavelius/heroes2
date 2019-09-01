@@ -104,3 +104,15 @@ direction_s map::to(direction_s f, direction_s d) {
 	default: return f;
 	}
 }
+
+bool map::is(short unsigned index, map_flag_s v) {
+	if(index == Blocked)
+		return false;
+	return (flags[index] & (4 << v))!=0;
+}
+
+void map::set(short unsigned index, map_flag_s v) {
+	if(index == Blocked)
+		return;
+	flags[index] |= (4 << v);
+}

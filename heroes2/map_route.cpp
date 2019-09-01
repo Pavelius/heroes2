@@ -24,19 +24,16 @@ bool map::ispathable(short unsigned index) {
 }
 
 bool map::isinteract(object_s v) {
-	return v<=LastObject;
+	return v <= LastObject;
 }
 
-void map::around(short unsigned index, unsigned m) {
+void map::around(short unsigned index, map_flag_s v) {
 	static const direction_s direction[] = {
 		Left, Right, Up, Down,
 		LeftUp, LeftDown, RightUp, RightDown
 	};
-	for(auto a : direction) {
-		auto i = to(index, a);
-		if(i != Blocked && path[i] < m && path[i] != BlockedPath)
-			path[i] = m;
-	}
+	for(auto a : direction)
+		set(to(index, a), v);
 }
 
 unsigned map::getcost(short unsigned index) {
@@ -134,52 +131,53 @@ direction_s map::getdir(short unsigned from, short unsigned to) {
 	return orientations[(ay + 2) * 5 + ax + 2];
 }
 
-// First, make wave and see what cell on map is passable
-void map::wave(short unsigned start, int skill, int ship_master, const playeri* player) {
+static void clear_map_flags() {
+	for(auto y = 0; y < map::height; y++) {
+		for(auto x = 0; x < map::width; x++) {
+			auto i = map::m2i(x, y);
+			map::flags[i] &= 3;
+		}
+	}
+}
+
+static void update_map_flags(const playeri* player, bool ship_master) {
 	static point block_castle[] = {{-1, -1}, {0, -1}, {1, -1}, {-2, 0}, {-1, 0}, {1, 0}, {2, 0}};
-	path_push = 0;
-	path_pop = 0;
-	memset(path, 0, sizeof(path));
-	if(start == Blocked)
-		return;
 	if(ship_master) {
 	} else {
 		// Block all water part
-		for(int y = 0; y < height; y++) {
-			for(int x = 0; x < width; x++) {
-				auto i = m2i(x, y);
-				if(gettile(i) == Water)
-					path[i] = BlockedPath;
+		for(int y = 0; y < map::height; y++) {
+			for(int x = 0; x < map::width; x++) {
+				auto i = map::m2i(x, y);
+				if(map::gettile(i) == Sea)
+					map::set(i, BlockedTile);
 			}
 		}
 		// Block all heroes parts
-		for(auto i = FirstHero; i <= LastHero; i = hero_s(i+1)) {
+		for(auto i = FirstHero; i <= LastHero; i = hero_s(i + 1)) {
 			auto& e = bsmeta<heroi>::elements[i];
 			if(!e.isadventure())
 				continue;
 			auto index = e.getpos();
-			if(player && e.getplayer()!=player)
-				path[index] = AttackPath;
-			else
-				path[index] = BlockedPath;
+			map::set(index, BlockedTile);
+			if(player && e.getplayer() != player)
+				map::set(index, AttackTile);
 		}
 		// Block all known castle parts
 		for(unsigned i = 0; i < bsmeta<castlei>::count; i++) {
 			auto& e = bsmeta<castlei>::elements[i];
 			auto index = e.getpos();
-			auto x = i2x(index);
-			auto y = i2y(index);
+			auto x = map::i2x(index);
+			auto y = map::i2y(index);
 			for(auto pt : block_castle) {
 				auto x1 = x + pt.x;
 				auto y1 = y + pt.y;
-				if(y1 < 0 || y1 >= height)
+				if(y1 < 0 || y1 >= map::height || x1 < 0 || x1 >= map::width)
 					continue;
-				if(x1 < 0 || x1 >= width)
-					continue;
-				auto i1 = m2i(x1, y1);
-				path[i1] = BlockedPath;
+				auto i1 = map::m2i(x1, y1);
+				map::set(i1, BlockedTile);
 			}
-			path[index] = ActionPath;
+			map::set(index, ActionTile);
+			map::set(index, BlockedTile);
 		}
 		// Block overland part
 		for(unsigned i = 0; i < bsmeta<moveablei>::count; i++) {
@@ -188,11 +186,15 @@ void map::wave(short unsigned start, int skill, int ship_master, const playeri* 
 				continue;
 			switch(e.element.type) {
 			case Monster:
-				map::around(e.index, AttackPath);
-				path[e.index] = AttackPath;
+				map::around(e.index, AttackTile);
+				map::set(e.index, BlockedTile);
+				map::set(e.index, ActionTile);
+				map::set(e.index, AttackTile);
 				break;
 			case Resource:
-				path[e.index] = ActionPath;
+			case Artifact:
+				map::set(e.index, BlockedTile);
+				map::set(e.index, ActionTile);
 				break;
 			case Object:
 				switch(e.element.object) {
@@ -202,7 +204,8 @@ void map::wave(short unsigned start, int skill, int ship_master, const playeri* 
 					break;
 				case TreasureChest:
 				case AncientLamp:
-					path[e.index] = ActionPath;
+					map::set(e.index, BlockedTile);
+					map::set(e.index, ActionTile);
 					break;
 				default:
 					e.blockpath(path);
@@ -212,6 +215,29 @@ void map::wave(short unsigned start, int skill, int ship_master, const playeri* 
 			}
 		}
 	}
+}
+
+static void update_cost() {
+	for(int y = 0; y < map::height; y++) {
+		for(int x = 0; x < map::width; x++) {
+			auto i = map::m2i(x, y);
+			if(map::is(i, BlockedTile))
+				path[i] = BlockedPath;
+			else
+				path[i] = 0;
+		}
+	}
+}
+
+// First, make wave and see what cell on map is passable
+void map::wave(short unsigned start, int skill, int ship_master, const playeri* player) {
+	path_push = 0;
+	path_pop = 0;
+	if(start == Blocked)
+		return;
+	clear_map_flags();
+	update_map_flags(player, ship_master);
+	update_cost();
 	path_stack[path_push++] = start;
 	path[start] = 1;
 	while(path_push != path_pop) {

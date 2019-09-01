@@ -946,7 +946,7 @@ static void standart_domodal() {
 			status_text);
 	}
 	image(hot::mouse.x + current_cursor.pos.x,
-		hot::mouse.y + current_cursor.pos.x,
+		hot::mouse.y + current_cursor.pos.y,
 		current_cursor.res, current_cursor.frame,
 		current_cursor.flags);
 #ifdef _DEBUG

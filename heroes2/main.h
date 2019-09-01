@@ -7,7 +7,7 @@ enum index_s : unsigned short {
 	Blocked = 0xFFFF,
 };
 enum path_s : unsigned {
-	BlockedPath = 0xFFFFFFF0, ActionPath, AttackPath,
+	BlockedPath = 0xFFFFFFFF
 };
 enum kind_s : unsigned char {
 	Barbarian, Knight, Necromancer, Sorcerer, Warlock, Wizard,
@@ -177,6 +177,9 @@ enum tag_s : unsigned char {
 };
 enum action_s : unsigned char {
 	Wait, Warn, Move, PalmFace, AttackAction, FlyAction, Shoot, Damaged, Dead, Killed,
+};
+enum map_flag_s : unsigned char {
+	AttackTile, BlockedTile, ActionTile,
 };
 enum spell_type_s : unsigned char {
 	AnySpell,
@@ -633,7 +636,7 @@ extern unsigned	char		roads[256 * 256];
 extern unsigned short		tiles[256 * 256];
 extern unsigned char		width;
 //
-void						around(short unsigned index, unsigned m);
+void						around(short unsigned index, map_flag_s v);
 void						clear();
 unsigned					getcost(short unsigned index);
 unsigned					getcost(short unsigned index, direction_s direct, unsigned pathfinding);
@@ -647,9 +650,11 @@ inline unsigned				getweekday() { return day % 7; }
 inline unsigned				getmonthweek() { return getweek() % 4; }
 inline int					i2x(short unsigned i) { return i % 256; }
 inline int					i2y(short unsigned i) { return i >> 8; }
+bool						is(short unsigned index, map_flag_s v);
 bool						isinteract(object_s v);
 bool						ispathable(short unsigned index);
 inline unsigned short		m2i(int x, int y) { return (y << 8) + x; }
+void						set(short unsigned index, map_flag_s v);
 void						setcamera(short unsigned index);
 short unsigned				to(short unsigned i, direction_s d);
 direction_s					to(direction_s f, direction_s d);

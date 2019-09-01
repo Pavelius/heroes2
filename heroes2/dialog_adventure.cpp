@@ -44,8 +44,8 @@ struct drawable : point, pvar {
 	}
 	int	getzpos() const {
 		if(type == Moveable && moveable->element.type == Object) {
-			if(moveable->element.object==TreeKnowledge)
-				return y+1;
+			if(moveable->element.object == TreeKnowledge)
+				return y + 1;
 		}
 		return y;
 	}
@@ -332,19 +332,19 @@ static void choose_castle() {
 	map::setcamera(current_var.castle->getpos());
 }
 
-static void standart_input(const pvar& e) {
-	switch(e.type) {
+static void standart_input() {
+	switch(hilite_var.type) {
 	case CastleVar:
 		if(hot::key == MouseLeft && hot::pressed)
-			draw::execute(choose_castle, (int)e.castle);
+			draw::execute(choose_castle, (int)hilite_var.castle);
 		else
-			e.castle->input(current_player);
+			hilite_var.castle->input(current_player);
 		break;
 	case Hero:
 		if(hot::key == MouseLeft && hot::pressed)
-			draw::execute(choose_hero, (int)e.hero);
+			draw::execute(choose_hero, (int)hilite_var.hero);
 		else
-			e.hero->input(current_player);
+			hilite_var.hero->input(current_player);
 		break;
 	}
 }
@@ -381,13 +381,8 @@ static struct castlec : public list {
 				draw::image(x - 1, y + 1, icn, 24);
 			if(current_var.castle == p)
 				rectb({x - 1, y, x + 54, y + 31}, 214);
-			if(mousein({x, y, x + 54, y + 31})) {
-				standart_input(data[index]);
-				//if(hot::key == MouseLeft && hot::pressed)
-				//	draw::execute(choose_castle, (int)data[index]);
-				//else
-				//	data[index]->input(current_player);
-			}
+			if(mousein({x, y, x + 54, y + 31}))
+				hilite_var = data[index];
 		} else
 			image(x - 1, y, isevil(LOCATORE, LOCATORS), 5 + index);
 	}
@@ -413,12 +408,8 @@ static struct heroc : public list {
 			image(x + 43, y + 5, MANA, imin(20 / 5, 25));
 			if(current_var.hero == p)
 				rectb({x - 1, y, x + 54, y + 31}, 214);
-			if(mousein({x, y, x + 54, y + 31})) {
-				if(hot::key == MouseLeft && hot::pressed)
-					draw::execute(choose_hero, (int)data[index]);
-				else
-					data[index]->input(current_player);
-			}
+			if(mousein({x, y, x + 54, y + 31}))
+				hilite_var = data[index];
 		} else
 			image(x - 1, y, isevil(LOCATORE, LOCATORS), 1 + index);
 	}
@@ -449,8 +440,6 @@ static void move_camera() {
 static void paint_tiles(rect screen, point camera) {
 	draw::state push;
 	draw::clipping = screen;
-	hilite_index = Blocked;
-	hilite_var.clear();
 	auto x2 = camera.x + screen.width();
 	auto y2 = camera.y + screen.height();
 	for(int y = camera.y; y < y2; y += 32) {
@@ -464,8 +453,8 @@ static void paint_tiles(rect screen, point camera) {
 				hilite_var = map::gettile(index);
 				hilite_index = index;
 #ifdef _DEBUG
-//				if(hilite_index == index)
-//					rectb(rc, 0x10);
+				if(hilite_index == index)
+					rectb(rc, 0x10);
 #endif
 			}
 		}
@@ -543,7 +532,7 @@ static void paint_value(int x, int y, int v) {
 	auto pf = font;
 	font = SMALFONT;
 	char temp[16]; zprint(temp, "%1i", v);
-	text(x - textw(temp)/2, y, temp);
+	text(x - textw(temp) / 2, y, temp);
 	font = pf;
 }
 
@@ -665,11 +654,9 @@ static void paint_objects(const rect& rcmap, point camera) {
 		drawables[i].paint();
 }
 
-static void paint_route(const rect& rcmap, point camera) {
+static void paint_block(const rect& rcmap, point camera) {
 	draw::state push;
 	draw::clipping = rcmap;
-	hilite_index = Blocked;
-	hilite_var.clear();
 	auto x2 = camera.x + rcmap.width();
 	auto y2 = camera.y + rcmap.height();
 	for(int y = camera.y; y < y2; y += 32) {
@@ -677,17 +664,12 @@ static void paint_route(const rect& rcmap, point camera) {
 			int index = map::m2i(x / 32, y / 32);
 			auto x1 = x - camera.x + rcmap.x1;
 			auto y1 = y - camera.y + rcmap.y1;
-			switch(map::getcost(index)) {
-			case BlockedPath:
+			if(!map::ispathable(index))
 				rectb({x1 + 2, y1 + 2, x1 + 30, y1 + 30}, 180);
-				break;
-			case ActionPath:
-				rectb({x1 + 2, y1 + 2, x1 + 30, y1 + 30}, 90);
-				break;
-			case AttackPath:
-				rectb({x1 + 2, y1 + 2, x1 + 30, y1 + 30}, 110);
-				break;
-			}
+			if(map::is(index, ActionTile))
+				rectb({x1 + 3, y1 + 3, x1 + 29, y1 + 29}, 90);
+			if(map::is(index, AttackTile))
+				rectb({x1 + 4, y1 + 4, x1 + 28, y1 + 28}, 110);
 		}
 	}
 }
@@ -737,7 +719,32 @@ static void tips_info() {
 	tips_info(true, false, true);
 }
 
+static void update_cursor() {
+	if(hilite_index == Blocked)
+		return;
+	auto i = hilite_index;
+	if(current_var.type == Hero) {
+		if(map::is(i, AttackTile) && (map::is(i, ActionTile) || !map::is(i, BlockedTile)))
+			setcursor(ADVMCO, 5);
+		else if(map::is(hilite_index, ActionTile)) {
+			if(hilite_var.type == Hero) {
+				if(hilite_var.hero == current_var.hero)
+					setcursor(ADVMCO, 2);
+				else
+					setcursor(ADVMCO, 8);
+			} else
+				setcursor(ADVMCO, 9);
+		} else if(hilite_var.type == CastleVar)
+			setcursor(ADVMCO, 3);
+		else if(map::getcost(hilite_index) < BlockedPath)
+			setcursor(ADVMCO, 4);
+	} else if(hilite_var.type == Hero && current_var.type != Hero)
+		setcursor(ADVMCO, 2);
+}
+
 static void paint_screen() {
+	hilite_index = Blocked;
+	hilite_var.clear();
 	image(0, 0, isevil(ADVBORDE, ADVBORD), 0, 0);
 	minimap(480, 16, 0);
 	heroes.draw(481, 176, 56, 32);
@@ -745,7 +752,8 @@ static void paint_screen() {
 	paint_information(480, 320, current_player);
 	paint_tiles(rcmap, map::camera);
 	paint_objects(rcmap, map::camera);
-	paint_route(rcmap, map::camera);
+	//paint_block(rcmap, map::camera);
+	update_cursor();
 	if(mousein(rcmap)) {
 		if(hot::key == MouseRight && hot::pressed)
 			execute(tips_info);
@@ -773,7 +781,7 @@ void playeri::adventure() {
 	quickmessage({}, "Ход начал %1 игрок", getname());
 	while(ismodal()) {
 		paint_screen();
-		standart_input(hilite_var);
+		standart_input();
 		domodal();
 	}
 }

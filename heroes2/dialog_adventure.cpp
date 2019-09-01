@@ -321,6 +321,7 @@ static void choose_hero() {
 		return;
 	info_type = ObjectInfo;
 	map::setcamera(current_var.hero->getpos());
+	map::wave(current_var.hero->getpos(), current_var.hero->get(Pathfinding), 0, current_var.hero->getplayer());
 }
 
 static void choose_castle() {
@@ -664,6 +665,33 @@ static void paint_objects(const rect& rcmap, point camera) {
 		drawables[i].paint();
 }
 
+static void paint_route(const rect& rcmap, point camera) {
+	draw::state push;
+	draw::clipping = rcmap;
+	hilite_index = Blocked;
+	hilite_var.clear();
+	auto x2 = camera.x + rcmap.width();
+	auto y2 = camera.y + rcmap.height();
+	for(int y = camera.y; y < y2; y += 32) {
+		for(int x = camera.x; x < x2; x += 32) {
+			int index = map::m2i(x / 32, y / 32);
+			auto x1 = x - camera.x + rcmap.x1;
+			auto y1 = y - camera.y + rcmap.y1;
+			switch(map::getcost(index)) {
+			case BlockedPath:
+				rectb({x1 + 2, y1 + 2, x1 + 30, y1 + 30}, 180);
+				break;
+			case ActionPath:
+				rectb({x1 + 2, y1 + 2, x1 + 30, y1 + 30}, 90);
+				break;
+			case AttackPath:
+				rectb({x1 + 2, y1 + 2, x1 + 30, y1 + 30}, 110);
+				break;
+			}
+		}
+	}
+}
+
 static void tips_info(bool show_resource_count, bool show_monster_count, bool show_artifact_name) {
 	char temp[260]; stringbuilder sb(temp); temp[0] = 0;
 	//sb.add("%1i (%2i, %3i)", hilite_index, map::i2x(hilite_index), map::i2y(hilite_index));
@@ -717,7 +745,7 @@ static void paint_screen() {
 	paint_information(480, 320, current_player);
 	paint_tiles(rcmap, map::camera);
 	paint_objects(rcmap, map::camera);
-	//paint_route(rcmap, map::camera);
+	paint_route(rcmap, map::camera);
 	if(mousein(rcmap)) {
 		if(hot::key == MouseRight && hot::pressed)
 			execute(tips_info);

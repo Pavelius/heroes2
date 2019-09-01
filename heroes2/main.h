@@ -164,8 +164,8 @@ enum object_s : unsigned char {
 	FireAltar, AirAltar, EarthAltar, WaterAltar, // 0xFC-0xFF
 	FirstObject = WaterChest, LastObject = WaterAltar,
 	// Standart landscape objects
-	Brush, Cactus, Cliff, Crack, Flowers, Hill, Hole, Lake, Mountains, Mushrooms, Rock, Trees, Volcano, Stream, Road,
-	StreamDelta, Stumps, DiggingHole,
+	Brush, Cactus, Cliff, Crack, Flowers, Hill, Hole, Lake, Mountains, Mushrooms, Rock, Trees, Volcano,
+	Stream, Road, StreamDelta, Stumps, DiggingHole,
 	EmpthyObject,
 };
 enum tag_s : unsigned char {
@@ -647,6 +647,7 @@ inline unsigned				getweekday() { return day % 7; }
 inline unsigned				getmonthweek() { return getweek() % 4; }
 inline int					i2x(short unsigned i) { return i % 256; }
 inline int					i2y(short unsigned i) { return i >> 8; }
+bool						isinteract(object_s v);
 bool						ispathable(short unsigned index);
 inline unsigned short		m2i(int x, int y) { return (y << 8) + x; }
 void						setcamera(short unsigned index);

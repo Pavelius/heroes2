@@ -23,6 +23,10 @@ bool map::ispathable(short unsigned index) {
 	return path[index] < BlockedPath;
 }
 
+bool map::isinteract(object_s v) {
+	return v<=LastObject;
+}
+
 void map::around(short unsigned index, unsigned m) {
 	static const direction_s direction[] = {
 		Left, Right, Up, Down,
@@ -187,8 +191,15 @@ void map::wave(short unsigned start, int skill, int ship_master, const playeri* 
 				map::around(e.index, AttackPath);
 				path[e.index] = AttackPath;
 				break;
+			case Resource:
+				path[e.index] = ActionPath;
+				break;
 			case Object:
 				switch(e.element.object) {
+				case Stream:
+				case StreamDelta:
+				case Road:
+					break;
 				case TreasureChest:
 				case AncientLamp:
 					path[e.index] = ActionPath;

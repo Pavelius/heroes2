@@ -222,6 +222,7 @@ enum castle_flag_s : unsigned char {
 };
 class heroi;
 struct pvar;
+struct shapei;
 struct variant {
 	variant_s				type;
 	union {
@@ -411,6 +412,7 @@ struct moveablei {
 	explicit constexpr operator bool() const { return index != Blocked; }
 	void					blockpath(unsigned* path) const;
 	void					clear();
+	const shapei*			getshape() const;
 };
 class heroi : public namei, public armyi {
 	kind_s					kind;
@@ -669,7 +671,7 @@ extern unsigned char		width;
 //
 void						clear();
 void						clearpath();
-pvar						find(short unsigned index);
+pvar						find(short unsigned index, bool rich_find = false);
 unsigned					getcost(short unsigned index);
 unsigned					getcost(short unsigned index, direction_s direct, unsigned pathfinding);
 unsigned					getcost(short unsigned from, short unsigned to, unsigned pathfinding);

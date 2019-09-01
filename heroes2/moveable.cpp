@@ -197,3 +197,10 @@ void moveablei::blockpath(unsigned* path) const {
 	if(map::isinteract(element.object))
 		map::set(index, ActionTile);
 }
+
+const shapei* moveablei::getshape() const {
+	switch(element.type) {
+	case Object: return &bsmeta<drawobji>::elements[value].shape;
+	default: return 0;
+	}
+}

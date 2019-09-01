@@ -351,6 +351,7 @@ public:
 	costi&					getresources() { return resources; }
 	int						getspies() const;
 	int						gettowns() const;
+	void					hire(heroi* hero);
 	void					marketplace();
 	static void				message(const char* format);
 	static void				prepare(difficult_s difficult);
@@ -643,6 +644,18 @@ public:
 	void					addi(variant v, int value = 0);
 	void					addi(const costi& v);
 	static const char*		parse(const char* p, variantcol* source, unsigned& count);
+};
+struct shapei {
+	unsigned char			count;
+	point					size;
+	point					points[24];
+	unsigned char			animation[24];
+	unsigned char			content[24]; // 0 - shadow, 1 - passable, 2 - blocked
+	unsigned char			indecies[24];
+	point					offset;
+	unsigned char			zero;
+	unsigned char			initialized;
+	bool					is(short unsigned index) const;
 };
 namespace map {
 extern point				camera;

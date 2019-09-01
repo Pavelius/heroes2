@@ -217,9 +217,9 @@ static void hire_hero() {
 			return;
 	}
 	player->getresources() -= heroi::cost;
-	hero->set(player);
+	player->hire(hero);
 	hero->setpos(castle->getpos());
-	hero->set(Up);
+	buttoncancel();
 }
 
 static void hireling(int x, int y, castlei* castle, playeri* player, short unsigned index, heroi* hero) {

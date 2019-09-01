@@ -224,5 +224,8 @@
     <ClCompile Include="hero_interact.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="shape.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

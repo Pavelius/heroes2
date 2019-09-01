@@ -175,17 +175,6 @@ private:
 	void					box(int x, int y, res_s icn, int dy, int dx, int sbu, int sbd, int sbs, int sdbd, int sb, int bf, res_s iss) const;
 	void					flatbutton(int x, int y, res_s icn, int index, int command) const;
 };
-struct shapei {
-	unsigned char			count;
-	point					size;
-	point					points[24];
-	unsigned char			animation[24];
-	unsigned char			content[24]; // 0 - shadow, 1 - passable, 2 - blocked
-	unsigned char			indecies[24];
-	point					offset;
-	unsigned char			zero;
-	unsigned char			initialized;
-};
 struct drawobji			{
 	res_s					res;
 	object_s				object;

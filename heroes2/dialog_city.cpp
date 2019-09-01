@@ -467,15 +467,3 @@ void castlei::show() {
 		domodal();
 	}
 }
-
-static void open_dialog() {
-	auto p = (castlei*)hot::param;
-	p->show();
-}
-
-void castlei::input(const playeri* player) const {
-	if(hot::key == MouseLeftDBL && hot::pressed) {
-		if(!player || getplayer() == player)
-			execute(open_dialog, (int)this);
-	}
-}

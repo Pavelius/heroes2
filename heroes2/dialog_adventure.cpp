@@ -345,13 +345,24 @@ static void route_path() {
 		hero->moveto();
 }
 
+static void update_lists();
+
+static void open_dialog() {
+	auto p = (castlei*)hot::param;
+	p->show();
+	update_lists();
+	update_drawables();
+}
+
 static void standart_input() {
 	switch(hilite_var.type) {
 	case CastleVar:
 		if(hot::key == MouseLeft && hot::pressed)
 			draw::execute(choose_castle, (int)hilite_var.castle);
-		else
-			hilite_var.castle->input(current_player);
+		else if(hot::key == MouseLeftDBL && hot::pressed) {
+			if(!current_player || hilite_var.castle->getplayer() == current_player)
+				execute(open_dialog, (int)hilite_var.castle);
+		}
 		break;
 	case Hero:
 		if(hot::key == MouseLeft && hot::pressed)

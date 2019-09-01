@@ -178,6 +178,7 @@
     <ClCompile Include="dialog_hero.cpp" />
     <ClCompile Include="rumor.cpp" />
     <ClCompile Include="screenshot.cpp" />
+    <ClCompile Include="shape.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="speed.cpp" />
     <ClCompile Include="string.cpp" />

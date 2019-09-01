@@ -226,3 +226,16 @@ void playeri::prepare(difficult_s difficult) {
 		e.growth();
 	}
 }
+
+void playeri::hire(heroi* hero) {
+	hero->set(this);
+	hero->set(Up);
+	for(auto& e : bsmeta<playeri>::elements) {
+		for(auto i = 0; i < 2; i++) {
+			if(e.heroes[i] == hero->getid()) {
+				e.heroes[i] = RandomHero;
+				e.heroes[i] = randomhire(i)->getid();
+			}
+		}
+	}
+}

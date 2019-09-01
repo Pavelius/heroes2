@@ -157,7 +157,6 @@ void playeri::thieves() {
 		text(x, 429, "Лучший монстер:");
 		paint_monsters(x + startx, 429, maxw, players, count, monsters);
 		button(578, 461, WELLXTRA, buttoncancel, {0, 0, 1}, KeyEscape);
-		cursor(ADVMCO, 0);
 		domodal();
 	}
 }

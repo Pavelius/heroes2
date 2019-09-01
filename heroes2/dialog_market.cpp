@@ -110,7 +110,6 @@ void playeri::marketplace() {
 		paint_resources(x, y + 150, icn, resources, resf, Gold, 0);
 		paint_resources(x + 120, y + 150, icn, resources, rest, resf, market_count);
 		button(x + (width - getwidth(icn, 17)) / 2, y + height - getheight(icn, 17), icn, buttoncancel, {17, 17, 18}, KeyEscape);
-		cursor(ADVMCO, 0);
 		domodal();
 	}
 }

@@ -271,8 +271,6 @@ void castlei::build() {
 		}
 		button(553, 428, SWAPBTN, buttoncancel, {0, 0, 1}, KeyEscape, "Вернуться в город");
 		image(0, 461, CASLBAR, 0);
-		//
-		cursor(ADVMCO, 0);
 		domodal();
 	}
 }

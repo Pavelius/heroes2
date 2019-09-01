@@ -100,7 +100,6 @@ void heroi::show(bool allow_change) const {
 		armyi::paint(156, 130, this, allow_change);
 		button(5, 318, HSBTNS, dismiss_hero, {0, 0, 1}, Alpha + 'A', "Уволить героя");
 		button(603, 318, HSBTNS, buttoncancel, {2, 2, 3}, KeyEscape, "Закрыть окно");
-		cursor(ADVMCO, 0);
 		domodal();
 	}
 }

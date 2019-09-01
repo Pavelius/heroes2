@@ -36,7 +36,6 @@ void playeri::tavern() {
 		auto y1 = y + getheight(TAVWIN, 0) + 8;
 		textf(x, y1, 200, temp);
 		button((width - getwidth(res, 1)) / 2, ye - getheight(res, 1), res, buttonok, {1, 1, 2}, KeyEnter);
-		cursor(ADVMCO, 0);
 		domodal();
 	}
 }

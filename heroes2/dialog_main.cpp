@@ -74,7 +74,6 @@ static void main_menu() {
 		button(0, 0, BTNSHNGL, object_view, {13, 14, 15});
 		button(0, 0, BTNSHNGL, new_game, {17, 18, 19});
 		//latern.painting({0, 0});
-		cursor(ADVMCO, 0);
 		domodal();
 		if(hot::key == InputTimer)
 			latern.update();

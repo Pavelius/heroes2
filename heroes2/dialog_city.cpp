@@ -466,7 +466,6 @@ void castlei::show() {
 	heroi* hero = heroi::find(getpos());
 	while(ismodal()) {
 		paint(hero);
-		cursor(ADVMCO, 0);
 		domodal();
 	}
 }

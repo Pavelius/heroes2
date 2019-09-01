@@ -35,7 +35,6 @@ static int new_game() {
 		button(455, 110, BTNNEWGM, button2, {2, 2, 3});
 		button(455, 175, BTNNEWGM, button3, {4, 4, 5});
 		button(455, 375, BTNNEWGM, buttoncancel, {6, 6, 7});
-		cursor(ADVMCO, 0);
 		domodal();
 	}
 	return getresult();
@@ -144,7 +143,6 @@ bool gamei::choose() {
 		button(x + 161 + 16, y + 22, REQUESTS, cmd(set_filter, LargeSize), check(scenario_list.filter, LargeSize, 14), 0, "Отобрать только карты большого рамера");
 		button(x + 223 + 16, y + 22, REQUESTS, cmd(set_filter, XLargeSize), check(scenario_list.filter, XLargeSize, 16), 0, "Отобрать только карты огромного рамера");
 		button(x + 285 + 16, y + 22, REQUESTS, cmd(set_filter, NoSize), check(scenario_list.filter, NoSize, 18), 0, "Показать все карты");
-		cursor(ADVMCO, 0);
 		domodal();
 	}
 	if(getresult()) {
@@ -312,7 +310,6 @@ bool gamei::setupmap() {
 		// buttons
 		button(x + 31, y + 380, NGEXTRA, buttonok, {66, 66, 67}, KeyEnter, "Начать сценарий с выбранными настройками.");
 		button(x + 287, y + 380, NGEXTRA, buttoncancel, {68, 68, 69}, KeyEscape, "Отменить текущий выбор.");
-		cursor(ADVMCO, 0);
 		domodal();
 	}
 	return getresult() != 0;

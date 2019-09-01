@@ -110,6 +110,11 @@ static monsteran monsters[] = {{PEASANT, {1, 4}, {5, 8}, /*Fly*/{0, 0}, {0, 0}, 
 //	frame = monsters[id].idle[0];
 //}
 
+void animation::set(res_s res, unsigned char frame) {
+	this->res = res;
+	this->frame = frame;
+}
+
 void animation::set(monster_s id, action_s a, int param) {
 	auto& e = monsters[id];
 	res = e.icn;

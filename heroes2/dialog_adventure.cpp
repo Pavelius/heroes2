@@ -774,7 +774,6 @@ void playeri::adventure() {
 	while(ismodal()) {
 		paint_screen();
 		standart_input(hilite_var);
-		cursor(ADVMCO, 0);
 		domodal();
 	}
 }

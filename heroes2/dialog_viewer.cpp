@@ -63,7 +63,6 @@ void object_view() {
 			if(px == x1 && py == y1)
 				rectb({px + 2, y1 + 2, px + 30, py + 30}, 75);
 		}
-		cursor(ADVMCO, 0);
 		domodal();
 		switch(hot::key) {
 		case KeyEscape:

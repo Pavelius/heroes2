@@ -30,7 +30,6 @@ void dialog_palette() {
 		auto y1 = y0;
 		text(x1, y1, temp);
 		test_color(x1, y1 + 20, temp);
-		cursor(ADVMCO, 0);
 		domodal();
 	}
 }

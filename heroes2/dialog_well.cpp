@@ -96,7 +96,6 @@ void castlei::well() {
 		paint_monster(334, 168, 288, 124, 4);
 		paint_monster(334, 318, 288, 124, 6);
 		button(578, 461, WELLXTRA, buttoncancel, {0, 0, 1}, KeyEscape);
-		cursor(ADVMCO, 0);
 		domodal();
 	}
 }

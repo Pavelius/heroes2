@@ -240,10 +240,10 @@ void squadi::show(const heroi* hero, bool info_mode, bool allow_dismiss, bool al
 			button(x + 435, y + 192, back, cmd(upgrade_unit, (int)this), {5, 5, 6});
 		if(allow_dismiss)
 			button(x + 310, y + 221, back, cmd(dismiss_unit, (int)this), {1, 1, 2});
-		if(!info_mode) {
+		if(!info_mode)
 			button(x + 435, y + 221, back, buttoncancel, {3, 3, 4});
-			cursor(ADVMCO, 0);
-		}
+		else
+			setcursor(NoRes, 0);
 		domodal();
 		if(hot::key == InputTimer) {
 			if(mon.update()) {
@@ -308,7 +308,6 @@ bool playeri::recruit(monster_s unit, int& count, int maximum) {
 		//
 		button(x1 + 34, y1 + 249, RECRUIT, buttonok, {8, 8, 9}, KeyEnter);
 		button(x1 + 187, y1 + 249, RECRUIT, buttoncancel, {6, 6, 7}, KeyEscape);
-		cursor(ADVMCO, 0);
 		domodal();
 	}
 	return getresult() != 0;

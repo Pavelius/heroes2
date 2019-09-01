@@ -142,7 +142,6 @@ void heroi::showbook(spell_type_s original_mode) {
 				}
 			}
 		}
-		cursor(ADVMCO, 0);
 		domodal();
 	}
 }

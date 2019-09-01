@@ -86,6 +86,7 @@ struct animation {
 	int						getwidth() const;
 	void					paint(int x, int y, unsigned flags = 0) const;
 	void					set(monster_s id, action_s a, int param = 0);
+	void					set(res_s id, unsigned char frame);
 	bool					update();
 };
 struct screenshoot {
@@ -201,7 +202,6 @@ bool						buttonx(int x, int y, res_s res, void* source, const buttoni& decor, i
 void						buttoncancel();
 void						buttonok();
 bool						create(const char* title, unsigned milliseconds, bool fullscreen);
-void						cursor(res_s id, int n, int ox = 0, int oy = 0);
 int							dialog(int height, int* xpos = 0);
 void						edit(int x, int y, int width, int& value, int maximum = 100, int minimum = 0, const controli& up = {}, const controli& down = {}, const controli& max = {});
 void						execute(eventproc proc, int param = 0);
@@ -239,6 +239,7 @@ unsigned char*				ptr(int x, int y);
 void						quicktips(int x, int y, const char* format);
 void						rectb(const rect& rc, unsigned char m);
 void						rectf(const rect& rc, unsigned char m);
+void						setcursor(res_s res, unsigned char frame);
 void						setevil(bool value);
 void						shadow(int x1, int y1, int x2, int y2, int intense);
 void						splitter(int x, int y, res_s res, int& value, int from, int to);

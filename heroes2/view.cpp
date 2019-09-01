@@ -38,6 +38,7 @@ static const unsigned char monster_animation_cicl1[] = {
 	3, 4, 5, 4, 3, 0,
 };
 
+static animation		current_cursor;
 static unsigned char	resources_frame[] = {6, 0, 1, 2, 3, 4, 5};
 static unsigned char	bits[draw::width*draw::height];
 rect					draw::clipping = {0, 0, draw::width, draw::height};
@@ -853,10 +854,6 @@ void draw::image(const rect& rc, resource_s id, int count, const char* tips) {
 	//rectb(rc, 0x10);
 }
 
-void draw::cursor(res_s id, int n, int ox, int oy) {
-	image(hot::mouse.x + ox, hot::mouse.y + oy, id, n, 0);
-}
-
 static void show_tooltips() {
 	message(tooltips_text, RandomKind, NoBuilding, 0, 0, NoButtons);
 }
@@ -938,12 +935,20 @@ void draw::status(const rect& rc) {
 	status_rect = rc;
 }
 
+void draw::setcursor(res_s res, unsigned char frame) {
+	current_cursor.set(res, frame);
+}
+
 static void standart_domodal() {
 	if(status_rect && status_text[0]) {
 		text(status_rect.x1 + (status_rect.width() - textw(status_text)) / 2,
 			status_rect.y1 + (status_rect.height() - texth()) / 2,
 			status_text);
 	}
+	image(hot::mouse.x + current_cursor.pos.x,
+		hot::mouse.y + current_cursor.pos.x,
+		current_cursor.res, current_cursor.frame,
+		current_cursor.flags);
 #ifdef _DEBUG
 	//static bool show_debug_view = true;
 	//if(hot::key == Ctrl + Alpha + 'D')
@@ -985,6 +990,7 @@ int draw::getresult() {
 bool draw::ismodal() {
 	status_rect.clear();
 	status_text[0] = 0;
+	current_cursor.set(ADVMCO, 0);
 	domodal = standart_domodal;
 	if(!break_modal)
 		return true;
@@ -1332,8 +1338,8 @@ int draw::message(const char* format, kind_s kind, building_s building, const va
 			button((width - getwidth(ic1, 1)) / 2, y1, ic1, buttonok, {1, 1, 2}, KeyEnter);
 			break;
 		}
-		if(mode != NoButtons)
-			cursor(ADVMCO, 0);
+		if(mode == NoButtons)
+			setcursor(NoRes, 0);
 		domodal();
 		if(mode == NoButtons) {
 			if(hot::key == MouseLeft || hot::key == MouseRight)

@@ -34,7 +34,6 @@ void hightscore::show() {
 		}
 		button(9, 315, HISCORE, buttonok, {0, 0, 1});
 		button(640 - 36, 315, HISCORE, buttoncancel, {4, 4, 5});
-		cursor(ADVMCO, 0);
 		domodal();
 	}
 }

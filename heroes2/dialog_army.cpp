@@ -236,10 +236,14 @@ void squadi::show(const heroi* hero, bool info_mode, bool allow_dismiss, bool al
 			char temp[32]; zprint(temp, "%1i", count);
 			text(x1 + 140 - textw(temp) / 2, y1 + 227, temp);
 		}
-		if(allow_upgrade && canupgrade())
-			button(x + 435, y + 192, back, cmd(upgrade_unit, (int)this), {5, 5, 6});
-		if(allow_dismiss)
-			button(x + 310, y + 221, back, cmd(dismiss_unit, (int)this), {1, 1, 2});
+		if(allow_upgrade && canupgrade()) {
+			if(button(x + 435, y + 192, back, {5, 5, 6}))
+				execute(upgrade_unit, (int)this);
+		}
+		if(allow_dismiss) {
+			if(button(x + 310, y + 221, back, {1, 1, 2}))
+				execute(dismiss_unit, (int)this);
+		}
 		if(!info_mode)
 			button(x + 435, y + 221, back, buttoncancel, {3, 3, 4});
 		else

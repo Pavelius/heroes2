@@ -11,7 +11,7 @@ skilli bsmeta<skilli>::elements[] = {{"Pathfinding", "Поиск пути"},
 {"Mysticism", "Мистицизм"},
 {"Luck", "Удача"},
 {"Ballistics", "Баллистика"},
-{"Eagle Eye", "Орлинный глаз"},
+{"Eagle Eye", "Колдовство"},
 {"Necromancy", "Некромантия"},
 {"Estates", "Доход"}
 };

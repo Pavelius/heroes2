@@ -140,14 +140,6 @@ private:
 	unsigned char*			font_color;
 	rect					clipping;
 };
-struct cmd {
-	eventproc				proc;
-	int						param;
-	constexpr cmd() : proc(0), param(0) {}
-	constexpr cmd(eventproc proc) : proc(proc), param(0) {}
-	constexpr cmd(eventproc proc, int param) : proc(proc), param(param) {}
-	void					execute() const;
-};
 struct controli {
 	int						x, y;
 	res_s					res;
@@ -185,8 +177,8 @@ struct drawobji			{
 	static void				initialize();
 };
 void						breakmodal(int result);
-void						button(int x, int y, res_s res, const cmd& ev, const buttoni& decor, int key = 0, const char* tips = 0);
-bool						buttonx(int x, int y, res_s res, void* source, const buttoni& decor, int key = 0, const char* tips = 0);
+void						button(int x, int y, res_s res, eventproc proc, const buttoni& decor, int key = 0, const char* tips = 0);
+bool						button(int x, int y, res_s res, const buttoni& decor, int key = 0, const char* tips = 0);
 void						buttoncancel();
 void						buttonok();
 bool						create(const char* title, unsigned milliseconds, bool fullscreen);

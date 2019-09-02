@@ -104,7 +104,8 @@ void playeri::marketplace() {
 				text(x, y + 96 - texth() - 2, width, AlignCenter, "Количество");
 				font = pf;
 			}
-			button(x + (width - getwidth(icn, 15)) / 2, y + 120, icn, cmd(make_trade, (int)this), {15, 15, 16}, KeyEnter);
+			if(button(x + (width - getwidth(icn, 15)) / 2, y + 120, icn, {15, 15, 16}, KeyEnter))
+				execute(make_trade, (int)this);
 		} else
 			textf(x, y, width, "Этот обмен не возможен.");
 		paint_resources(x, y + 150, icn, resources, resf, Gold, 0);

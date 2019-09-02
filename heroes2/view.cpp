@@ -864,17 +864,13 @@ void draw::tooltips(const char* header, const char* format, ...) {
 	execute(show_tooltips);
 }
 
-void cmd::execute() const {
-	draw::execute(proc, param);
+void draw::button(int x, int y, res_s res, eventproc proc, const buttoni& decor, int key, const char* tips) {
+	if(button(x, y, res, decor, key, tips))
+		execute(proc);
 }
 
-void draw::button(int x, int y, res_s res, const cmd& ev, const buttoni& decor, int key, const char* tips) {
-	if(buttonx(x, y, res, (void*)ev.proc, decor, key, tips))
-		ev.execute();
-}
-
-bool draw::buttonx(int x, int y, res_s res, void* source, const buttoni& decor, int key, const char* tips) {
-	static void* id_pressed;
+bool draw::button(int x, int y, res_s res, const buttoni& decor, int key, const char* tips) {
+	static point point_cashe;
 	int i = decor.normal;
 	rect rc = get(res, i, x, y, 0);
 	auto need_execute = false;
@@ -890,10 +886,12 @@ bool draw::buttonx(int x, int y, res_s res, void* source, const buttoni& decor, 
 		}
 		if(hot::key == MouseLeft) {
 			if(!hot::pressed) {
-				if(id_pressed == source)
+				if(point_cashe.x==rc.x1 && point_cashe.y==rc.y1)
 					need_execute = true;
-			} else
-				id_pressed = source;
+			} else {
+				point_cashe.x = rc.x1;
+				point_cashe.y = rc.y1;
+			}
 		}
 	}
 	image(x, y, res, i, 0);
@@ -1068,19 +1066,19 @@ void draw::edit(int x, int y, int width, int& value, int maximum, int minimum, c
 	char temp[32]; zprint(temp, "%1i", value);
 	text(x + (width - textw(temp)) / 2, y, temp, -1);
 	if(max) {
-		if(buttonx(max.x, max.y, max.res, maximize, {max.normal, max.hilited, max.pressed}, Alpha + Ctrl + 'M', 0)) {
+		if(button(max.x, max.y, max.res, {max.normal, max.hilited, max.pressed}, Alpha + Ctrl + 'M', 0)) {
 			current_border = maximum;
 			execute(maximize, (int)&value);
 		}
 	}
 	if(up) {
-		if(buttonx(up.x, up.y, up.res, increase, {up.normal, up.hilited, up.pressed}, KeyUp, 0)) {
+		if(button(up.x, up.y, up.res, {up.normal, up.hilited, up.pressed}, KeyUp, 0)) {
 			current_border = maximum;
 			execute(increase, (int)&value);
 		}
 	}
 	if(down) {
-		if(buttonx(down.x, down.y, down.res, increase, {down.normal, down.hilited, down.pressed}, KeyDown, 0)) {
+		if(button(down.x, down.y, down.res, {down.normal, down.hilited, down.pressed}, KeyDown, 0)) {
 			current_border = minimum;
 			execute(decrease, (int)&value);
 		}
@@ -1477,11 +1475,11 @@ void draw::splitter(int x, int y, res_s res, int& value, int minimum, int maximu
 			}
 		}
 	}
-	if(buttonx(x + left_offset, y + 1, res, &value, {left, left, (unsigned char)(left + pressed)}, KeyLeft, 0)) {
+	if(button(x + left_offset, y + 1, res, {left, left, (unsigned char)(left + pressed)}, KeyLeft, 0)) {
 		current_border = minimum;
 		execute(decrease, (int)&value);
 	}
-	if(buttonx(x + getwidth(res, body) - getwidth(res, right) - 1, y + 1, res, &value, {right, right, (unsigned char)(right + pressed)}, KeyRight, 0)) {
+	if(button(x + getwidth(res, body) - getwidth(res, right) - 1, y + 1, res, {right, right, (unsigned char)(right + pressed)}, KeyRight, 0)) {
 		current_border = maximum;
 		execute(increase, (int)&value);
 	}

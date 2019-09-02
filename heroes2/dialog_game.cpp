@@ -138,11 +138,16 @@ bool gamei::choose() {
 		textm(x + 66, y + 324, 278, AlignCenter, e.description);
 		button(x + 140 + 16, y + 410, REQUESTS, buttonok, {1, 1, 2}, KeyEnter);
 		// maps
-		button(x + 37 + 16, y + 22, REQUESTS, cmd(set_filter, SmallSize), check(scenario_list.filter, SmallSize, 10), 0, "Отобрать только карты маленького рамера");
-		button(x + 99 + 16, y + 22, REQUESTS, cmd(set_filter, MediumSize), check(scenario_list.filter, MediumSize, 12), 0, "Отобрать только карты среднего рамера");
-		button(x + 161 + 16, y + 22, REQUESTS, cmd(set_filter, LargeSize), check(scenario_list.filter, LargeSize, 14), 0, "Отобрать только карты большого рамера");
-		button(x + 223 + 16, y + 22, REQUESTS, cmd(set_filter, XLargeSize), check(scenario_list.filter, XLargeSize, 16), 0, "Отобрать только карты огромного рамера");
-		button(x + 285 + 16, y + 22, REQUESTS, cmd(set_filter, NoSize), check(scenario_list.filter, NoSize, 18), 0, "Показать все карты");
+		if(button(x + 37 + 16, y + 22, REQUESTS, check(scenario_list.filter, SmallSize, 10), 0, "Отобрать только карты маленького рамера"))
+			execute(set_filter, SmallSize);
+		if(button(x + 99 + 16, y + 22, REQUESTS, check(scenario_list.filter, MediumSize, 12), 0, "Отобрать только карты среднего рамера"))
+			execute(set_filter, MediumSize);
+		if(button(x + 161 + 16, y + 22, REQUESTS, check(scenario_list.filter, LargeSize, 14), 0, "Отобрать только карты большого рамера"))
+			execute(set_filter, LargeSize);
+		if(button(x + 223 + 16, y + 22, REQUESTS, check(scenario_list.filter, XLargeSize, 16), 0, "Отобрать только карты огромного рамера"))
+			execute(set_filter, XLargeSize);
+		if(button(x + 285 + 16, y + 22, REQUESTS, check(scenario_list.filter, NoSize, 18), 0, "Показать все карты"))
+			execute(set_filter, NoSize);
 		domodal();
 	}
 	if(getresult()) {
@@ -274,7 +279,8 @@ bool gamei::setupmap() {
 		// map
 		p = "Сценарий";
 		text(x + (w - draw::textw(p)) / 2, y + 24, p);
-		button(x + 309, y + 45, NGEXTRA, cmd(choose_game, (int)this), {64, 64, 65}, F4);
+		if(button(x + 309, y + 45, NGEXTRA, {64, 64, 65}, F4))
+			execute(choose_game, (int)this);
 		text(x + (w - draw::textw(name)) / 2, y + 48, name);
 		// difficult
 		p = "Сложность:";

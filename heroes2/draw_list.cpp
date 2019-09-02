@@ -24,9 +24,9 @@ void list::draw(int x, int y, int sx, int sy) {
 	auto icn = isevil(SCROLLE, SCROLLCN);
 	auto y1 = y + 1;
 	auto y2 = y + sy*row_per_screen - getheight(icn, 2) - 1;
-	if(buttonx(x + sx, y1, icn, &current, {0, 0, 1}))
+	if(button(x + sx, y1, icn, {0, 0, 1}))
 		execute(&list::scroll, origin - 1);
-	if(buttonx(x + sx, y2, icn, &current, {2, 2, 3}))
+	if(button(x + sx, y2, icn, {2, 2, 3}))
 		execute(&list::scroll, origin + 1);
 	auto s1 = y1 + getheight(icn, 0) + 4;
 	auto s2 = y2 - getheight(icn, 4) - 4;

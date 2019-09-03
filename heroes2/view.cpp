@@ -1130,6 +1130,8 @@ void picture::setsize(res_s res, unsigned char frame) {
 }
 
 void picture::set(const variant e, int value) {
+	auto pf = font;
+	font = SMALFONT;
 	format = 0;
 	switch(e.type) {
 	case Artifact:
@@ -1157,19 +1159,34 @@ void picture::set(const variant e, int value) {
 		setsize(TOWNWIND, 18);
 		break;
 	case Ability:
-		res = PRIMSKIL; frame = e.ability;
-		setsize(PRIMSKIL, 4);
+		if(e.ability <= Knowledge) {
+			res = PRIMSKIL; frame = e.ability;
+			setsize(PRIMSKIL, 4);
+		} else {
+			res = EXPMRL;
+			switch(e.ability) {
+			case MoraleStat: frame = (value >= 0) ? 2 : 3; break;
+			case Experience: frame = 4; format = "%1i"; break;
+			default: frame = (value >= 0) ? 0 : 1; break;
+			}
+			setsize();
+			size.y += texth() + 4;
+		}
 		break;
 	case Skill:
 		res = SECSKILL; frame = e.skill + 1;
 		setsize(SECSKILL, 15);
 		break;
+	case Player:
+		res = BRCREST; frame = e.player;
+		setsize(res, 6);
 	default:
 		res = NoRes; frame = 0;
 		size.x = 0;
 		size.y = 0;
 		break;
 	}
+	font = pf;
 }
 
 int picture::gettotalheight(unsigned count, int width_per_line) const {
@@ -1272,8 +1289,11 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 		}
 		break;
 	case Ability:
-		render(x, z, PRIMSKIL, 4);
-		render(x, z + 6, res, frame);
+		if(element.ability <= Knowledge) {
+			render(x, z, PRIMSKIL, 4);
+			render(x, z + 6, res, frame);
+		} else
+			render(x, z, res, frame);
 		break;
 	case Skill:
 		render(x, z, SECSKILL, 15);
@@ -1286,8 +1306,12 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 		}
 		break;
 	case Hero:
-		render(x, z-6, TOWNWIND, 18);
+		render(x, z - 6, TOWNWIND, 18);
 		render(x, z, res, frame);
+		break;
+	case Player:
+		render(x, z, res, 6);
+		render(x, z + 2, res, frame);
 		break;
 	default:
 		render(x, z, res, frame);

@@ -11,7 +11,11 @@ static void test_message() {
 	str.addi(LordKillburn);
 	str.addh("Форт Месса");
 	str.addn("Во время посещения форта вы улучшили некоторые войска в своей армии.");
-	heroi::learn(str, {Diplomacy, 1}, {Scounting, 3});
+	variantcol source[2];
+	source[0] = {Experience, 500};
+	source[1] = {Gold, 1500};
+	//message(str, source, 2, ButtonYesNo);
+	heroi::learn(str, {LuckStat, -1}, {MoraleStat, -1});
 }
 
 static void full_castle(const playeri* player, kind_s type) {

@@ -20,6 +20,7 @@ enum ability_s : unsigned char {
 	DamageMin, DamageMax,
 	HitPoints, HitPointsMax,
 	Shoots, ShootsMax,
+	Experience,
 	AllAbilities, AttackDefence, SpellPowerKnowledge,
 };
 enum skill_s : unsigned char {
@@ -232,6 +233,7 @@ struct variant {
 		building_s			building;
 		hero_s				hero;
 		landscape_s			landscape;
+		player_s			player;
 		skill_s				skill;
 		spell_s				spell;
 		resource_s			resource;
@@ -248,6 +250,7 @@ struct variant {
 	constexpr variant(hero_s v) : type(Hero), hero(v) {}
 	constexpr variant(landscape_s v) : type(Landscape), landscape(v) {}
 	constexpr variant(object_s v) : type(Object), object(v) {}
+	constexpr variant(player_s v) : type(Player), player(v) {}
 	constexpr variant(monster_s v) : type(Monster), monster(v) {}
 	constexpr variant(resource_s v) : type(Resource), resource(v) {}
 	constexpr variant(skill_s v) : type(Skill), skill(v) {}

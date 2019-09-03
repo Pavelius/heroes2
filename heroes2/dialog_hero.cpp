@@ -124,3 +124,14 @@ void heroi::input(const playeri* player) const {
 			execute(information_hero, (int)this);
 	}
 }
+
+int heroi::learn(const char* format, variantcol v1, variantcol v2) {
+	if(!v2.element && !v2.element)
+		return message(format, 0, 0, ButtonOK);
+	else if(!v2.element)
+		return message(format, &v1, 1, ButtonLearn);
+	else {
+		const variantcol source[] = {v1, v2};
+		return message(format, source, 2, ButtonLearn);
+	}
+}

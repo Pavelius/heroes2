@@ -1154,7 +1154,7 @@ void picture::set(const variant e, int value) {
 		break;
 	case Hero:
 		res = res_s(PORT0000 + e.hero); frame = 0;
-		setsize();
+		setsize(TOWNWIND, 18);
 		break;
 	case Ability:
 		res = PRIMSKIL; frame = e.ability;
@@ -1284,6 +1284,10 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 			p = skill_level_name[count];
 			text(x + (size.x - textw(p)) / 2, z + 57, p);
 		}
+		break;
+	case Hero:
+		render(x, z-6, TOWNWIND, 18);
+		render(x, z, res, frame);
 		break;
 	default:
 		render(x, z, res, frame);

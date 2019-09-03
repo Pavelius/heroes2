@@ -223,6 +223,7 @@ enum castle_flag_s : unsigned char {
 class heroi;
 struct pvar;
 struct shapei;
+struct variantcol;
 struct variant {
 	variant_s				type;
 	union {
@@ -456,6 +457,7 @@ public:
 	bool					interact(moveablei& object);
 	bool					is(spell_s v) const { return spellbook.is(v); }
 	bool					isadventure() const { return index != Blocked; }
+	static int				learn(const char* format, variantcol v1, variantcol v2);
 	static unsigned			select(heroi** result, heroi** result_maximum, const playeri* player, kind_s kind, kind_s kind_exclude, bool include_special = false);
 	void					set(ability_s id, int v);
 	void					set(direction_s v) { direction = v; }

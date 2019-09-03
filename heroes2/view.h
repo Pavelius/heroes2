@@ -44,7 +44,7 @@ enum align_s : unsigned char {
 	AlignLeft, AlignCenter, AlignRight,
 };
 enum button_s : unsigned char {
-	NoButtons, ButtonOK, ButtonYesNo,
+	NoButtons, ButtonOK, ButtonYesNo, ButtonLearn,
 };
 namespace hot {
 void						clear();
@@ -212,7 +212,7 @@ int							imagex(int x, int y, int width, const variantcol* source, unsigned cou
 void						initialize();
 res_s						isevil(res_s evil, res_s good);
 void						line(int x1, int y1, int x2, int y2, unsigned char m);
-int							message(const char* format, button_s mode);
+int							message(const char* format, const variantcol* source, unsigned count, button_s mode);
 bool						mousein(const rect& rc);
 void						pixel(int x, int y, unsigned char a);
 unsigned char*				ptr(int x, int y);

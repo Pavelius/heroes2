@@ -855,7 +855,7 @@ void draw::image(const rect& rc, resource_s id, int count, const char* tips) {
 }
 
 static void show_tooltips() {
-	message(tooltips_text, NoButtons);
+	message(tooltips_text, 0, 0, NoButtons);
 }
 
 void draw::tooltips(const char* header, const char* format, ...) {
@@ -886,7 +886,7 @@ bool draw::button(int x, int y, res_s res, const buttoni& decor, int key, const 
 		}
 		if(hot::key == MouseLeft) {
 			if(!hot::pressed) {
-				if(point_cashe.x==rc.x1 && point_cashe.y==rc.y1)
+				if(point_cashe.x == rc.x1 && point_cashe.y == rc.y1)
 					need_execute = true;
 			} else {
 				point_cashe.x = rc.x1;
@@ -1240,6 +1240,8 @@ void picture::clear() {
 }
 
 void picture::paint(int x, int y, int h1, variant element, int count) const {
+	auto pf = font;
+	font = SMALFONT;
 	char temp[64];
 	auto z = y + h1 - size.y;
 	switch(element.type) {
@@ -1265,8 +1267,6 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 		render(x, z + 2, res, frame);
 		if(true) {
 			auto p = getstr(element.building, kind_s(count));
-			auto pf = font;
-			font = SMALFONT;
 			text(x + (size.x - textw(p)) / 2, y + 61, p);
 			font = pf;
 		}
@@ -1277,7 +1277,7 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 		break;
 	case Skill:
 		render(x, z, SECSKILL, 15);
-		render(x, z+2, res, frame);
+		render(x, z + 2, res, frame);
 		if(count) {
 			const char* p = getstr(element.skill);
 			text(x + (size.x - textw(p)) / 2, z + 6, p);
@@ -1294,6 +1294,7 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 		zprint(temp, format, count);
 		text(x + (size.x - textw(temp)) / 2, y + h1 - t, temp);
 	}
+	font = pf;
 }
 
 int draw::imagex(int x, int y, int width, const variantcol* source, unsigned count) {
@@ -1337,7 +1338,11 @@ int draw::image(int x, int y, int width, const costi& source) {
 	//rectb({x, y, x + width, y + h}, 0x10);
 }
 
-int draw::message(const char* format, button_s mode) {
+static void buttonbreak() {
+	breakmodal(hot::param);
+}
+
+int draw::message(const char* format, const variantcol* source, unsigned count, button_s mode) {
 	draw::screenshoot surface;
 	draw::state push;
 	font = FONT;
@@ -1349,12 +1354,38 @@ int draw::message(const char* format, button_s mode) {
 	auto h1 = th;
 	if(mode != NoButtons)
 		h1 += getheight(ic1, 1) + 8;
+	auto variant_height = 0;
+	if(count == 0)
+		count = 1;
+	if(source) {
+		variant_height = getsize(source, count, dialog_width);
+		h1 += variant_height + 8;
+	}
+	auto vw = dialog_width / count;
 	while(ismodal()) {
 		surface.restore();
 		auto y2 = 0;
 		auto y1 = dialog(h1, &y2);
 		textf((width - dialog_width) / 2, y1, dialog_width, format);
 		y1 = y2 - getheight(ic1, 1);
+		if(source) {
+			auto n = x;
+			for(unsigned i = 0; i < count; i++) {
+				picture vr;
+				vr.set(source[i].element, source[i].count);
+				vr.paint(n + (vw - vr.size.x) / 2, y1 - variant_height - 8, variant_height,
+					source[i].element, source[i].count);
+				n += vw;
+			}
+			if(count == 2) {
+				auto fp = font;
+				font = SMALFONT;
+				auto p = "или";
+				text((width - textw(p)) / 2, y1 - variant_height / 2, p);
+				font = fp;
+			}
+		}
+		int bw, x2;
 		switch(mode) {
 		case ButtonYesNo:
 			button(x + 10, y1, ic1, buttonok, {5, 5, 6}, KeyEnter);
@@ -1362,6 +1393,15 @@ int draw::message(const char* format, button_s mode) {
 			break;
 		case ButtonOK:
 			button((width - getwidth(ic1, 1)) / 2, y1, ic1, buttonok, {1, 1, 2}, KeyEnter);
+			break;
+		case ButtonLearn:
+			bw = getwidth(ic1, 9);
+			x2 = x;
+			for(unsigned i = 0; i < count; i++) {
+				if(button(x2 + (vw - bw) / 2, y1, ic1, {9, 9, 10}))
+					execute(buttonbreak, i);
+				x2 += vw;
+			}
 			break;
 		}
 		if(mode == NoButtons)
@@ -1376,15 +1416,15 @@ int draw::message(const char* format, button_s mode) {
 }
 
 void playeri::message(const char* format) {
-	draw::message(format, ButtonOK);
+	draw::message(format, 0, 0, ButtonOK);
 }
 
 bool playeri::confirm(const char* format) {
-	return draw::message(format, ButtonYesNo) != 0;
+	return draw::message(format, 0, 0, ButtonYesNo) != 0;
 }
 
 void playeri::tooltips(const char* format) {
-	draw::message(format, NoButtons);
+	draw::message(format, 0, 0, NoButtons);
 }
 
 void draw::quicktips(int x, int y, const char* format) {

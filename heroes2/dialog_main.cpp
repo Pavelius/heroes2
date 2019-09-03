@@ -11,10 +11,13 @@ static void test_message() {
 	str.addi(Tavern, Warlock);
 	str.addh("Форт Месса");
 	str.addn("Во время посещения форта вы улучшили некоторые войска в своей армии.");
-	str.addsep('\n');
-	str.addi(EagleEye, 1);
-	str.addi(Archery, 3);
-	playeri::message(str);
+	//str.addsep('\n');
+	//str.addi(EagleEye, 1);
+	//str.addi(Archery, 3);
+	variantcol vr[2];
+	vr[0] = {Necromancy, 2};
+	vr[1] = {EagleEye, 1};
+	draw::message(str, vr, 2, ButtonLearn);
 }
 
 static void full_castle(const playeri* player, kind_s type) {

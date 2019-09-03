@@ -125,13 +125,12 @@ void heroi::input(const playeri* player) const {
 	}
 }
 
-int heroi::learn(const char* format, variantcol v1, variantcol v2) {
-	if(!v2.element && !v2.element)
-		return message(format, 0, 0, ButtonOK);
-	else if(!v2.element)
-		return message(format, &v1, 1, ButtonLearn);
-	else {
-		const variantcol source[] = {v1, v2};
-		return message(format, source, 2, ButtonLearn);
+int heroi::learn(const char* format, const variantcol* v1, unsigned count) {
+	switch(count) {
+	case 1: case 2:
+		return message(format, v1, count, ButtonLearn);
+	default:
+		message(format, 0, 0, ButtonOK);
+		return -1;
 	}
 }

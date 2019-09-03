@@ -382,7 +382,12 @@ struct kindi {
 	unsigned short			abilities[4];
 	skill_s					skills[2];
 	monster_s				units[2];
+	char					ability_chance[Knowledge + 1];
+	char					ability_chance_high[Knowledge + 1];
+	char					skill_chance[LastSkill + 1];
 	spell_s					spell;
+	ability_s				getrandomability(int level) const;
+	variant					getrandomskill(cflags<skill_s> exclude) const;
 };
 struct landscapei {
 	const char*				name;
@@ -432,9 +437,11 @@ class heroi : public namei, public armyi {
 	spellbooki				spellbook;
 	direction_s				direction;
 	static void				open_artifact();
+	void					checklevelup();
 public:
 	void					add(artifact_s id);
 	void					add(monster_s id, short unsigned count) { armyi::add(id, count); }
+	void					addexperience(unsigned count, bool interactive = true);
 	void					clear();
 	static const costi		cost;
 	static heroi*			find(short unsigned index);
@@ -449,10 +456,12 @@ public:
 	int						getmpmax() const;
 	kind_s					getkind() const;
 	int						getlevel() const { return level; }
+	unsigned				getlearn(variantcol* skill, unsigned count) const;
 	unsigned char			getportrait() const { return portrait; }
 	short unsigned			getpos() const { return index; }
 	int						getspmax() const;
 	int						getsprefresh() const;
+	int						getskillscount() const;
 	void					moveto();
 	static void				initialize();
 	void					input(const playeri* player) const;
@@ -460,7 +469,8 @@ public:
 	bool					interact(moveablei& object);
 	bool					is(spell_s v) const { return spellbook.is(v); }
 	bool					isadventure() const { return index != Blocked; }
-	static int				learn(const char* format, variantcol v1, variantcol v2);
+	static int				learn(const char* format, const variantcol* v1, unsigned count);
+	void					levelup(bool interactive);
 	static unsigned			select(heroi** result, heroi** result_maximum, const playeri* player, kind_s kind, kind_s kind_exclude, bool include_special = false);
 	void					set(ability_s id, int v);
 	void					set(direction_s v) { direction = v; }

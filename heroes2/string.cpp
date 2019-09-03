@@ -11,6 +11,7 @@ static iconi icons[] = {{Ability, "ab"},
 {Building, "bd"},
 {Hero, "hr"},
 {Monster, "mn"},
+{Player, "pl"},
 {Resource, "rs"},
 {Skill, "sk"},
 };

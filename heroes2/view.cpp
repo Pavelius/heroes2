@@ -46,7 +46,7 @@ unsigned				draw::counter;
 eventproc				draw::domodal;
 res_s					draw::font = FONT;
 unsigned char*			draw::font_color;
-static const char*		skill_level_name[] = {"нет", "Базово", "Продвинуто", "Эксперт"};
+extern const char*		skill_level_name[];
 static rect             status_rect;
 static char             status_text[260];
 static char             tooltips_text[260];
@@ -70,9 +70,10 @@ int						sys_input(bool wait); // Wait for system input
 void*					sys_get_pallette(); // Get system pallette
 
 static const char* zskipspcr(const char* p) {
-	if(p)
-		while(*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')
+	if(p) {
+		while(*p == ' ' || *p == '\t')
 			p++;
+	}
 	return p;
 }
 
@@ -1180,6 +1181,7 @@ void picture::set(const variant e, int value) {
 	case Player:
 		res = BRCREST; frame = e.player;
 		setsize(res, 6);
+		break;
 	default:
 		res = NoRes; frame = 0;
 		size.x = 0;
@@ -1311,7 +1313,7 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 		break;
 	case Player:
 		render(x, z, res, 6);
-		render(x, z + 2, res, frame);
+		render(x, z + 4, res, frame);
 		break;
 	default:
 		render(x, z, res, frame);

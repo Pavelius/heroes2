@@ -8,14 +8,29 @@ static void test_message() {
 	setevil(true);
 	string str;
 	str.addsep('\n');
-	str.addi(LordKillburn);
+	str.addi(Tsabu);
 	str.addh("Форт Месса");
 	str.addn("Во время посещения форта вы улучшили некоторые войска в своей армии.");
+	str.addsep('\n');
+	str.addi(PlayerRed);
+	str.addi(PlayerYellow);
 	variantcol source[2];
-	source[0] = {Experience, 500};
-	source[1] = {Gold, 1500};
+	source[0] = {Luck, 3};
 	//message(str, source, 2, ButtonYesNo);
-	heroi::learn(str, {LuckStat, -1}, {MoraleStat, -1});
+	//message(str, 0, 0, ButtonOK);
+	heroi::learn(str, source, 1);
+}
+
+static void test_experience() {
+	heroi::initialize();
+	setevil(true);
+	auto& e = bsmeta<heroi>::elements[Jezebel];
+	e.addexperience(2000000, true);
+	e.show(true);
+}
+
+static void show_test() {
+	test_experience();
 }
 
 static void full_castle(const playeri* player, kind_s type) {
@@ -76,7 +91,7 @@ static void main_menu() {
 		button(0, 0, BTNSHNGL, gamei::newgame, {1, 2, 3}, 0, "Начать новую одиночную или мультиплеер игру.");
 		button(0, 0, BTNSHNGL, dialog_palette, {5, 6, 7}, Ctrl + Alpha + 'L', "Загрузить ранее сохраненную игру.");
 		button(0, 0, BTNSHNGL, hightscore::show, {9, 10, 11});
-		button(0, 0, BTNSHNGL, test_message, {13, 14, 15});
+		button(0, 0, BTNSHNGL, test_experience, {13, 14, 15});
 		button(0, 0, BTNSHNGL, new_game, {17, 18, 19});
 		//latern.painting({0, 0});
 		domodal();
@@ -97,6 +112,8 @@ int main() {
 	drawobji::initialize();
 	if(!draw::create("test", 190, false))
 		return -1;
+	srand(21837);
+	show_test();
 	util_main();
 	main_menu();
 	return 0;

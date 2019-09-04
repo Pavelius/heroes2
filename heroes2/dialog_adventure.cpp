@@ -13,7 +13,6 @@ const unsigned			delay_information = 8;
 const int				map_sx = 14;
 const int				map_sy = 14;
 static char				info_text[512];
-static costi			info_cost;
 static rect				rcmap = {16, 16, 16 + 32 * 14, 16 + 32 * 14};
 static unsigned			show_message = delay_information;
 static unsigned			show_sunrise = delay_information;
@@ -966,10 +965,9 @@ static void update_lists() {
 	heroes.setup(current_player);
 }
 
-void playeri::quickmessage(const costi& cost, const char* format, ...) {
+void playeri::quickmessage(const char* format) {
 	stringbuilder sb(info_text);
 	sb.addv(format, xva_start(format));
-	info_cost = cost;
 	show_message = delay_information;
 }
 
@@ -977,7 +975,6 @@ void playeri::adventure() {
 	current_player = this;
 	update_drawables();
 	update_lists();
-	quickmessage({}, "Ход начал %1 игрок", getname());
 	while(ismodal()) {
 		paint_screen();
 		standart_input();

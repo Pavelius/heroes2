@@ -25,7 +25,7 @@ enum ability_s : unsigned char {
 };
 enum skill_s : unsigned char {
 	Pathfinding, Archery, Logistics, Scounting, Diplomacy,
-	Navigation, Leadership, WisdomSkill, Mysticism, Luck,
+	Navigation, Leadership, Wisdow, Mysticism, Luck,
 	Ballistics, EagleEye, Necromancy, Estates,
 	FirstSkill = Pathfinding, LastSkill = Estates,
 };
@@ -360,7 +360,7 @@ public:
 	void					marketplace();
 	static void				message(const char* format);
 	static void				prepare(difficult_s difficult);
-	void					quickmessage(const costi& cost, const char* format, ...);
+	void					quickmessage(const char* format);
 	static heroi*			randomhire(kind_s kind, kind_s excude_kind);
 	heroi*					randomhire(int index) const;
 	bool					recruit(monster_s unit, int& count, int maximum);
@@ -440,8 +440,10 @@ class heroi : public namei, public armyi {
 	void					checklevelup();
 public:
 	void					add(artifact_s id);
+	void					add(const variantcol& v);
 	void					add(monster_s id, short unsigned count) { armyi::add(id, count); }
 	void					addexperience(unsigned count, bool interactive = true);
+	int						ask(const char* format, const variantcol* source);
 	void					clear();
 	static const costi		cost;
 	static heroi*			find(short unsigned index);
@@ -594,6 +596,7 @@ struct gamei {
 	bool					choose();
 	void					clear();
 	int						getplayers() const;
+	static unsigned char	getrandom(variant e);
 	bool					isallow(int index) const { return types[index] != NotAllowed; }
 	static bool				isresource(unsigned char object);
 	bool					load(const char* filename);

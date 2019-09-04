@@ -30,6 +30,22 @@ struct cflags {
 	constexpr bool			is(const T id) const { return (data & (1 << id)) != 0; }
 	constexpr void			remove(T id) { data &= ~(1 << id); }
 };
+template<typename T> struct aref {
+	unsigned				count;
+	T*						data;
+	constexpr aref() :count(0), data(0) {}
+	template<unsigned N> constexpr aref(T(&data)[N]) : data(data), count(N) {}
+	constexpr T& operator[](unsigned index) { return data[index]; }
+	constexpr const T& operator[](unsigned index) const { return data[index]; }
+	explicit operator bool() const { return count != 0; }
+	constexpr T*			begin() { return data; }
+	constexpr const T*		begin() const { return data; }
+	constexpr const T*		end() const { return data + count; }
+	int						getcount() const { return count; }
+	int						indexof(const T* t) const { if(t<data || t>data + count) return -1; return t - data; }
+	int						indexof(const T t) const { for(unsigned i = 0; i < count; i++) if(data[i] == t) return i; return -1; }
+	bool					is(const T t) const { return indexof(t) != -1; }
+};
 // Common access data types
 template<typename T> struct bsmeta {
 	typedef T				data_type;

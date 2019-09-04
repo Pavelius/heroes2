@@ -25,7 +25,7 @@ static void test_experience() {
 	heroi::initialize();
 	setevil(true);
 	auto& e = bsmeta<heroi>::elements[Jezebel];
-	e.addexperience(2000000, true);
+	e.addexperience(5000);
 	e.show(true);
 }
 
@@ -61,26 +61,6 @@ static void full_castle(const playeri* player, kind_s type) {
 	p->show();
 }
 
-static void random_castle() {
-	castlei castle = {};
-	castle.random(false);
-	castle.set(Necromancer);
-	castle.show();
-}
-
-static void new_game() {
-	//random_castle();
-	heroi::initialize();
-	playeri::initialize();
-	auto p1 = bsmeta<playeri>::elements;
-	p1->set(Human);
-	p1->setup(EasyDifficulty);
-	auto p2 = bsmeta<playeri>::elements + 1;
-	p2->set(Computer);
-	p2->setup(ImpossibleDifficulty);
-	full_castle(p1, Knight);
-}
-
 static void load_game() {}
 void dialog_palette();
 
@@ -91,8 +71,8 @@ static void main_menu() {
 		button(0, 0, BTNSHNGL, gamei::newgame, {1, 2, 3}, 0, "Начать новую одиночную или мультиплеер игру.");
 		button(0, 0, BTNSHNGL, dialog_palette, {5, 6, 7}, Ctrl + Alpha + 'L', "Загрузить ранее сохраненную игру.");
 		button(0, 0, BTNSHNGL, hightscore::show, {9, 10, 11});
-		button(0, 0, BTNSHNGL, test_experience, {13, 14, 15});
-		button(0, 0, BTNSHNGL, new_game, {17, 18, 19});
+		button(0, 0, BTNSHNGL, buttoncancel, {13, 14, 15});
+		button(0, 0, BTNSHNGL, buttoncancel, {17, 18, 19});
 		//latern.painting({0, 0});
 		domodal();
 		if(hot::key == InputTimer)
@@ -113,7 +93,7 @@ int main() {
 	if(!draw::create("test", 190, false))
 		return -1;
 	srand(21837);
-	show_test();
+	//show_test();
 	util_main();
 	main_menu();
 	return 0;

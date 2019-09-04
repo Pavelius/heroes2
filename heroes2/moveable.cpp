@@ -76,12 +76,14 @@ moveablei* add_moveable(short unsigned index, variant v, short unsigned quantity
 		default: quantity = xrand(12, 30); break;
 		}
 		break;
+	default:
+		break;
 	}
 	p->element = v;
 	p->index = index;
 	p->value = quantity;
 	p->player = RandomPlayer;
-	p->value2 = 0;
+	p->value2 = gamei::getrandom(v);
 	return p;
 }
 

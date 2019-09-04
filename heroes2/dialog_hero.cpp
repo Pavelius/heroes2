@@ -134,3 +134,7 @@ int heroi::learn(const char* format, const variantcol* v1, unsigned count) {
 		return -1;
 	}
 }
+
+int	heroi::ask(const char* format, const variantcol* source) {
+	return message(format, source, 2, ButtonYesNo);
+}

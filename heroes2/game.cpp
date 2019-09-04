@@ -679,21 +679,8 @@ void gamei::prepare() {
 			add_moveable(i1, generate.resource(), 0);
 			break;
 		case mp2obj(TreasureChest):
-			if(isresource(tiles[i].objectName1)) {
-				auto quantity = tiles[i].quantity1;
-				if(!quantity) {
-					auto percent = d100();
-					if(percent < 75) // Золото
-						quantity = rand() % 4;
-					else if(percent < 95)
-						quantity = generate.artifact(1);
-					else {
-						static artifact_s bad_artifacts[] = {TaxLien, FizbinMesfortune, HideousMask};
-						quantity = bad_artifacts[rand() % sizeof(bad_artifacts) / sizeof(bad_artifacts[0])];
-					}
-				}
-				add_moveable(i1, TreasureChest, quantity);
-			}
+			if(isresource(tiles[i].objectName1))
+				add_moveable(i1, TreasureChest, 0);
 			break;
 		}
 	}

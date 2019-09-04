@@ -445,6 +445,7 @@ public:
 	void					addexperience(unsigned count, bool interactive = true);
 	int						ask(const char* format, const variantcol* source = 0);
 	void					clear();
+	void					choose();
 	static const costi		cost;
 	static heroi*			find(short unsigned index);
 	playeri*				getplayer() const;

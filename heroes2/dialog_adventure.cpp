@@ -314,13 +314,17 @@ static void update_drawables() {
 	normalize_drawables();
 }
 
-static void choose_hero() {
-	current_var = (heroi*)hot::param;
-	if(!current_var)
-		return;
+void heroi::choose() {
+	current_var = this;
 	info_type = ObjectInfo;
-	map::setcamera(current_var.hero->getpos());
-	map::wave(current_var.hero->getpos(), current_var.hero->get(Pathfinding), 0);
+	map::setcamera(getpos());
+	map::wave(getpos(), get(Pathfinding), 0);
+	if(getmove() != Blocked)
+		map::route(getmove());
+}
+
+static void choose_hero() {
+	((heroi*)hot::param)->choose();
 }
 
 static void choose_castle() {
@@ -337,6 +341,7 @@ static void route_path() {
 	short unsigned index = hot::param;
 	if(index == Blocked)
 		return;
+	
 	if(index != move) {
 		map::route(index);
 		hero->setmove(index);
@@ -458,10 +463,14 @@ static void correct_camera() {
 
 static void move_camera() {
 	switch(hot::param) {
+	case KeyPageUp: map::camera.x += 32; map::camera.y -= 32; break;
+	case KeyPageDown: map::camera.x += 32; map::camera.y += 32; break;
 	case KeyLeft: map::camera.x -= 32; break;
 	case KeyRight: map::camera.x += 32; break;
 	case KeyUp: map::camera.y -= 32; break;
 	case KeyDown: map::camera.y += 32; break;
+	case KeyHome: map::camera.x -= 32; map::camera.y -= 32; break;
+	case KeyEnd: map::camera.x -= 32; map::camera.y += 32; break;
 	}
 	correct_camera();
 }
@@ -475,9 +484,14 @@ static void scroll(const rect& rc, event_s key, int frame) {
 }
 
 static void paint_scroll() {
+	scroll({0, 0, rcmap.x1 - 1, rcmap.y1 - 1}, KeyHome, 39);
+	scroll({0, rcmap.y2, rcmap.x1 - 1, height - 1}, KeyEnd, 37);
+	scroll({width - 15, 0, width - 1, 15}, KeyPageUp, 33);
+	scroll({width - 15, rcmap.y2, width - 1, height-1}, KeyPageDown, 35);
+	//
 	scroll({rcmap.x1, 0, width - 16, rcmap.y1 - 1}, KeyUp, 32);
 	scroll({0, rcmap.y1, rcmap.x1 - 1, rcmap.y2 - 1}, KeyLeft, 38);
-	scroll({width - 16, rcmap.y1, width-1, rcmap.y2 - 1}, KeyRight, 34);
+	scroll({width - 16, rcmap.y1, width - 1, rcmap.y2 - 1}, KeyRight, 34);
 	scroll({rcmap.x1, rcmap.y2, width - 16, height - 1}, KeyDown, 36);
 }
 
@@ -1046,11 +1060,6 @@ void heroi::moveto() {
 						screenshoot second;
 						first.blend(second);
 					}
-				} else {
-					if(interactive) {
-						update_lists();
-						map::setcamera(getpos());
-					}
 				}
 				break;
 			}
@@ -1066,4 +1075,11 @@ void heroi::moveto() {
 		}
 	}
 	map::wave(getpos(), get(Pathfinding), 0);
+	if(getmove() != Blocked)
+		map::route(getmove());
+	if(interactive) {
+		update_lists();
+		map::setcamera(getpos());
+		paint_screen();
+	}
 }

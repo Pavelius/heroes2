@@ -466,11 +466,19 @@ static void move_camera() {
 	correct_camera();
 }
 
-static void scroll(const rect& rc, event_s key) {
-	if(!mousein({0, rcmap.y1, rcmap.x1, rcmap.y2}))
+static void scroll(const rect& rc, event_s key, int frame) {
+	if(!mousein(rc))
 		return;
+	setcursor(ADVMCO, frame);
 	if(hot::key == InputTimer)
 		execute(move_camera, key);
+}
+
+static void paint_scroll() {
+	scroll({rcmap.x1, 0, width - 16, rcmap.y1 - 1}, KeyUp, 32);
+	scroll({0, rcmap.y1, rcmap.x1 - 1, rcmap.y2 - 1}, KeyLeft, 38);
+	scroll({width - 16, rcmap.y1, width-1, rcmap.y2 - 1}, KeyRight, 34);
+	scroll({rcmap.x1, rcmap.y2, width - 16, height - 1}, KeyDown, 36);
 }
 
 static void paint_tiles() {
@@ -936,11 +944,11 @@ static void paint_route() {
 		auto y = map::i2y(index) * 32 - map::camera.y + rcmap.y1;
 		int c = map::getcost(from, to, hero->get(Pathfinding));
 		unsigned char* change = 0;
-		if(mp>c)
+		if(mp > c)
 			image(x, y, ROUTE, routeindex(from, index, to, 100), 0, change);
 		else
 			image(x, y, ROUTE, routeindex(from, index, to, 100), 0, route_brown);
-		if(mp>0)
+		if(mp > 0)
 			mp -= c;
 		from = index;
 	}
@@ -955,11 +963,12 @@ static void paint_screen() {
 	castles.draw(553, 176, 56, 32);
 	paint_information(480, 320, current_player);
 	paint_tiles();
+	paint_scroll();
 	paint_objects();
 	//paint_block(rcmap, map::camera);
 	paint_route();
-	update_cursor();
 	if(mousein(rcmap)) {
+		update_cursor();
 		if(hot::key == MouseRight && hot::pressed)
 			execute(tips_info);
 	}
@@ -994,7 +1003,7 @@ void heroi::moveto() {
 		return;
 	auto stack = map::getpath();
 	auto interactive = true;
-	while((map::getpathcount() - 1)>0) {
+	while((map::getpathcount() - 1) > 0) {
 		auto pi = map::getpathcount();
 		auto from = getpos();
 		auto to = stack[pi - 2];

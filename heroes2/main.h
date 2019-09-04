@@ -422,6 +422,7 @@ struct moveablei {
 	void					blockpath(unsigned* path) const;
 	void					clear();
 	const shapei*			getshape() const;
+	bool					isonetime() const;
 };
 class heroi : public namei, public armyi {
 	kind_s					kind;
@@ -437,13 +438,12 @@ class heroi : public namei, public armyi {
 	spellbooki				spellbook;
 	direction_s				direction;
 	static void				open_artifact();
-	void					checklevelup();
 public:
 	void					add(artifact_s id);
 	void					add(const variantcol& v);
 	void					add(monster_s id, short unsigned count) { armyi::add(id, count); }
 	void					addexperience(unsigned count, bool interactive = true);
-	int						ask(const char* format, const variantcol* source);
+	int						ask(const char* format, const variantcol* source = 0);
 	void					clear();
 	static const costi		cost;
 	static heroi*			find(short unsigned index);
@@ -473,6 +473,7 @@ public:
 	bool					isadventure() const { return index != Blocked; }
 	static int				learn(const char* format, const variantcol* v1, unsigned count);
 	void					levelup(bool interactive);
+	void					message(const char* format);
 	static unsigned			select(heroi** result, heroi** result_maximum, const playeri* player, kind_s kind, kind_s kind_exclude, bool include_special = false);
 	void					set(ability_s id, int v);
 	void					set(direction_s v) { direction = v; }

@@ -466,6 +466,13 @@ static void move_camera() {
 	correct_camera();
 }
 
+static void scroll(const rect& rc, event_s key) {
+	if(!mousein({0, rcmap.y1, rcmap.x1, rcmap.y2}))
+		return;
+	if(hot::key == InputTimer)
+		execute(move_camera, key);
+}
+
 static void paint_tiles() {
 	draw::state push;
 	draw::clipping = rcmap;
@@ -1005,16 +1012,22 @@ void heroi::moveto() {
 			paint_screen();
 			updatescreen();
 			auto object = map::find(to);
+			auto onetime = (object.type == Moveable && object.moveable->isonetime());
 			if(object) {
-				auto discard = interact(to, object);
-				if(discard) {
+				if(!onetime) {
+					setpos(to);
+					if(interactive) {
+						update_lists();
+						map::setcamera(getpos());
+						paint_screen();
+					}
+				}
+				auto action_result = interact(to, object);
+				if(onetime) {
 					auto applied = false;
 					screenshoot first;
 					if(object.type == Moveable) {
 						object.moveable->clear();
-						applied = true;
-					} else if(object.type == Hero) {
-						object.hero->setpos(Blocked);
 						applied = true;
 					}
 					if(applied) {
@@ -1023,6 +1036,11 @@ void heroi::moveto() {
 						paint_screen();
 						screenshoot second;
 						first.blend(second);
+					}
+				} else {
+					if(interactive) {
+						update_lists();
+						map::setcamera(getpos());
 					}
 				}
 				break;

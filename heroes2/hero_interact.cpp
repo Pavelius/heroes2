@@ -43,18 +43,6 @@ static unsigned char random(const aref<actioncase>& source) {
 	return 0;
 }
 
-static bool isonetime(object_s id) {
-	switch(id) {
-	case CampFire:
-	case TreasureChest:
-	case ResourceObject:
-	case WaterChest:
-		return true;
-	default:
-		return false;
-	}
-}
-
 unsigned char gamei::getrandom(variant e) {
 	if(e.type==Object) {
 		switch(e.object) {
@@ -66,55 +54,71 @@ unsigned char gamei::getrandom(variant e) {
 	return 0;
 }
 
+static monster_s getdwelve(object_s e) {
+	switch(e) {
+	case GoblinHut: return Goblin;
+	case ArcherHouse: return Archer;
+	case DwarfCottage: return Dwarf;
+	default: return RandomMonster;
+	}
+}
+
 bool heroi::interact(moveablei& object) {
+	string str;
+	auto player = getplayer();
+	int choose;
+	const actioncase* pa;
+	switch(object.element.type) {
+	case Resource:
+		add(variantcol{object.element, object.value});
+		if(player) {
+			costi cost;
+			cost.clear();
+			cost.add(object.element.resource, object.value);
+			str.add("Вы нашли ресурс\n(%-1)", getstr(object.element.resource));
+			str.addsep();
+			str.addi(object.element.resource, object.value);
+			player->quickmessage(str);
+		}
+		break;
+	case Artifact:
+		break;
+	case Object:
+		switch(object.element.object) {
+		case TreasureChest:
+			pa = treasure_chest + object.value2;
+			switch(pa->variants[0].element.type) {
+			case Resource:
+				str.add("Исследуя окресности вы наткнулись на древний ларец. Золото можно оставить сее или раздать крестьянам в омен на опыт. Вы останите золото себе?");
+				choose = ask(str, pa->variants);
+				choose = choose ? 0 : 1;
+				add(pa->variants[choose]);
+				break;
+			}
+			break;
+		case GoblinHut:
+			str.add("Группа %1 в поисках славы желает примкнуть к вашему войску. Согласны ли вы их принять?",
+				bsmeta<monsteri>::elements[getdwelve(object.element.object)].multiname);
+			if(ask(str, 0)) {
+
+			}
+			break;
+		case Mines:
+			str.add("Вы стали хозяином %1 шахты.");
+			message(str);
+			break;
+		}
+	}
 	return true;
 }
 
 bool heroi::interact(short unsigned index, const pvar& object) {
-	string str;
-	const actioncase* pa;
-	auto player = getplayer();
-	int choose;
 	switch(object.type) {
-	case Hero:
-		break;
-	case CastleVar:
-		break;
-	case Moveable:
-		switch(object.moveable->element.type) {
-		case Resource:
-			add(variantcol{object.moveable->element, object.moveable->value});
-			if(player) {
-				costi cost;
-				cost.clear();
-				cost.add(object.moveable->element.resource, object.moveable->value);
-				str.add("Вы нашли ресурс\n(%-1)", getstr(object.moveable->element.resource));
-				str.addsep();
-				str.addi(object.moveable->element.resource, object.moveable->value);
-				player->quickmessage(str);
-			}
-			return true;
-		case Artifact:
-			return true;
-		case Object:
-			switch(object.moveable->element.object) {
-			case TreasureChest:
-				pa = treasure_chest + object.moveable->value2;
-				switch(pa->variants[0].element.type) {
-				case Resource:
-					str.add("Исследуя окресности вы наткнулись на древний ларец. Золото можно оставить сее или раздать крестьянам в омен на опыт. Вы останите золото себе?");
-					choose = ask(str, pa->variants);
-					choose = choose ? 0 : 1;
-					add(pa->variants[choose]);
-					break;
-				}
-				return true;
-			default: return isonetime(object.moveable->element.object);
-			}
-		}
-		break;
+	case Hero: break;
+	case CastleVar: break;
+	case Moveable: return interact(*object.moveable);
 	}
-	return false;
+	return true;
 }
 
 void heroi::add(const variantcol& v) {
@@ -142,5 +146,6 @@ void heroi::add(const variantcol& v) {
 			addexperience(v.count);
 			break;
 		}
+		break;
 	}
 }

@@ -128,13 +128,17 @@ void heroi::input(const playeri* player) const {
 int heroi::learn(const char* format, const variantcol* v1, unsigned count) {
 	switch(count) {
 	case 1: case 2:
-		return message(format, v1, count, ButtonLearn);
+		return draw::message(format, v1, count, ButtonLearn);
 	default:
-		message(format, 0, 0, ButtonOK);
+		draw::message(format, 0, 0, ButtonOK);
 		return -1;
 	}
 }
 
 int	heroi::ask(const char* format, const variantcol* source) {
-	return message(format, source, 2, ButtonYesNo);
+	return draw::message(format, source, 2, ButtonYesNo);
+}
+
+void heroi::message(const char* format) {
+	draw::message(format, 0, 0, ButtonOK);
 }

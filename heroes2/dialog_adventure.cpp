@@ -950,20 +950,18 @@ static void paint_route() {
 	auto from = path[count - 1];
 	auto mp = hero->get(MovePoints);
 	for(int i = count - 2; i >= 0; i--) {
-		int index = path[i];
-		int to = index;
+		auto index = path[i];
+		auto to = index;
 		if(i > 0)
 			to = path[i - 1];
 		auto x = map::i2x(index) * 32 - 12 - map::camera.x + rcmap.x1;
 		auto y = map::i2y(index) * 32 - map::camera.y + rcmap.y1;
-		int c = map::getcost(from, to, hero->get(Pathfinding));
+		auto c = (int)map::getcost(index);
 		unsigned char* change = 0;
 		if(mp > c)
 			image(x, y, ROUTE, routeindex(from, index, to, 100), 0, change);
 		else
 			image(x, y, ROUTE, routeindex(from, index, to, 100), 0, route_brown);
-		if(mp > 0)
-			mp -= c;
 		from = index;
 	}
 }
@@ -1023,8 +1021,10 @@ void heroi::moveto() {
 		auto to = stack[pi - 2];
 		auto d = map::getdir(from, to);
 		auto mp = get(MovePoints);
-		auto mc = (int)getcost(from, to);
-		if(mp < mc)
+		auto c2 = map::getcost(to);
+		auto c1 = map::getcost(from);
+		auto mc = (c2==BlockedPath) ? map::getcost(from, map::getdir(from, to), get(Pathfinding)) : c2 - c1;
+		if(mp < (int)mc)
 			break;
 		set(d);
 		abilities[MovePoints] -= mc;
@@ -1046,7 +1046,8 @@ void heroi::moveto() {
 					}
 				}
 				auto action_result = interact(to, object);
-				if(onetime) {
+				if(onetime && action_result) {
+					// If one time object taken then make it disapear
 					auto applied = false;
 					screenshoot first;
 					if(object.type == Moveable) {
@@ -1080,6 +1081,5 @@ void heroi::moveto() {
 	if(interactive) {
 		update_lists();
 		map::setcamera(getpos());
-		paint_screen();
 	}
 }

@@ -327,6 +327,11 @@ static void choose_hero() {
 	((heroi*)hot::param)->choose();
 }
 
+static void move_hero() {
+	if(current_var.type == Hero)
+		current_var.hero->moveto();
+}
+
 static void choose_castle() {
 	current_var = (castlei*)hot::param;
 	if(!current_var)
@@ -544,7 +549,7 @@ static void endturn() {
 static int paint_buttons(int x, int y, const playeri* player) {
 	auto icn = isevil(ADVEBTNS, ADVBTNS);
 	draw::button(x + 0 * 36, y + 0 * 36, icn, buttonok, {0, 0, 1}, Alpha + 'H', "Следующий герой");
-	draw::button(x + 1 * 36, y + 0 * 36, icn, buttonok, {2, 2, 3}, Alpha + 'M', "Продолжить движение");
+	draw::button(x + 1 * 36, y + 0 * 36, icn, move_hero, {2, 2, 3}, Alpha + 'M', "Продолжить движение");
 	draw::button(x + 2 * 36, y + 0 * 36, icn, buttonok, {4, 4, 5});
 	draw::button(x + 3 * 36, y + 0 * 36, icn, buttonok, {6, 6, 7});
 	draw::button(x + 0 * 36, y + 1 * 36, icn, endturn, {8, 8, 9}, Alpha + 'E', "Закончить ход");
@@ -956,9 +961,11 @@ static void paint_route() {
 			to = path[i - 1];
 		auto x = map::i2x(index) * 32 - 12 - map::camera.x + rcmap.x1;
 		auto y = map::i2y(index) * 32 - map::camera.y + rcmap.y1;
-		auto c = (int)map::getcost(index);
+		auto c = map::getcost(index);
+		if(c == BlockedPath)
+			c = map::getcost(from) + map::getcost(from, index, hero->get(Pathfinding));
 		unsigned char* change = 0;
-		if(mp > c)
+		if(mp > (int)c)
 			image(x, y, ROUTE, routeindex(from, index, to, 100), 0, change);
 		else
 			image(x, y, ROUTE, routeindex(from, index, to, 100), 0, route_brown);

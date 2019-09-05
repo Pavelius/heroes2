@@ -1,33 +1,8 @@
 #include "main.h"
 
-struct actioncase {
-	int			chance;
-	variantcol	variants[2];
-};
-static actioncase treasure_chest[] = {{20, {{Gold, 1000}, {Experience, 500}}},
-{30, {{Gold, 1500}, {Experience, 1000}}},
-{20, {{Gold, 2000}, {Experience, 1500}}},
-{17, {{ThunderMace}}},
-{5, {{TaxLien}}},
-{4, {{HideousMask}}},
-{4, {{FizbinMesfortune}}},
-};
-static actioncase artifact_take[] = {{1, {{Paladin, 1}}},
-{1, {{Crusader, 1}}},
-{1, {{Genie, 1}}},
-{1, {{GreenDragon, 1}}},
-{1, {{RedDragon, 1}}},
-{1, {{Cyclop, 1}}},
-{1, {{Titan, 1}}},
-{1, {{Giant, 1}}},
-{5, {{Wisdow}}},
-{5, {{Leadership}}},
-{20, {{ArtifactObject}}},
-{2, {{Gold, 3000}}},
-{2, {{Gold, 1500}, {Gems, 3}}},
-};
+static const char* mine_names_of[] = {"Золотой", "Деревянной", "Ртутной", "Рудной", "Серной", "Кристальной", "Изумрудной"};
 
-static unsigned char random(const aref<actioncase>& source) {
+static unsigned char random(const aref<casei>& source) {
 	auto total_weight = 0;
 	for(auto& e : source)
 		total_weight += e.chance;
@@ -44,34 +19,69 @@ static unsigned char random(const aref<actioncase>& source) {
 }
 
 unsigned char gamei::getrandom(variant e) {
-	if(e.type==Object) {
-		switch(e.object) {
-		case TreasureChest: return random(treasure_chest);
-		case ArtifactObject: return random(artifact_take);
-		default: return 0;
-		}
+	if(e.type == Object) {
+		auto& m = bsmeta<objecti>::elements[e.object];
+		if(m.actions)
+			return random(m.actions);
 	}
 	return 0;
 }
 
-static monster_s getdwelve(object_s e) {
-	switch(e) {
+bool heroi::interact(moveablei& object, interact_s type, const variantcol* variants, const char* text) {
+	string str;
+	switch(type) {
+	case TreasureCase:
+		str.add(text);
+		auto choose = ask(str, variants) ? 0 : 1;
+		add(variants[choose]);
+		break;
+	}
+	return true;
+}
+
+monster_s getmonster(object_s type) {
+	switch(type) {
 	case GoblinHut: return Goblin;
-	case ArcherHouse: return Archer;
 	case DwarfCottage: return Dwarf;
+	case ArcherHouse: return Archer;
+	case SpriteHouse: return Sprite;
+	case PeasantHut: return Peasant;
+	case HalflingHole: return Halfling;
 	default: return RandomMonster;
 	}
 }
 
-bool heroi::interact(moveablei& object) {
+bool heroi::interact(moveablei& object, object_s type, const char* text) {
 	string str;
-	auto player = getplayer();
-	int choose;
-	const actioncase* pa;
+	switch(type) {
+	case GoblinHut:
+	case DwarfCottage:
+	case ArcherHouse:
+	case SpriteHouse:
+	case PeasantHut:
+	case HalflingHole:
+		str.add(text, bsmeta<monsteri>::elements[getmonster(type)].multiname);
+		if(ask(str)) {
+		}
+		break;
+	case Mines:
+		str.add(text, mine_names_of[object.value2]);
+		message(str);
+		break;
+	default:
+		return false;
+	}
+	return true;
+}
+
+bool heroi::interact(moveablei& object) {
+	const objecti* po;
 	switch(object.element.type) {
 	case Resource:
 		add(variantcol{object.element, object.value});
-		if(player) {
+		if(getplayer()) {
+			auto player = getplayer();
+			string str;
 			costi cost;
 			cost.clear();
 			cost.add(object.element.resource, object.value);
@@ -84,30 +94,12 @@ bool heroi::interact(moveablei& object) {
 	case Artifact:
 		break;
 	case Object:
-		switch(object.element.object) {
-		case TreasureChest:
-			pa = treasure_chest + object.value2;
-			switch(pa->variants[0].element.type) {
-			case Resource:
-				str.add("Исследуя окресности вы наткнулись на древний ларец. Золото можно оставить сее или раздать крестьянам в омен на опыт. Вы останите золото себе?");
-				choose = ask(str, pa->variants);
-				choose = choose ? 0 : 1;
-				add(pa->variants[choose]);
-				break;
-			}
-			break;
-		case GoblinHut:
-			str.add("Группа %1 в поисках славы желает примкнуть к вашему войску. Согласны ли вы их принять?",
-				bsmeta<monsteri>::elements[getdwelve(object.element.object)].multiname);
-			if(ask(str, 0)) {
-
-			}
-			break;
-		case Mines:
-			str.add("Вы стали хозяином %1 шахты.");
-			message(str);
-			break;
-		}
+		po = bsmeta<objecti>::elements + object.element.object;
+		if(po->actions) {
+			auto& e = po->actions.data[object.value2];
+			return interact(object, e.type, e.variants, po->text);
+		} else
+			return interact(object, object.element.object, po->text);
 	}
 	return true;
 }

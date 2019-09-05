@@ -327,6 +327,9 @@ static void choose_hero() {
 	((heroi*)hot::param)->choose();
 }
 
+static void next_hero() {
+}
+
 static void move_hero() {
 	if(current_var.type == Hero)
 		current_var.hero->moveto();
@@ -548,7 +551,7 @@ static void endturn() {
 
 static int paint_buttons(int x, int y, const playeri* player) {
 	auto icn = isevil(ADVEBTNS, ADVBTNS);
-	draw::button(x + 0 * 36, y + 0 * 36, icn, buttonok, {0, 0, 1}, Alpha + 'H', "Следующий герой");
+	draw::button(x + 0 * 36, y + 0 * 36, icn, next_hero, {0, 0, 1}, Alpha + 'H', "Следующий герой");
 	draw::button(x + 1 * 36, y + 0 * 36, icn, move_hero, {2, 2, 3}, Alpha + 'M', "Продолжить движение");
 	draw::button(x + 2 * 36, y + 0 * 36, icn, buttonok, {4, 4, 5});
 	draw::button(x + 3 * 36, y + 0 * 36, icn, buttonok, {6, 6, 7});

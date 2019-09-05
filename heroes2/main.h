@@ -221,6 +221,10 @@ enum landscape_s : unsigned char {
 enum castle_flag_s : unsigned char {
 	AlreadyMoved,
 };
+enum interact_s : unsigned char {
+	TreasureCase, TreasureArtifact,
+	FightArtifact, GuardSoldier, QuestArtifact, BuyArtifact,
+};
 class heroi;
 struct pvar;
 struct shapei;
@@ -443,7 +447,8 @@ public:
 	void					add(const variantcol& v);
 	void					add(monster_s id, short unsigned count) { armyi::add(id, count); }
 	void					addexperience(unsigned count, bool interactive = true);
-	int						ask(const char* format, const variantcol* source = 0);
+	int						ask(const char* format);
+	int						ask(const char* format, const variantcol* source);
 	void					clear();
 	void					choose();
 	static const costi		cost;
@@ -470,6 +475,8 @@ public:
 	void					input(const playeri* player) const;
 	bool					interact(short unsigned index, const pvar& object);
 	bool					interact(moveablei& object);
+	bool					interact(moveablei& object, object_s type, const char* text);
+	bool					interact(moveablei& object, interact_s type, const variantcol* variants, const char* text);
 	bool					is(spell_s v) const { return spellbook.is(v); }
 	bool					isadventure() const { return index != Blocked; }
 	static int				learn(const char* format, const variantcol* v1, unsigned count);
@@ -608,8 +615,9 @@ struct gamei {
 private:
 	void					updatebase();
 };
-struct objecti {
-	const char*				name;
+struct interacti {
+	const char*				id;
+	const char*				text;
 };
 struct hightscore {
 	char					name[32];
@@ -657,6 +665,16 @@ public:
 	const char*				castlename();
 	monster_s				monster(int level = 0);
 	resource_s				resource();
+};
+struct casei {
+	unsigned short			chance;
+	interact_s				type;
+	variantcol				variants[2];
+};
+struct objecti {
+	const char*				name;
+	const char*				text;
+	const aref<casei>		actions;
 };
 class string : public stringbuilder {
 	char					buffer[512];

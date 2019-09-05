@@ -153,6 +153,7 @@
     <ClCompile Include="dialog_well.cpp" />
     <ClCompile Include="difficult.cpp" />
     <ClCompile Include="draw_list.cpp" />
+    <ClCompile Include="event.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="generator.cpp" />
     <ClCompile Include="hero_interact.cpp" />

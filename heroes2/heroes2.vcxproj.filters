@@ -230,5 +230,8 @@
     <ClCompile Include="maproute.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="event.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

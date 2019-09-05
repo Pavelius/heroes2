@@ -544,26 +544,32 @@ void gamei::prepare() {
 				// add event maps
 				if(sizeblock > sizeof(mp2::eventday) - 1 && pblock[0] == 0x01) {
 					mp2::eventcoord& e = (mp2::eventcoord&)pblock;
-					//int rec = bscreate(FirstEvent);
-					//bsset(rec, Index, mp2i(findobject));
-					//bsset(rec, Name, e.text);
-					//bsset(rec, OneTime, e.cancel);
-					//bsset(rec, Computer, e.computer);
-					//bsset(rec, PlayerBlue, e.blue);
-					//bsset(rec, PlayerGreen, e.green);
-					//bsset(rec, PlayerRed, e.red);
-					//bsset(rec, PlayerYellow, e.yellow);
-					//bsset(rec, PlayerOrange, e.orange);
-					//bsset(rec, PlayerPurple, e.purple);
-					//bsset(rec, Gold, e.golds);
-					//bsset(rec, Mercury, e.mercury);
-					//bsset(rec, Sulfur, e.sulfur);
-					//bsset(rec, Crystal, e.crystal);
-					//bsset(rec, Ore, e.ore);
-					//bsset(rec, Wood, e.wood);
-					//bsset(rec, Gems, e.gems);
-					//if(e.artifact != 0xFFFF)
-					//	bsset(rec, Artifact, e.artifact);
+					auto p = bsmeta<eventi>::add();
+					if(!p)
+						break;
+					p->clear();
+					p->set(Active);
+					p->setpos(mp2i(findobject));
+					p->setname(e.text);
+					if(e.cancel) p->set(OneUse);
+					if(e.computer) p->set(AllowComputer);
+					if(e.blue) p->set(PlayerBlue);
+					if(e.green) p->set(PlayerGreen);
+					if(e.red) p->set(PlayerRed);
+					if(e.yellow) p->set(PlayerYellow);
+					if(e.orange) p->set(PlayerOrange);
+					if(e.purple) p->set(PlayerPurple);
+					if(e.artifact != 0xFFFF)
+						p->set(artifact_s(e.artifact));
+					// Обозначим ресурсы
+					auto& r = p->getresources();
+					r.add(Gold, e.golds);
+					r.add(Mercury, e.mercury);
+					r.add(Sulfur, e.sulfur);
+					r.add(Crystal, e.crystal);
+					r.add(Ore, e.ore);
+					r.add(Wood, e.wood);
+					r.add(Gems, e.gems);
 				}
 				break;
 			case mp2obj(Sphinx):

@@ -184,37 +184,26 @@ static void update_map_flags(bool ship_master) {
 			auto& e = bsmeta<moveablei>::elements[i];
 			if(!e)
 				continue;
-			switch(e.element.type) {
-			case Monster:
+			switch(e.type) {
+			case MonsterObject:
 				for(auto d : all_around) {
 					auto i = map::to(e.index, d);
-					map::set(i, BlockedTile);
 					map::set(i, AttackTile);
 				}
 				map::set(e.index, BlockedTile);
-				map::set(e.index, ActionTile);
 				map::set(e.index, AttackTile);
 				break;
-			case Resource:
-			case Artifact:
+			case ArtifactObject:
 				map::set(e.index, BlockedTile);
 				map::set(e.index, ActionTile);
 				break;
-			case Object:
-				switch(e.element.object) {
-				case Stream:
-				case StreamDelta:
-				case Road:
-					break;
-				case TreasureChest:
-				case AncientLamp:
-					map::set(e.index, BlockedTile);
-					map::set(e.index, ActionTile);
-					break;
-				default:
-					e.blockpath(path);
-					break;
-				}
+			case Stream:
+			case StreamDelta:
+			case Road:
+			case Crack:
+				break;
+			default:
+				e.blockpath(path);
 				break;
 			}
 		}

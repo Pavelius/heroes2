@@ -173,7 +173,7 @@ struct drawobji			{
 	shapei&					shape;
 	unsigned char			first;
 	unsigned char			last;
-	static const drawobji* find(res_s res, unsigned char frame);
+	static const drawobji*	find(res_s res, unsigned char frame);
 	static void				initialize();
 };
 void						breakmodal(int result);

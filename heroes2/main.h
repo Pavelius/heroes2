@@ -436,14 +436,17 @@ public:
 	void					set(spell_s v) { data[v / size] |= (1 << (v % 32)); }
 };
 struct moveablei {
+	object_s				type;
+	playerf					player1;
+	short unsigned			drawobj;
 	short unsigned			index;
-	variant					element;
 	short unsigned			value;
 	player_s				player;
 	unsigned char			value2;
 	explicit constexpr operator bool() const { return index != Blocked; }
 	void					blockpath(unsigned* path) const;
 	void					clear();
+	monster_s				getmonster() const { return monster_s(value2); }
 	resource_s				getresource() const { return resource_s(value2); }
 	const shapei*			getshape() const;
 	spell_s					getspell() const;

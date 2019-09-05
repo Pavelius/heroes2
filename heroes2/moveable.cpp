@@ -58,19 +58,20 @@ static unsigned char getroad(unsigned char object, unsigned char index) {
 	}
 }
 
-moveablei* add_moveable(short unsigned index, variant v, short unsigned quantity) {
+moveablei* add_moveable(short unsigned index, object_s v, unsigned char value2, unsigned short drawobj) {
 	auto p = bsmeta<moveablei>::add();
-	switch(v.type) {
-	case Resource:
-		switch(v.resource) {
+	short unsigned quantity = 0;
+	switch(v) {
+	case ResourceObject:
+		switch(value2) {
 		case Ore: case Wood: quantity = xrand(5, 10); break;
 		case Gold: quantity = 100 * xrand(3, 9); break;
 		default: quantity = xrand(3, 6); break;
 		}
 		break;
-	case Monster:
-		switch(bsmeta<monsteri>::elements[v.monster].level) {
-		case 2: quantity = xrand(8, 12); break;
+	case MonsterObject:
+		switch(bsmeta<monsteri>::elements[value2].level) {
+		case 2: quantity = xrand(8, 14); break;
 		case 3: quantity = xrand(4, 7); break;
 		case 4: quantity = xrand(1, 3); break;
 		default: quantity = xrand(12, 30); break;
@@ -79,15 +80,16 @@ moveablei* add_moveable(short unsigned index, variant v, short unsigned quantity
 	default:
 		break;
 	}
-	p->element = v;
+	p->type = v;
 	p->index = index;
+	p->drawobj = drawobj;
 	p->value = quantity;
 	p->player = RandomPlayer;
 	p->value2 = gamei::getrandom(v);
 	return p;
 }
 
-moveablei* add_object(unsigned short index, unsigned char object, unsigned char frame, unsigned char quantity) {
+moveablei* add_object(unsigned short index, unsigned char object, unsigned char frame) {
 	static moveablei* last_object;
 	const drawobji* pi = 0;
 	auto icn = getres(object);
@@ -113,15 +115,15 @@ moveablei* add_object(unsigned short index, unsigned char object, unsigned char 
 	case EXTRAOVR:
 		if(last_object) {
 			// Abandone mine and Mountain Mines has overlay just after their objects
-			if(last_object->element.object == Mines || last_object->element.object == AbandoneMine)
+			if(last_object->type == Mines || last_object->type == AbandoneMine)
 				last_object->value2 = maptbl(frame2resource, frame);
 		}
 		return last_object;
 	case STREAM:
-		return add_moveable(index, Stream, frame);
+		return add_moveable(index, Stream, frame, 0);
 	case ROAD:
 		map::roads[index] = getroad(object, frame);
-		return add_moveable(index, Road, frame);
+		return add_moveable(index, Road, frame, 0);
 	default:
 		pi = drawobji::find(icn, frame);
 		//assert(pi);
@@ -134,7 +136,7 @@ moveablei* add_object(unsigned short index, unsigned char object, unsigned char 
 	}
 	// В конце добави новый подвижный объект
 	if(pi) {
-		last_object = add_moveable(index, pi->object, pi - bsmeta<drawobji>::elements);
+		last_object = add_moveable(index, pi->object, 0, pi - bsmeta<drawobji>::elements);
 		return last_object;
 	}
 	return 0;
@@ -196,15 +198,12 @@ void moveablei::blockpath(unsigned* path) const {
 		auto index = map::m2i(px, py);
 		map::set(index, BlockedTile);
 	}
-	if(map::isinteract(element.object))
+	if(map::isinteract(type))
 		map::set(index, ActionTile);
 }
 
 const shapei* moveablei::getshape() const {
-	switch(element.type) {
-	case Object: return &bsmeta<drawobji>::elements[value].shape;
-	default: return 0;
-	}
+	return &bsmeta<drawobji>::elements[drawobj].shape;
 }
 
 spell_s	moveablei::getspell() const {

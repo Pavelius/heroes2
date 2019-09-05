@@ -31,8 +31,8 @@ struct drawable : point, pvar {
 		}
 	}
 	int	getlevel() const {
-		if(type == Moveable && moveable->element.type == Object) {
-			switch(moveable->element.object) {
+		if(type == Moveable) {
+			switch(moveable->type) {
 			case Road: return 3;
 			case Lake: case Cliff: case Hole: return 2;
 			case Stream: case StreamDelta: return 1;
@@ -42,8 +42,8 @@ struct drawable : point, pvar {
 		return 10;
 	}
 	int	getzpos() const {
-		if(type == Moveable && moveable->element.type == Object) {
-			if(moveable->element.object == TreeKnowledge)
+		if(type == Moveable) {
+			if(moveable->type == TreeKnowledge)
 				return y + 1;
 		}
 		return y;
@@ -64,7 +64,7 @@ struct drawable : point, pvar {
 	void getrect(rect& rc) const {
 		rc.x1 = x;
 		rc.y1 = y;
-		if(type == Moveable && moveable->element.type == Object) {
+		if(type == Moveable) {
 			auto& sh = bsmeta<drawobji>::elements[moveable->value].shape;
 			rc.x1 += sh.offset.x * 32;
 			rc.y1 += sh.offset.y * 32;
@@ -177,58 +177,54 @@ struct drawable : point, pvar {
 		int i;
 		switch(type) {
 		case Moveable:
-			switch(moveable->element.type) {
-			case Monster:
-				image(x + 16, y + 30, moveable->element.monster, moveable->index, 0, getmode(moveable->element.monster));
+			switch(moveable->type) {
+			case MonsterObject:
+				image(x + 16, y + 30, moveable->getmonster(), moveable->index, 0, getmode(moveable->getmonster()));
 				break;
-			case Resource:
-				i = decode_resource[moveable->element.resource];
-				image(x - 32, y, OBJNRSRC, i);
-				image(x, y, OBJNRSRC, i + 1);
-				break;
-			case Artifact:
-				i = moveable->element.artifact * 2;
+			//case ResourceObject:
+			//	i = decode_resource[moveable->getresource()];
+			//	image(x - 32, y, OBJNRSRC, i);
+			//	image(x, y, OBJNRSRC, i + 1);
+			//	break;
+			case ArtifactObject:
+				i = moveable->value2 * 2;
 				image(x - 32, y, OBJNARTI, i);
 				image(x, y, OBJNARTI, i + 1);
 				break;
-			case Object:
-				switch(moveable->element.object) {
-				case TreasureChest:
-					image(x - 32, y, OBJNRSRC, 18);
-					image(x, y, OBJNRSRC, 19);
-					break;
-				case AncientLamp:
-					image(x - 32, y, OBJNRSRC, 14);
-					image(x, y, OBJNRSRC, 15);
-					break;
-				case Road:
-					image(x, y, ROAD, moveable->value);
-					break;
-				case Stream:
-					image(x, y, STREAM, moveable->value);
-					break;
-				case Mines:
-					imags(x, y, moveable->value, moveable->index);
-					if(moveable->player != RandomPlayer)
-						image(x + 6, y - 26, FLAG32, moveable->player*2);
-					image(x, y, EXTRAOVR, decode_extraovr[moveable->value2]);
-					if(moveable_hilite(moveable->index, hilite_index, moveable->value))
-						hilite_var = moveable;
-					break;
-				case SawMill:
-				case AlchemyLab:
-					imags(x, y, moveable->value, moveable->index);
-					if(moveable->player != RandomPlayer)
-						image(x + 12, y - 48, FLAG32, moveable->player*2);
-					if(moveable_hilite(moveable->index, hilite_index, moveable->value))
-						hilite_var = moveable;
-					break;
-				default:
-					imags(x, y, moveable->value, moveable->index);
-					if(moveable_hilite(moveable->index, hilite_index, moveable->value))
-						hilite_var = moveable;
-					break;
-				}
+			//case TreasureChest:
+			//	image(x - 32, y, OBJNRSRC, 18);
+			//	image(x, y, OBJNRSRC, 19);
+			//	break;
+			//case AncientLamp:
+			//	image(x - 32, y, OBJNRSRC, 14);
+			//	image(x, y, OBJNRSRC, 15);
+			//	break;
+			case Road:
+				image(x, y, ROAD, moveable->value2);
+				break;
+			case Stream:
+				image(x, y, STREAM, moveable->value2);
+				break;
+			case Mines:
+				imags(x, y, moveable->value, moveable->index);
+				if(moveable->player != RandomPlayer)
+					image(x + 6, y - 26, FLAG32, moveable->player * 2);
+				image(x, y, EXTRAOVR, decode_extraovr[moveable->value2]);
+				if(moveable_hilite(moveable->index, hilite_index, moveable->value))
+					hilite_var = moveable;
+				break;
+			case SawMill:
+			case AlchemyLab:
+				imags(x, y, moveable->value, moveable->index);
+				if(moveable->player != RandomPlayer)
+					image(x + 12, y - 48, FLAG32, moveable->player * 2);
+				if(moveable_hilite(moveable->index, hilite_index, moveable->value))
+					hilite_var = moveable;
+				break;
+			default:
+				imags(x, y, moveable->value, moveable->index);
+				if(moveable_hilite(moveable->index, hilite_index, moveable->value))
+					hilite_var = moveable;
 				break;
 			}
 			if(moveable->index == hilite_index)
@@ -328,8 +324,7 @@ static void choose_hero() {
 	((heroi*)hot::param)->choose();
 }
 
-static void next_hero() {
-}
+static void next_hero() {}
 
 static void move_hero() {
 	if(current_var.type == Hero)
@@ -350,7 +345,7 @@ static void route_path() {
 	short unsigned index = hot::param;
 	if(index == Blocked)
 		return;
-	
+
 	if(index != move) {
 		map::route(index);
 		hero->setmove(index);
@@ -496,7 +491,7 @@ static void paint_scroll() {
 	scroll({0, 0, rcmap.x1 - 1, rcmap.y1 - 1}, KeyHome, 39);
 	scroll({0, rcmap.y2, rcmap.x1 - 1, height - 1}, KeyEnd, 37);
 	scroll({width - 15, 0, width - 1, 15}, KeyPageUp, 33);
-	scroll({width - 15, rcmap.y2, width - 1, height-1}, KeyPageDown, 35);
+	scroll({width - 15, rcmap.y2, width - 1, height - 1}, KeyPageDown, 35);
 	//
 	scroll({rcmap.x1, 0, width - 16, rcmap.y1 - 1}, KeyUp, 32);
 	scroll({0, rcmap.y1, rcmap.x1 - 1, rcmap.y2 - 1}, KeyLeft, 38);
@@ -746,32 +741,32 @@ static void tips_info(bool show_resource_count, bool show_monster_count, bool sh
 	//sb.add("%1i (%2i, %3i)", hilite_index, map::i2x(hilite_index), map::i2y(hilite_index));
 	switch(hilite_var.type) {
 	case Moveable:
-		switch(hilite_var.moveable->element.type) {
-		case Monster:
+		switch(hilite_var.moveable->type) {
+		case MonsterObject:
 			if(show_monster_count)
 				sb.addn("%1i %2",
 					hilite_var.moveable->value,
-					bsmeta<monsteri>::elements[hilite_var.moveable->element.monster].multiname);
+					bsmeta<monsteri>::elements[hilite_var.moveable->getmonster()].multiname);
 			else
 				sb.addn("%1 %-2",
 					armysizei::find(hilite_var.moveable->value)->name,
-					bsmeta<monsteri>::elements[hilite_var.moveable->element.monster].multiname);
+					bsmeta<monsteri>::elements[hilite_var.moveable->getmonster()].multiname);
 			break;
-		case Artifact:
+		case ArtifactObject:
 			if(show_artifact_name)
-				sb.addn(getstr(hilite_var.moveable->element.artifact));
+				sb.addn(getstr(artifact_s(hilite_var.moveable->value2)));
 			else
 				sb.addn("Артефакт");
 			break;
-		case Resource:
+		case ResourceObject:
 			if(show_resource_count)
 				sb.addn("%1i %-2", hilite_var.moveable->value,
-					bsmeta<resourcei>::elements[hilite_var.moveable->element.resource].nameof);
+					bsmeta<resourcei>::elements[hilite_var.moveable->getresource()].nameof);
 			else
-				sb.addn(getstr(hilite_var.moveable->element.resource));
+				sb.addn(getstr(hilite_var.moveable->getresource()));
 			break;
 		case Object:
-			sb.addn(getstr(hilite_var.moveable->element.object));
+			sb.addn(getstr(hilite_var.moveable->type));
 			break;
 		}
 		break;
@@ -1037,7 +1032,7 @@ void heroi::moveto() {
 		auto mp = get(MovePoints);
 		auto c2 = map::getcost(to);
 		auto c1 = map::getcost(from);
-		auto mc = (c2==BlockedPath) ? map::getcost(from, map::getdir(from, to), get(Pathfinding)) : c2 - c1;
+		auto mc = (c2 == BlockedPath) ? map::getcost(from, map::getdir(from, to), get(Pathfinding)) : c2 - c1;
 		if(mp < (int)mc)
 			break;
 		set(d);

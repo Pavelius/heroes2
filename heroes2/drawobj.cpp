@@ -532,6 +532,16 @@ drawobji bsmeta<drawobji>::elements[] = {{OBJNGRAS, AbandoneMine, sh4x2}, // Hau
 {OBJNMUL2, WatchTower, sh3x2u2},
 {OBJNMUL2, Graveyard, sh4x2gr},
 {OBJNMUL2, SawMill, sh4x2sm}, // Green grass
+{OBJNRSRC, ResourceObject, sh2x1},
+{OBJNRSRC, ResourceObject, sh2x1},
+{OBJNRSRC, ResourceObject, sh2x1},
+{OBJNRSRC, ResourceObject, sh2x1},
+{OBJNRSRC, ResourceObject, sh2x1},
+{OBJNRSRC, ResourceObject, sh2x1},
+{OBJNRSRC, ResourceObject, sh2x1},
+{OBJNRSRC, AncientLamp, sh2x1},
+{OBJNRSRC, RndResource, sh2x1},
+{OBJNRSRC, TreasureChest, sh2x1},
 };
 unsigned bsmeta<drawobji>::count = sizeof(bsmeta<drawobji>::elements) / sizeof(bsmeta<drawobji>::elements[0]);
 

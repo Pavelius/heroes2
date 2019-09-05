@@ -64,16 +64,12 @@ monster_s getmonster(object_s type) {
 }
 
 bool moveablei::isonetime() const {
-	switch(element.type) {
-	case Artifact: return true;
-	case Resource: return true;
-	case Object:
-		switch(element.object) {
-		case TreasureChest: return true;
-		case CampFire: return true;
-		case WaterChest: return true;
-		}
-		break;
+	switch(type) {
+	case ArtifactObject: return true;
+	case ResourceObject: return true;
+	case TreasureChest: return true;
+	case CampFire: return true;
+	case WaterChest: return true;
 	}
 	return false;
 }
@@ -142,9 +138,7 @@ void heroi::add(const variantcol& v) {
 }
 
 bool heroi::isvisited(const moveablei& object) const {
-	if(object.element.type != Object)
-		return false;
-	switch(object.element.object) {
+	switch(object.type) {
 	case MagicWell:
 		return get(SpellPoints) >= getspmax();
 	case Shrine1:
@@ -229,21 +223,16 @@ bool heroi::interact(moveablei& object, object_s type, const char* text, const c
 }
 
 bool heroi::interact(moveablei& object) {
-	const objecti* po;
-	switch(object.element.type) {
-	case Resource:
-		gain(object.element.resource, object.value);
-		break;
-	case Artifact:
-		break;
-	case Object:
-		po = bsmeta<objecti>::elements + object.element.object;
-		if(po->actions) {
-			auto& e = po->actions.data[object.value2];
-			return interact(e.type, e.variants, e.text ? e.text : po->text);
-		} else
-			return interact(object, object.element.object, po->text, po->text_fail);
+	if(object.type == ResourceObject) {
+		gain(object.getresource(), object.value);
+		return true;
 	}
+	const objecti* po = bsmeta<objecti>::elements + object.type;
+	if(po->actions) {
+		auto& e = po->actions.data[object.value2];
+		return interact(e.type, e.variants, e.text ? e.text : po->text);
+	} else
+		return interact(object, object.type, po->text, po->text_fail);
 	return true;
 }
 

@@ -430,8 +430,8 @@ void gamei::updatebase() {
 	}
 }
 
-moveablei* add_moveable(short unsigned index, variant v, short unsigned quantity = 0);
-moveablei* add_object(unsigned short index, unsigned char object, unsigned char frame, unsigned char quantity);
+moveablei* add_moveable(short unsigned index, object_s type, unsigned char value2, unsigned short drwobj = 0);
+moveablei* add_object(unsigned short index, unsigned char object, unsigned char frame);
 
 static resource_s decode_resource[] = {Wood, Mercury, Ore, Sulfur, Crystal, Gems, Gold};
 
@@ -651,27 +651,27 @@ void gamei::prepare() {
 		for(int level = 3; level >= 0; level--) {
 			// level 1.0
 			if(tiles[i].indexName1 != 0xFF && (tiles[i].quantity1 % 4) == level)
-				add_object(i1, tiles[i].objectName1, tiles[i].indexName1, tiles[i].quantity1);
+				add_object(i1, tiles[i].objectName1, tiles[i].indexName1);
 			// level 1.N
 			if(tiles[i].indexAddon) {
 				auto ai = tiles[i].indexAddon;
 				while(ai) {
 					auto& a = addons[ai];
 					if(a.objectNameN1 && a.indexNameN1 != 0xFF && (a.quantityN % 4) == level)
-						add_object(i1, a.objectNameN1, a.indexNameN1, a.quantityN);
+						add_object(i1, a.objectNameN1, a.indexNameN1);
 					ai = a.indexAddon;
 				}
 			}
 			// level 2.0
 			if(tiles[i].indexName2 != 0xFF && (tiles[i].quantity2 % 4) == level)
-				add_object(i1, tiles[i].objectName2, tiles[i].indexName2, tiles[i].quantity2);
+				add_object(i1, tiles[i].objectName2, tiles[i].indexName2);
 			// level 2.N
 			if(tiles[i].indexAddon) {
 				auto ai = tiles[i].indexAddon;
 				while(ai) {
 					auto& a = addons[ai];
 					if(a.objectNameN2 && a.indexNameN2 != 0xFF && (a.quantityN % 4) == level)
-						add_object(i1, a.objectNameN2, a.indexNameN2, a.quantityN);
+						add_object(i1, a.objectNameN2, a.indexNameN2);
 					ai = a.indexAddon;
 				}
 			}
@@ -683,36 +683,36 @@ void gamei::prepare() {
 		auto m = tiles[i].generalObject;
 		switch(m) {
 		case mp2obj(MonsterObject):
-			add_moveable(i1, generate.add(monster_s(FirstMonster + tiles[i].indexName1)), 0);
+			add_moveable(i1, MonsterObject, generate.add(monster_s(FirstMonster + tiles[i].indexName1)));
 			break;
 		case mp2obj(RndMonster):
-			add_moveable(i1, generate.monster(0), 0);
+			add_moveable(i1, MonsterObject, generate.monster(0));
 			break;
 		case mp2obj(RndMonster1):
 		case mp2obj(RndMonster2):
 		case mp2obj(RndMonster3):
 		case mp2obj(RndMonster4):
-			add_moveable(i1, generate.monster(tiles[i].generalObject - mp2obj(RndMonster1) + 1), 0);
+			add_moveable(i1, MonsterObject, generate.monster(tiles[i].generalObject - mp2obj(RndMonster1) + 1));
 			break;
 		case mp2obj(ArtifactObject):
-			add_moveable(i1, generate.add(artifact_s(FirstArtifact + (tiles[i].indexName1 - 1) / 2)), 0);
+			add_moveable(i1, ArtifactObject, generate.add(artifact_s(FirstArtifact + (tiles[i].indexName1 - 1) / 2)));
 			break;
 		case mp2obj(RndArtifact):
-			add_moveable(i1, generate.artifact(0), 0);
+			add_moveable(i1, ArtifactObject, generate.artifact(0));
 			break;
 		case mp2obj(RndArtifact1):
 		case mp2obj(RndArtifact2):
 		case mp2obj(RndArtifact3):
-			add_moveable(i1, generate.artifact(m - mp2obj(RndArtifact1) + 1), 0);
+			add_moveable(i1, ArtifactObject, generate.artifact(m - mp2obj(RndArtifact1) + 1));
 			break;
 		case mp2obj(RndUltimateArtifact):
-			add_moveable(i1, generate.artifact(4), 0);
+			add_moveable(i1, ArtifactObject, generate.artifact(4));
 			break;
 		case mp2obj(ResourceObject):
-			add_moveable(i1, maptbl(decode_resource, tiles[i].indexName1 / 2), 0);
+			add_moveable(i1, ResourceObject, maptbl(decode_resource, tiles[i].indexName1 / 2));
 			break;
 		case mp2obj(RndResource):
-			add_moveable(i1, generate.resource(), 0);
+			add_moveable(i1, ResourceObject, generate.resource());
 			break;
 		case mp2obj(TreasureChest):
 			if(isresource(tiles[i].objectName1))

@@ -303,11 +303,9 @@ costi playeri::getprofit() const {
 		auto& e = bsmeta<moveablei>::elements[i];
 		if(!e)
 			continue;
-		if(e.element.type != Object)
-			continue;
 		if(e.player != player_id)
 			continue;
-		switch(e.element.object) {
+		switch(e.type) {
 		case Mines:
 			result.add(e.getresource(), getmineincome(e.getresource()));
 			break;

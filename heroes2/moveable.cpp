@@ -206,3 +206,7 @@ const shapei* moveablei::getshape() const {
 	default: return 0;
 	}
 }
+
+spell_s	moveablei::getspell() const {
+	return spell_s(value2);
+}

@@ -135,6 +135,24 @@ void heroi::add(const variantcol& v) {
 			break;
 		}
 		break;
+	case Spell:
+		set(v.element.spell);
+		break;
+	}
+}
+
+bool heroi::isvisited(const moveablei& object) const {
+	if(object.element.type != Object)
+		return false;
+	switch(object.element.object) {
+	case MagicWell:
+		return get(SpellPoints) >= getspmax();
+	case Shrine1:
+	case Shrine2:
+	case Shrine3:
+		return is(object.getspell());
+	default:
+		return false;
 	}
 }
 
@@ -142,6 +160,7 @@ bool heroi::interact(moveablei& object, object_s type, const char* text, const c
 	costi cost;
 	string str;
 	monster_s monster;
+	bool allok;
 	switch(type) {
 	case GoblinHut:
 	case DwarfCottage:
@@ -179,12 +198,29 @@ bool heroi::interact(moveablei& object, object_s type, const char* text, const c
 	case CampFire:
 		cost.clear();
 		cost.add(Gold, xrand(5, 10) * 100);
-		cost.add(resource_s(xrand(Wood, Gems)), xrand(2, 6));
+		cost.add(resource_s(xrand(Wood, Gems)), xrand(3, 6));
 		str.add(text);
 		str.addsep();
 		str.addi(cost);
 		message(str);
 		add(cost);
+		break;
+	case Shrine1:
+	case Shrine2:
+	case Shrine3:
+		allok = false;
+		str.add(text, getstr(object.getspell()));
+		if(!is(MagicBook))
+			str.adds("К сожелению у вас нету Волшебной книги, чтобы записать заклинание в нее.");
+		else if(isvisited(object))
+			str.adds("Однако, это заклиание вы уже и так знаете, поэтому их помощь вам была не нужна.");
+		else {
+			allok = true;
+			str.addsep();
+			str.addi(object.getspell());
+		}
+		message(str);
+		add(variantcol{object.getspell(), 1});
 		break;
 	default:
 		return false;

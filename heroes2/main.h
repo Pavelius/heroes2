@@ -446,6 +446,7 @@ struct moveablei {
 	void					clear();
 	resource_s				getresource() const { return resource_s(value2); }
 	const shapei*			getshape() const;
+	spell_s					getspell() const;
 	bool					isonetime() const;
 };
 class heroi : public namei, public armyi, public positioni {
@@ -499,8 +500,10 @@ public:
 	bool					interact(moveablei& object);
 	bool					interact(moveablei& object, object_s type, const char* text, const char* text_fail);
 	bool					interact(interact_s type, const variantcol* variants, const char* text);
+	bool					is(artifact_s v) const;
 	bool					is(spell_s v) const { return spellbook.is(v); }
 	bool					isadventure() const { return index != Blocked; }
+	bool					isvisited(const moveablei& object) const;
 	static int				learn(const char* format, const variantcol* v1, unsigned count);
 	void					levelup(bool interactive);
 	void					message(const char* format);

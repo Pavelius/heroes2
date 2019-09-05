@@ -316,3 +316,13 @@ unsigned heroi::get(artifact_s* source, unsigned count_maximum) {
 	}
 	return pb - source;
 }
+
+bool heroi::is(artifact_s v) const {
+	for(auto e : artifacts) {
+		if(e == NoArtifact)
+			continue;
+		if(e == v)
+			return true;
+	}
+	return false;
+}

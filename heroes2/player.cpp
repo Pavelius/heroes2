@@ -325,3 +325,13 @@ costi playeri::getprofit() const {
 void playeri::gainprofit() {
 	getresources() += getprofit();
 }
+
+heroi* playeri::gethero(heroi* current) const {
+	auto p2 = bsmeta<heroi>::elements + LastHero;
+	for(auto p = current ? (current + 1) : bsmeta<heroi>::elements; p < p2; p++) {
+		if(p->getplayer() != this)
+			continue;
+		return p;
+	}
+	return 0;
+}

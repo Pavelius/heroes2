@@ -614,5 +614,5 @@ void castlei::information(building_s v, kind_s k) {
 }
 
 void castlei::refresh() {
-	remove(AlreadyMoved);
+	remove(Used);
 }

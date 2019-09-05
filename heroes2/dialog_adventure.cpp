@@ -420,7 +420,7 @@ static struct castlec : public list {
 			case Necromancer: index_sprite = iscastle ? 14 : 20; break;
 			}
 			image(x - 1, y, icn, index_sprite);
-			if(p->is(AlreadyMoved))
+			if(p->is(Used))
 				draw::image(x - 1, y + 1, icn, 24);
 			if(current_var.castle == p)
 				rectb({x - 1, y, x + 54, y + 31}, 214);
@@ -1012,6 +1012,9 @@ void playeri::quickmessage(const char* format) {
 
 void playeri::adventure() {
 	current_player = this;
+	auto hero = gethero();
+	if(hero)
+		hero->choose();
 	update_drawables();
 	update_lists();
 	while(ismodal()) {

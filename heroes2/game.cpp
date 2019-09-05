@@ -518,23 +518,26 @@ void gamei::prepare() {
 					auto type = mini2type(tiles[findobject].indexName1);
 					if(type == RandomPlayer)
 						type = pla->getkind();
+					heroi* p = 0;
 					if(pblock[17] && pblock[18] <= (Bax - FirstHero)) {
-						auto& e = bsmeta<heroi>::elements[pblock[18]];
-						load_object(e, *((mp2::hero*)pblock));
-						e.set(pla);
-						e.set(Right);
-						e.setpos(mp2i(findobject));
-					} /*else
-						game::hire(game::random::hero(type), pla, mp2i(findobject));*/
+						p = bsmeta<heroi>::elements + pblock[18];
+						load_object(*p, *((mp2::hero*)pblock));
+					} else
+						p = playeri::randomhire(type, RandomKind);
+					if(p) {
+						p->set(pla);
+						p->set(Right);
+						p->setpos(mp2i(findobject));
+					}
 				}
 				break;
 			case mp2obj(Sign):
 			case mp2obj(Bottle):
 				// add sign or buttle
 				if(sizeblock > sizeof(mp2::info) - 1 && pblock[0] == 0x01) {
-					//int rec = bscreate(FirstSign);
-					//bsset(rec, Index, mp2i(findobject));
-					//bsset(rec, Name, (char*)&pblock[9]);
+					auto p = bsmeta<mapinfoi>::add();
+					zcpy(p->text, (char*)&pblock[9], sizeof(p->text) - 1);
+					p->index = mp2i(findobject);
 				}
 				break;
 			case mp2obj(Event):

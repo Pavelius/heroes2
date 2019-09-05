@@ -215,9 +215,6 @@
     <ClCompile Include="dialog_viewer.cpp">
       <Filter>Диалоги</Filter>
     </ClCompile>
-    <ClCompile Include="map_route.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
     <ClCompile Include="moveable.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
@@ -225,6 +222,12 @@
       <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="shape.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="mapinfo.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="maproute.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
   </ItemGroup>

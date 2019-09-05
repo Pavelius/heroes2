@@ -218,8 +218,8 @@ enum armysize_s {
 enum landscape_s : unsigned char {
 	Beach, Desert, Dirt, Grass, Lava, Sea, Snow, Swamp, Waste,
 };
-enum castle_flag_s : unsigned char {
-	AlreadyMoved,
+enum object_flag_s : unsigned char {
+	Used,
 };
 enum interact_s : unsigned char {
 	TreasureCase, TreasureArtifact,
@@ -294,6 +294,11 @@ struct namei {
 	const char*				getname() const { return name; }
 	void					setname(const char* v) { zcpy(name, v, sizeof(name) - 1); }
 };
+struct mapinfoi {
+	short unsigned			index;
+	char					text[126];
+	static const mapinfoi*	find(short unsigned index);
+};
 struct leveli {
 	const char*				name;
 };
@@ -353,6 +358,7 @@ public:
 	int						getbuildings(building_s v) const;
 	int						getbuildings(building_s v, kind_s kind) const;
 	int						getcastles() const;
+	heroi*					gethero(heroi* current = 0) const;
 	int						getheroes() const;
 	heroi*					gethire(int index) const;
 	player_s				getid() const { return player_s(this - bsmeta<playeri>::elements); }
@@ -518,7 +524,7 @@ class castlei : public namei, public armyi {
 	void					paint_panorama(int x, int y) const;
 	void					paint_name() const;
 	void					paint_monster(int x, int y, int height, int width, int level);
-	cflags<castle_flag_s, unsigned char> flags;
+	cflags<object_flag_s, unsigned char> flags;
 public:
 	void					add(monster_s id, unsigned short count) { armyi::add(id, count); }
 	void					build();
@@ -547,7 +553,7 @@ public:
 	void					input(const playeri* player) const;
 	constexpr int			is(building_s v) const { return buildings.is(v); }
 	bool					is(monster_s v) const { return armyi::is(v); }
-	bool					is(castle_flag_s v) const { return flags.is(v); }
+	bool					is(object_flag_s v) const { return flags.is(v); }
 	bool					isallow(monster_s v) const;
 	bool					iscoastal() const;
 	static bool				isdwelling(building_s v) { return (v >= Dwelving1 && v <= Dwelving6) || (v >= Dwelving1u && v <= Dwelving6u2); }
@@ -557,7 +563,7 @@ public:
 	void					random(bool castle);
 	void					recruit(building_s building);
 	void					refresh();
-	void					set(castle_flag_s v) { flags.add(v); }
+	void					set(object_flag_s v) { flags.add(v); }
 	void					set(const playeri* v) { player = (v ? v->getid() : RandomPlayer); }
 	void					set(player_s v) { player = v; }
 	void					set(building_s v) { buildings.add(v); }
@@ -566,7 +572,7 @@ public:
 	void					show();
 	void					well();
 	void					remove(building_s v) { buildings.remove(v); }
-	void					remove(castle_flag_s v) { flags.remove(v); }
+	void					remove(object_flag_s v) { flags.remove(v); }
 	void					growth();
 };
 struct spelli {

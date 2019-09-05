@@ -65,7 +65,7 @@ bool castlei::build(building_s building, bool confirm) {
 	screenshoot first;
 	player->getresources() -= cost;
 	set(building);
-	set(AlreadyMoved);
+	set(Used);
 	if(building>=Dwelving1 && building<=Dwelving6) {
 		auto monster = getmonster(building, getkind());
 		population[building - Dwelving1] += bsmeta<monsteri>::elements[monster].grown;
@@ -101,7 +101,7 @@ static void building_control(const rect& rc, building_s building, castlei* castl
 	bool lack_resources = !(c1 >= c2);
 	bool lack_requisits = !isallow(*castle, r2);
 	auto already_build = castle->is(building);
-	auto already_moved = castle->is(AlreadyMoved);
+	auto already_moved = castle->is(Used);
 	auto hilite = mousein({rc.x1, rc.y1, rc.x1 + 135, rc.y1 + 80});
 	const char* name = getstr(building, kind);
 	if(paint_border) {

@@ -131,15 +131,18 @@ pvar map::find(short unsigned index, bool rich_find) {
 			return &e;
 	}
 	// Moveables
+	moveablei* pf = 0;
 	for(unsigned i = 0; i <= bsmeta<moveablei>::count; i++) {
 		auto& e = bsmeta<moveablei>::elements[i];
 		if(e.index == index)
-			return &e;
-		if(rich_find) {
+			pf = &e;
+		else if(rich_find) {
 			auto ps = e.getshape();
 			if(ps && ps->is(index))
-				return &e;
+				pf = &e;
 		}
 	}
+	if(pf)
+		return pf;
 	return gettile(index);
 }

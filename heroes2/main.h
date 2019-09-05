@@ -453,6 +453,7 @@ public:
 	void					choose();
 	static const costi		cost;
 	static heroi*			find(short unsigned index);
+	void					gain(resource_s type, unsigned short count);
 	playeri*				getplayer() const;
 	int						get(ability_s v) const;
 	int						get(skill_s v) const { return skills[v]; }
@@ -476,7 +477,7 @@ public:
 	bool					interact(short unsigned index, const pvar& object);
 	bool					interact(moveablei& object);
 	bool					interact(moveablei& object, object_s type, const char* text);
-	bool					interact(moveablei& object, interact_s type, const variantcol* variants, const char* text);
+	bool					interact(interact_s type, const variantcol* variants, const char* text);
 	bool					is(spell_s v) const { return spellbook.is(v); }
 	bool					isadventure() const { return index != Blocked; }
 	static int				learn(const char* format, const variantcol* v1, unsigned count);
@@ -661,6 +662,7 @@ public:
 	generator();
 	artifact_s				add(artifact_s v) { artifacts[v]++; return v; }
 	monster_s				add(monster_s v) { monsters[v]++; return v; }
+	static artifact_s		any_artifact(int level = 0);
 	artifact_s				artifact(int level = 0);
 	const char*				castlename();
 	monster_s				monster(int level = 0);
@@ -670,6 +672,7 @@ struct casei {
 	unsigned short			chance;
 	interact_s				type;
 	variantcol				variants[2];
+	const char*				text;
 };
 struct objecti {
 	const char*				name;

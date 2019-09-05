@@ -18,6 +18,16 @@ static unsigned char fill_source(unsigned char* indecies, unsigned char* source,
 	return p - indecies;
 }
 
+static unsigned char fill_values(unsigned char* indecies, unsigned char source_count, allowproc allow, int param) {
+	auto p = indecies;
+	for(unsigned char i = 0; i < source_count; i++) {
+		if(allow && !allow(i, param))
+			continue;
+		*p++ = i;
+	}
+	return p - indecies;
+}
+
 static unsigned char get(unsigned char* source, unsigned char source_count, allowproc allow, int param) {
 	for(unsigned char i = 0; i < 255; i++) {
 		unsigned char indecies[256];
@@ -29,6 +39,15 @@ static unsigned char get(unsigned char* source, unsigned char source_count, allo
 		return n;
 	}
 	return 0;
+}
+
+static unsigned char get_random(unsigned char count, allowproc allow, int param) {
+	unsigned char indecies[256];
+	auto c = fill_values(indecies, count, allow, param);
+	if(!c)
+		return 0xFF;
+	auto n = indecies[rand() % c];
+	return n;
 }
 
 static bool allow_artifact(unsigned char i, int level) {
@@ -51,6 +70,10 @@ generator::generator() {
 
 artifact_s generator::artifact(int level) {
 	return (artifact_s)get(artifacts, sizeof(artifacts), allow_artifact, level);
+}
+
+artifact_s generator::any_artifact(int level) {
+	return (artifact_s)get_random(BlackPearl, allow_artifact, level);
 }
 
 monster_s generator::monster(int level) {

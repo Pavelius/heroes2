@@ -27,13 +27,25 @@ unsigned char gamei::getrandom(variant e) {
 	return 0;
 }
 
-bool heroi::interact(moveablei& object, interact_s type, const variantcol* variants, const char* text) {
+bool heroi::interact(interact_s type, const variantcol* variants, const char* text) {
 	string str;
+	artifact_s artifact;
+	int choose;
 	switch(type) {
 	case TreasureCase:
 		str.add(text);
-		auto choose = ask(str, variants) ? 0 : 1;
+		choose = ask(str, variants) ? 0 : 1;
 		add(variants[choose]);
+		break;
+	case TreasureArtifact:
+		artifact = variants[0].element.artifact;
+		if(artifact == ThunderMace)
+			artifact = generator::any_artifact(1);
+		str.add(text, getstr(artifact));
+		str.addsep();
+		str.addi(artifact);
+		message(str);
+		add(artifact);
 		break;
 	}
 	return true;
@@ -65,6 +77,7 @@ bool heroi::interact(moveablei& object, object_s type, const char* text) {
 		}
 		break;
 	case Mines:
+		object.player = getplayer()->getid();
 		str.add(text, mine_names_of[object.value2]);
 		message(str);
 		break;
@@ -74,43 +87,19 @@ bool heroi::interact(moveablei& object, object_s type, const char* text) {
 	return true;
 }
 
-bool heroi::interact(moveablei& object) {
-	const objecti* po;
-	switch(object.element.type) {
-	case Resource:
-		add(variantcol{object.element, object.value});
-		if(getplayer()) {
-			auto player = getplayer();
-			string str;
-			costi cost;
-			cost.clear();
-			cost.add(object.element.resource, object.value);
-			str.add("Вы нашли ресурс\n(%-1)", getstr(object.element.resource));
-			str.addsep();
-			str.addi(object.element.resource, object.value);
-			player->quickmessage(str);
-		}
-		break;
-	case Artifact:
-		break;
-	case Object:
-		po = bsmeta<objecti>::elements + object.element.object;
-		if(po->actions) {
-			auto& e = po->actions.data[object.value2];
-			return interact(object, e.type, e.variants, po->text);
-		} else
-			return interact(object, object.element.object, po->text);
+void heroi::gain(resource_s type, unsigned short count) {
+	add(variantcol{type, count});
+	auto player = getplayer();
+	if(player) {
+		string str;
+		costi cost;
+		cost.clear();
+		cost.add(type, count);
+		str.add("Вы нашли ресурс\n(%-1)", getstr(type));
+		str.addsep();
+		str.addi(type, count);
+		player->quickmessage(str);
 	}
-	return true;
-}
-
-bool heroi::interact(short unsigned index, const pvar& object) {
-	switch(object.type) {
-	case Hero: break;
-	case CastleVar: break;
-	case Moveable: return interact(*object.moveable);
-	}
-	return true;
 }
 
 void heroi::add(const variantcol& v) {
@@ -140,4 +129,32 @@ void heroi::add(const variantcol& v) {
 		}
 		break;
 	}
+}
+
+bool heroi::interact(moveablei& object) {
+	const objecti* po;
+	switch(object.element.type) {
+	case Resource:
+		gain(object.element.resource, object.value);
+		break;
+	case Artifact:
+		break;
+	case Object:
+		po = bsmeta<objecti>::elements + object.element.object;
+		if(po->actions) {
+			auto& e = po->actions.data[object.value2];
+			return interact(e.type, e.variants, e.text ? e.text : po->text);
+		} else
+			return interact(object, object.element.object, po->text);
+	}
+	return true;
+}
+
+bool heroi::interact(short unsigned index, const pvar& object) {
+	switch(object.type) {
+	case Hero: break;
+	case CastleVar: break;
+	case Moveable: return interact(*object.moveable);
+	}
+	return true;
 }

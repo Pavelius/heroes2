@@ -1182,6 +1182,10 @@ void picture::set(const variant e, int value) {
 		res = BRCREST; frame = e.player;
 		setsize(res, 6);
 		break;
+	case Spell:
+		res = SPELLS; frame = bsmeta<spelli>::elements[e.spell].portrait;
+		setsize();
+		break;
 	default:
 		res = NoRes; frame = 0;
 		size.x = 0;

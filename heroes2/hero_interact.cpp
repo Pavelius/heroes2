@@ -216,7 +216,7 @@ bool heroi::interact(moveablei& object, object_s type, const char* text, const c
 			str.adds("Однако, это заклиание вы уже и так знаете, поэтому их помощь вам была не нужна.");
 		else {
 			allok = true;
-			str.addsep();
+			str.add("\n\n");
 			str.addi(object.getspell());
 		}
 		message(str);

@@ -14,6 +14,7 @@ static iconi icons[] = {{Ability, "ab"},
 {Player, "pl"},
 {Resource, "rs"},
 {Skill, "sk"},
+{Spell, "sp"},
 };
 
 const char* string::parse(const char* p, variantcol* source, unsigned& count) {

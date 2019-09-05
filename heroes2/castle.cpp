@@ -591,11 +591,11 @@ void castlei::information(building_s v, kind_s k) {
 	auto p = getdescription(v, k);
 	if(!p)
 		return;
-	string sb;
-	sb.addi(v, k);
-	sb.addsep();
-	sb.add(p);
-	sb.addsep();
+	string str;
+	str.addi(v, k);
+	str.addsep();
+	str.add(p);
+	str.addsep();
 	auto prerequisit = getprereqisit(v, k);
 	if(prerequisit.data) {
 		auto building_count = 0;
@@ -603,14 +603,14 @@ void castlei::information(building_s v, kind_s k) {
 			if(!prerequisit.is(i))
 				continue;
 			if(building_count == 0)
-				sb.add("Необходимо построить:");
-			sb.addn(getstr(i, k));
+				str.add("Необходимо построить:");
+			str.addn(getstr(i, k));
 			building_count++;
 		}
 	}
-	sb.addsep();
-	sb.addi(getcost(v, k));
-	playeri::tooltips(sb);
+	str.addsep();
+	str.addi(getcost(v, k));
+	playeri::tooltips(str);
 }
 
 void castlei::refresh() {

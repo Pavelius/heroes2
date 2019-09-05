@@ -279,11 +279,10 @@ static void buildings_information() {
 	auto building = (building_s)hot::param;
 	auto p = castlei::getdescription(building, kind);
 	if(p) {
-		string sb;
-		sb.addi(building, kind);
-		sb.addsep();
-		sb.add(p);
-		playeri::message(p);
+		string str;
+		str.addi(building, kind);
+		str.addn(p);
+		playeri::message(str);
 	}
 }
 

@@ -96,7 +96,7 @@ void heroi::initialize() {
 void heroi::clear() {
 	auto& d = hero_data[getid()];
 	memset(this, 0, sizeof(*this));
-	zcpy(name, d.name);
+	setname(d.name);
 	player = RandomPlayer;
 	kind = d.kind;
 	level = 1;

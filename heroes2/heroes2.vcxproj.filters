@@ -233,5 +233,8 @@
     <ClCompile Include="event.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="szdup.cpp">
+      <Filter>Утилиты</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

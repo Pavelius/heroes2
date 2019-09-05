@@ -219,7 +219,7 @@ enum landscape_s : unsigned char {
 	Beach, Desert, Dirt, Grass, Lava, Sea, Snow, Swamp, Waste,
 };
 enum object_flag_s : unsigned char {
-	Used, OneUse, Active, AllowComputer,
+	Used, OneUse, AllowComputer,
 };
 enum interact_s : unsigned char {
 	TreasureCase, TreasureArtifact,
@@ -291,10 +291,10 @@ struct costi {
 	void					paint(int x, int y) const;
 };
 struct namei {
-	char					name[32];
+	const char*				name;
 	constexpr operator bool() const { return name[0] != 0; }
 	const char*				getname() const { return name; }
-	void					setname(const char* v) { zcpy(name, v, sizeof(name) - 1); }
+	void					setname(const char* v) { name = szdup(v); }
 };
 struct mapinfoi {
 	short unsigned			index;
@@ -722,13 +722,12 @@ struct shapei {
 	unsigned char			initialized;
 	bool					is(short unsigned index) const;
 };
-class eventi {
+class eventi : public namei {
 	short unsigned			index;
 	playerf					players;
 	objectf					flags;
 	artifact_s				artifact;
 	costi					resources;
-	char					name[128];
 public:
 	void					clear();
 	bool					is(player_s v) { return players.is(v); }
@@ -738,8 +737,27 @@ public:
 	void					set(artifact_s v) { artifact = v; }
 	void					set(player_s v) { players.add(v); }
 	void					set(object_flag_s v) { flags.add(v); }
-	void					setname(const char* v) { zcpy(name, v, sizeof(name) - 1); }
 	void					setpos(short unsigned v) { index = v; }
+	void					remove(player_s v) { players.remove(v); }
+	void					remove(object_flag_s v) { flags.remove(v); }
+};
+class dayeventi : public namei {
+	playerf					players;
+	objectf					flags;
+	artifact_s				artifact;
+	costi					resources;
+	short unsigned			first, subsequenced;
+public:
+	void					clear();
+	bool					is(player_s v) { return players.is(v); }
+	bool					is(object_flag_s v) { return flags.is(v); }
+	artifact_s				getartifact() { return artifact; }
+	costi&					getresources() { return resources; }
+	void					set(artifact_s v) { artifact = v; }
+	void					set(player_s v) { players.add(v); }
+	void					set(object_flag_s v) { flags.add(v); }
+	void					setfirst(short unsigned v) { first = v; }
+	void					setsubsequenced(short unsigned v) { subsequenced = v; }
 	void					remove(player_s v) { players.remove(v); }
 	void					remove(object_flag_s v) { flags.remove(v); }
 };

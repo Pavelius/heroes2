@@ -4,6 +4,7 @@ template<class T> inline T			imax(T a, T b) { return a > b ? a : b; }
 template<class T> inline T			imin(T a, T b) { return a < b ? a : b; }
 template<class T> inline T			iabs(T a) { return a > 0 ? a : -a; }
 //
+const char*							szdup(const char* text);
 char*								szprint(char* result, const char* result_maximum, const char* format, ...);
 char*								szprintv(char* result, const char* result_maximum, const char* format, const char* format_param);
 // Inline strings functions

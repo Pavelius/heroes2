@@ -185,6 +185,7 @@
     <ClCompile Include="speed.cpp" />
     <ClCompile Include="string.cpp" />
     <ClCompile Include="stringbuilder.cpp" />
+    <ClCompile Include="szdup.cpp" />
     <ClCompile Include="util.cpp" />
     <ClCompile Include="view.cpp" />
     <ClCompile Include="point.cpp" />

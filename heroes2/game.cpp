@@ -548,7 +548,6 @@ void gamei::prepare() {
 					if(!p)
 						break;
 					p->clear();
-					p->set(Active);
 					p->setpos(mp2i(findobject));
 					p->setname(e.text);
 					if(e.cancel) p->set(OneUse);
@@ -575,7 +574,7 @@ void gamei::prepare() {
 			case mp2obj(Sphinx):
 				// add riddle sphinx
 				if(sizeblock > sizeof(mp2::riddle) - 1 && pblock[0] == 0x00) {
-					//mp2::riddle& e = (mp2::riddle&)pblock;
+					auto& e = (mp2::riddle&)pblock;
 					//int rec = bscreate(FirstEvent);
 					//bsset(rec, Index, mp2i(findobject));
 					//bsset(rec, Name, e.text);
@@ -601,7 +600,35 @@ void gamei::prepare() {
 			}
 		} else if(pblock[0] == 0) {
 			if(sizeblock > sizeof(mp2::eventday) - 1 && pblock[42] == 1) {
-				// add event day
+				auto p = bsmeta<dayeventi>::add();
+				if(p) {
+					auto& e = (mp2::eventday&)pblock;
+					auto p = bsmeta<dayeventi>::add();
+					if(!p)
+						break;
+					p->clear();
+					p->setname(&e.text);
+					p->setfirst(e.first);
+					p->setsubsequenced(e.subsequent);
+					if(e.computer) p->set(AllowComputer);
+					if(e.blue) p->set(PlayerBlue);
+					if(e.green) p->set(PlayerGreen);
+					if(e.red) p->set(PlayerRed);
+					if(e.yellow) p->set(PlayerYellow);
+					if(e.orange) p->set(PlayerOrange);
+					if(e.purple) p->set(PlayerPurple);
+					if(e.artifact != 0xFFFF)
+						p->set(artifact_s(e.artifact));
+					// Обозначим ресурсы
+					auto& r = p->getresources();
+					r.add(Gold, e.golds);
+					r.add(Mercury, e.mercury);
+					r.add(Sulfur, e.sulfur);
+					r.add(Crystal, e.crystal);
+					r.add(Ore, e.ore);
+					r.add(Wood, e.wood);
+					r.add(Gems, e.gems);
+				}
 			} else if(sizeblock > sizeof(mp2::rumor) - 1) {
 				auto m = (mp2::rumor*)pblock;
 				if(m->text[0]) {

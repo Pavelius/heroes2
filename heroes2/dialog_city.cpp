@@ -238,6 +238,16 @@ static void thieves_guild() {
 	((playeri*)hot::param)->thieves();
 }
 
+static void mage_guild() {
+	hot::key = 0;
+	auto castle = ((castlei*)hot::param);
+	auto hero = heroi::find(castle->getpos());
+	if(hero) {
+		if(!hero->buymagicbook())
+			return;
+	}
+}
+
 static void castle_build() {
 	hot::key = 0;
 	((castlei*)hot::param)->build();
@@ -386,6 +396,12 @@ void castlei::paint_panorama(int x, int y) const {
 					execute(thieves_guild, (int)getplayer());
 				else if(building == Castle)
 					execute(castle_build, (int)this);
+				else if(building == MageGuild
+					|| building == MageGuild2
+					|| building == MageGuild3
+					|| building == MageGuild4
+					|| building == MageGuild5)
+					execute(mage_guild, (int)this);
 				else {
 					current_castle = const_cast<castlei*>(this);
 					execute(buildings_information, building);

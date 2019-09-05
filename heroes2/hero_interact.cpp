@@ -255,3 +255,31 @@ bool heroi::interact(short unsigned index, const pvar& object) {
 	}
 	return true;
 }
+
+bool heroi::buymagicbook() {
+	if(is(MagicBook))
+		return true;
+	auto player = getplayer();
+	if(!player)
+		return false;
+	costi cost;
+	cost.clear();
+	cost.add(Gold, gamei::cost_magic_book);
+	string str;
+	str.add("Чтобы направлять заклинания, прежде следует купить волшебную книгу за %1i золотых.",
+		cost.get(Gold));
+	if(player->getresources() >= cost) {
+		str.adds("Желаете приобрести ее?");
+		str.addsep();
+		str.addi(MagicBook);
+		if(!ask(str))
+			return false;
+	} else {
+		str.adds("К сожелению у вас не хватает денег.");
+		message(str);
+		return false;
+	}
+	player->getresources() -= cost;
+	add(MagicBook);
+	return true;
+}

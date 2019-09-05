@@ -470,6 +470,7 @@ public:
 	void					addexperience(unsigned count, bool interactive = true);
 	int						ask(const char* format);
 	int						ask(const char* format, const variantcol* source);
+	bool					buymagicbook();
 	void					clear();
 	void					choose();
 	static const costi		cost;
@@ -625,6 +626,8 @@ struct gamei {
 	level_s					level;
 	difficult_s				difficult;
 	bool					start_hero;
+	//
+	static const int		cost_magic_book = 500;
 	//
 	operator bool() const { return file[0] != 0; }
 	bool					choose();

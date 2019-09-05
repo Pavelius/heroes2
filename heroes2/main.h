@@ -347,15 +347,20 @@ public:
 	static bool				confirm(const char* format);
 	static void				endturn();
 	static void				initialize();
+	void					gainprofit();
 	int						getadventurers() const;
 	activity_s				getactivity() const { return activity; }
 	int						getbuildings(building_s v) const;
+	int						getbuildings(building_s v, kind_s kind) const;
 	int						getcastles() const;
 	int						getheroes() const;
 	heroi*					gethire(int index) const;
 	player_s				getid() const { return player_s(this - bsmeta<playeri>::elements); }
 	kind_s					getkind() const { return kind; }
 	int						getmarket() const;
+	int						getmines(resource_s id) const;
+	static int				getmineincome(resource_s id);
+	costi					getprofit() const;
 	static int				getrate(resource_s resf, resource_s rest, int markets);
 	costi&					getresources() { return resources; }
 	int						getspies() const;
@@ -368,6 +373,7 @@ public:
 	static heroi*			randomhire(kind_s kind, kind_s excude_kind);
 	heroi*					randomhire(int index) const;
 	bool					recruit(monster_s unit, int& count, int maximum);
+	void					refresh();
 	void					set(activity_s v) { activity = v; }
 	void					set(kind_s v) { kind = v; }
 	void					sethire(int index);
@@ -425,6 +431,7 @@ struct moveablei {
 	explicit constexpr operator bool() const { return index != Blocked; }
 	void					blockpath(unsigned* path) const;
 	void					clear();
+	resource_s				getresource() const { return resource_s(value2); }
 	const shapei*			getshape() const;
 	bool					isonetime() const;
 };
@@ -454,9 +461,11 @@ public:
 	static const costi		cost;
 	static heroi*			find(short unsigned index);
 	void					gain(resource_s type, unsigned short count);
+	void					gainmine(const char* text, resource_s mine);
 	playeri*				getplayer() const;
 	int						get(ability_s v) const;
 	int						get(skill_s v) const { return skills[v]; }
+	unsigned				get(artifact_s* source, unsigned count_maximum);
 	int						getcost(spell_s v) const;
 	unsigned				getcost(short unsigned from, short unsigned to) const;
 	direction_s				getdirection() const { return direction; }
@@ -483,6 +492,7 @@ public:
 	static int				learn(const char* format, const variantcol* v1, unsigned count);
 	void					levelup(bool interactive);
 	void					message(const char* format);
+	void					refresh();
 	static unsigned			select(heroi** result, heroi** result_maximum, const playeri* player, kind_s kind, kind_s kind_exclude, bool include_special = false);
 	void					set(ability_s id, int v);
 	void					set(direction_s v) { direction = v; }
@@ -519,6 +529,7 @@ public:
 	static const costi&		getcost(building_s v, kind_s k);
 	static const char*		getdescription(building_s v, kind_s k);
 	static building_s		getdowngrade(building_s v);
+	static int				getdungeonincome() { return 500; }
 	static unsigned char	getframe(building_s v);
 	int						getgrowth(building_s building) const;
 	kind_s					getkind() const { return kind; }
@@ -544,6 +555,7 @@ public:
 	static void				paint(int x, int y, landscape_s tile, kind_s race, bool castle, bool shadow);
 	void					random(bool castle);
 	void					recruit(building_s building);
+	void					refresh();
 	void					set(castle_flag_s v) { flags.add(v); }
 	void					set(const playeri* v) { player = (v ? v->getid() : RandomPlayer); }
 	void					set(player_s v) { player = v; }

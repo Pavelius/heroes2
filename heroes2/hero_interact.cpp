@@ -63,6 +63,14 @@ monster_s getmonster(object_s type) {
 	}
 }
 
+void heroi::gainmine(const char* text, resource_s mine) {
+	string str;
+	str.add(text, mine_names_of[mine]);
+	str.addsep();
+	str.addi(mine, 1);
+	message(str);
+}
+
 bool heroi::interact(moveablei& object, object_s type, const char* text) {
 	string str;
 	switch(type) {
@@ -77,9 +85,16 @@ bool heroi::interact(moveablei& object, object_s type, const char* text) {
 		}
 		break;
 	case Mines:
+		gainmine(text, object.getresource());
 		object.player = getplayer()->getid();
-		str.add(text, mine_names_of[object.value2]);
-		message(str);
+		break;
+	case SawMill:
+		gainmine(text, Wood);
+		object.player = getplayer()->getid();
+		break;
+	case AlchemyLab:
+		gainmine(text, Mercury);
+		object.player = getplayer()->getid();
 		break;
 	default:
 		return false;

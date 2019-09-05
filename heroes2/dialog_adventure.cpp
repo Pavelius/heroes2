@@ -210,7 +210,7 @@ struct drawable : point, pvar {
 				case Mines:
 					imags(x, y, moveable->value, moveable->index);
 					if(moveable->player != RandomPlayer)
-						image(x + 6, y - 26, FLAG32, moveable->player);
+						image(x + 6, y - 26, FLAG32, moveable->player*2);
 					image(x, y, EXTRAOVR, decode_extraovr[moveable->value2]);
 					if(moveable_hilite(moveable->index, hilite_index, moveable->value))
 						hilite_var = moveable;

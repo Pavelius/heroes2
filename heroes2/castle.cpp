@@ -156,6 +156,22 @@ int playeri::getbuildings(building_s v) const {
 	return result;
 }
 
+int playeri::getbuildings(building_s v, kind_s kind) const {
+	int result = 0;
+	for(auto& e : bsmeta<castlei>::elements) {
+		if(!e)
+			continue;
+		if(e.getplayer() != this)
+			continue;
+		if(e.getkind() != kind)
+			continue;
+		if(v != NoBuilding && !e.is(v))
+			continue;
+		result++;
+	}
+	return result;
+}
+
 const costi& castlei::getcost(building_s v, kind_s k) {
 	static costi buildings_general[32] = {{{5000, 20, 0, 20}}, {{750, 5}}, {{500, 5}}, {{2000, 20}}, {{500}}, {{1250, 0, 0, 5}},
 	{{1500, 0, 0, 5}}, {{1500, 0, 0, 5}}, {{750}},
@@ -595,4 +611,8 @@ void castlei::information(building_s v, kind_s k) {
 	sb.addsep();
 	sb.addi(getcost(v, k));
 	playeri::tooltips(sb);
+}
+
+void castlei::refresh() {
+	remove(AlreadyMoved);
 }

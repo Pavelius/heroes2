@@ -23,16 +23,20 @@ void playeri::endturn() {
 	for(auto& e : bsmeta<playeri>::elements) {
 		if(!e)
 			continue;
+		e.refresh();
+		e.gainprofit();
+	}
+	for(unsigned i = 0; i < bsmeta<castlei>::count; i++) {
+		auto& e = bsmeta<castlei>::elements[i];
+		if(!e)
+			continue;
+		e.refresh();
 	}
 	for(unsigned i = FirstHero; i <= LastHero; i = hero_s(i+1)) {
 		auto& e = bsmeta<heroi>::elements[i];
 		if(!e.isadventure())
 			continue;
-		auto v0 = e.get(SpellPoints);
-		auto v1 = e.getspmax();
-		if(v0 < v1)
-			e.set(SpellPoints, imax(0, imin(v0 + e.getsprefresh(), v1)));
-		e.set(MovePoints, e.getmpmax());
+		e.refresh();
 	}
 	map::day++;
 }
@@ -238,4 +242,86 @@ void playeri::hire(heroi* hero) {
 			}
 		}
 	}
+}
+
+int	playeri::getmines(resource_s id) const {
+	auto result = 0;
+	auto player = getid();
+	for(unsigned i = 0; i < bsmeta<moveablei>::count; i++) {
+		auto& e = bsmeta<moveablei>::elements[i];
+		if(!e)
+			continue;
+		if(e.player != player)
+			continue;
+		result++;
+	}
+	return result;
+}
+
+void playeri::refresh() {
+}
+
+int	playeri::getmineincome(resource_s id) {
+	static int data[] = {1000, 2, 1, 2, 1, 1, 1};
+	return data[id];
+}
+
+costi playeri::getprofit() const {
+	static int estates_income[] = {0, 100, 250, 500};
+	costi result; result.clear();
+	// Прибыль с замков
+	auto castles_count = getcastles();
+	auto town_count = gettowns();
+	auto statue_count = getbuildings(Statue);
+	auto dungeon_count = getbuildings(SpecialBuilding, Warlock);
+	result.add(Gold, castles_count * 1000);
+	result.add(Gold, town_count * 500);
+	result.add(Gold, statue_count * castlei::getstatueincome());
+	result.add(Gold, dungeon_count * castlei::getdungeonincome());
+	// Прибыль с героев
+	artifact_s artifact_source[32];
+	aref<artifact_s> artifacts(artifact_source);
+	for(auto i = FirstHero; i <= LastHero; i = (hero_s)(i+1)) {
+		auto& e = bsmeta<heroi>::elements[i];
+		if(!e || !e.isadventure())
+			continue;
+		if(e.getplayer() != this)
+			continue;
+		// Прибыль с артифактов
+		artifacts.count = e.get(artifacts.data, sizeof(artifact_source) / sizeof(artifact_source[0]));
+		for(auto a : artifacts) {
+			auto& ae = bsmeta<artifacti>::elements[a];
+			if(ae.type.type == Resource)
+				result.add(ae.type.resource, ae.effect);
+		}
+		// Прибыль с навыков
+		result.add(Gold, estates_income[e.get(Estates)]);
+	}
+	// Прибыль с шахт
+	auto player_id = getid();
+	for(unsigned i = 0; i < bsmeta<moveablei>::count; i++) {
+		auto& e = bsmeta<moveablei>::elements[i];
+		if(!e)
+			continue;
+		if(e.element.type != Object)
+			continue;
+		if(e.player != player_id)
+			continue;
+		switch(e.element.object) {
+		case Mines:
+			result.add(e.getresource(), getmineincome(e.getresource()));
+			break;
+		case AlchemyLab:
+			result.add(Mercury, getmineincome(Mercury));
+			break;
+		case SawMill:
+			result.add(Wood, getmineincome(Wood));
+			break;
+		}
+	}
+	return result;
+}
+
+void playeri::gainprofit() {
+	getresources() += getprofit();
 }

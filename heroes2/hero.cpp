@@ -100,6 +100,8 @@ void heroi::clear() {
 	player = RandomPlayer;
 	kind = d.kind;
 	level = 1;
+	for(auto& e : artifacts)
+		e = NoArtifact;
 	for(unsigned i = 0; i < 4; i++)
 		abilities[i] = bsmeta<kindi>::elements[kind].abilities[i];
 	for(auto e : bsmeta<kindi>::elements[kind].skills)
@@ -293,4 +295,24 @@ int	heroi::getskillscount() const {
 			n++;
 	}
 	return n;
+}
+
+void heroi::refresh() {
+	auto v0 = get(SpellPoints);
+	auto v1 = getspmax();
+	if(v0 < v1)
+		set(SpellPoints, imax(0, imin(v0 + getsprefresh(), v1)));
+	set(MovePoints, getmpmax());
+}
+
+unsigned heroi::get(artifact_s* source, unsigned count_maximum) {
+	auto pe = source + count_maximum;
+	auto pb = source;
+	for(auto e : artifacts) {
+		if(e == NoArtifact)
+			continue;
+		if(pb < pe)
+			*pb++ = e;
+	}
+	return pb - source;
 }

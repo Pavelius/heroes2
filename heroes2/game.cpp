@@ -575,26 +575,29 @@ void gamei::prepare() {
 				// add riddle sphinx
 				if(sizeblock > sizeof(mp2::riddle) - 1 && pblock[0] == 0x00) {
 					auto& e = (mp2::riddle&)pblock;
-					//int rec = bscreate(FirstEvent);
-					//bsset(rec, Index, mp2i(findobject));
-					//bsset(rec, Name, e.text);
-					//bsset(rec, Gold, e.golds);
-					//bsset(rec, Mercury, e.mercury);
-					//bsset(rec, Sulfur, e.sulfur);
-					//bsset(rec, Crystal, e.crystal);
-					//bsset(rec, Ore, e.ore);
-					//bsset(rec, Wood, e.wood);
-					//bsset(rec, Gems, e.gems);
+					auto p = bsmeta<sphinxi>::add();
+					if(!p)
+						break;
+					p->setpos(mp2i(findobject));
+					p->setname(e.text);
+					auto& r = p->getresources();
+					r.add(Gold, e.golds);
+					r.add(Mercury, e.mercury);
+					r.add(Sulfur, e.sulfur);
+					r.add(Crystal, e.crystal);
+					r.add(Ore, e.ore);
+					r.add(Wood, e.wood);
+					r.add(Gems, e.gems);
 					//if(e.artifact != 0xFFFF)
 					//	bsset(rec, Artifact, e.artifact);
-					//ne->answers[0] = szdup(e.answer1);
-					//ne->answers[1] = szdup(e.answer2);
-					//ne->answers[2] = szdup(e.answer3);
-					//ne->answers[3] = szdup(e.answer4);
-					//ne->answers[4] = szdup(e.answer5);
-					//ne->answers[5] = szdup(e.answer6);
-					//ne->answers[6] = szdup(e.answer7);
-					//ne->answers[7] = szdup(e.answer8);
+					p->setanswer(0, e.answer1);
+					p->setanswer(1, e.answer2);
+					p->setanswer(2, e.answer3);
+					p->setanswer(3, e.answer4);
+					p->setanswer(4, e.answer5);
+					p->setanswer(5, e.answer6);
+					p->setanswer(6, e.answer7);
+					p->setanswer(7, e.answer8);
 				}
 				break;
 			}

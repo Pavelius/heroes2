@@ -206,18 +206,3 @@ const shapei* moveablei::getshape() const {
 	default: return 0;
 	}
 }
-
-bool moveablei::isonetime() const {
-	switch(element.type) {
-	case Artifact: return true;
-	case Resource: return true;
-	case Object:
-		switch(element.object) {
-		case TreasureChest: return true;
-		case CampFire: return true;
-		case WaterChest: return true;
-		}
-		break;
-	}
-	return false;
-}

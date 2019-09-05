@@ -183,6 +183,7 @@
     <ClCompile Include="shape.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="speed.cpp" />
+    <ClCompile Include="sphinx.cpp" />
     <ClCompile Include="string.cpp" />
     <ClCompile Include="stringbuilder.cpp" />
     <ClCompile Include="szdup.cpp" />

@@ -63,6 +63,21 @@ monster_s getmonster(object_s type) {
 	}
 }
 
+bool moveablei::isonetime() const {
+	switch(element.type) {
+	case Artifact: return true;
+	case Resource: return true;
+	case Object:
+		switch(element.object) {
+		case TreasureChest: return true;
+		case CampFire: return true;
+		case WaterChest: return true;
+		}
+		break;
+	}
+	return false;
+}
+
 void heroi::gainmine(const char* text, resource_s mine) {
 	string str;
 	str.add(text, mine_names_of[mine]);
@@ -70,37 +85,6 @@ void heroi::gainmine(const char* text, resource_s mine) {
 	str.add("\n");
 	str.addi(mine, playeri::getmineincome(mine), 1);
 	message(str);
-}
-
-bool heroi::interact(moveablei& object, object_s type, const char* text) {
-	string str;
-	switch(type) {
-	case GoblinHut:
-	case DwarfCottage:
-	case ArcherHouse:
-	case SpriteHouse:
-	case PeasantHut:
-	case HalflingHole:
-		str.add(text, bsmeta<monsteri>::elements[getmonster(type)].multiname);
-		if(ask(str)) {
-		}
-		break;
-	case Mines:
-		gainmine(text, object.getresource());
-		object.player = getplayer()->getid();
-		break;
-	case SawMill:
-		gainmine(text, Wood);
-		object.player = getplayer()->getid();
-		break;
-	case AlchemyLab:
-		gainmine(text, Mercury);
-		object.player = getplayer()->getid();
-		break;
-	default:
-		return false;
-	}
-	return true;
 }
 
 void heroi::gain(resource_s type, unsigned short count) {
@@ -118,18 +102,25 @@ void heroi::gain(resource_s type, unsigned short count) {
 	}
 }
 
+void heroi::add(const costi& v) {
+	auto player = getplayer();
+	if(player)
+		player->getresources() += v;
+}
+
 void heroi::add(const variantcol& v) {
 	costi cost;
-	auto player = getplayer();
 	switch(v.element.type) {
 	case Resource:
 		cost.clear();
 		cost.add(v.element.resource, v.count);
-		if(player)
-			player->getresources() += cost;
+		add(cost);
 		break;
 	case Artifact:
 		add(v.element.artifact);
+		break;
+	case Monster:
+		armyi::add(v.element.monster, v.count);
 		break;
 	case Ability:
 		switch(v.element.ability) {
@@ -147,6 +138,60 @@ void heroi::add(const variantcol& v) {
 	}
 }
 
+bool heroi::interact(moveablei& object, object_s type, const char* text, const char* text_fail) {
+	costi cost;
+	string str;
+	monster_s monster;
+	switch(type) {
+	case GoblinHut:
+	case DwarfCottage:
+	case ArcherHouse:
+	case SpriteHouse:
+	case PeasantHut:
+	case HalflingHole:
+		monster = getmonster(type);
+		if(!object.value2) {
+			str.add(text_fail, bsmeta<monsteri>::elements[monster].multiname);
+			message(str);
+		} else {
+			str.add(text, bsmeta<monsteri>::elements[monster].multiname);
+			if(ask(str)) {
+				variantcol e;
+				e.element = monster;
+				e.count = object.value2;
+				add(e);
+				object.value2 = 0;
+			}
+		}
+		break;
+	case Mines:
+		gainmine(text, object.getresource());
+		object.player = getplayer()->getid();
+		break;
+	case SawMill:
+		gainmine(text, Wood);
+		object.player = getplayer()->getid();
+		break;
+	case AlchemyLab:
+		gainmine(text, Mercury);
+		object.player = getplayer()->getid();
+		break;
+	case CampFire:
+		cost.clear();
+		cost.add(Gold, xrand(5, 10) * 100);
+		cost.add(resource_s(xrand(Wood, Gems)), xrand(2, 6));
+		str.add(text);
+		str.addsep();
+		str.addi(cost);
+		message(str);
+		add(cost);
+		break;
+	default:
+		return false;
+	}
+	return true;
+}
+
 bool heroi::interact(moveablei& object) {
 	const objecti* po;
 	switch(object.element.type) {
@@ -161,7 +206,7 @@ bool heroi::interact(moveablei& object) {
 			auto& e = po->actions.data[object.value2];
 			return interact(e.type, e.variants, e.text ? e.text : po->text);
 		} else
-			return interact(object, object.element.object, po->text);
+			return interact(object, object.element.object, po->text, po->text_fail);
 	}
 	return true;
 }

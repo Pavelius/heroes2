@@ -160,7 +160,7 @@ int	heroi::getmpmax() const {
 
 void heroi::add(artifact_s id) {
 	for(auto& e : artifacts) {
-		if(e)
+		if(e!=NoArtifact)
 			continue;
 		e = id;
 		break;

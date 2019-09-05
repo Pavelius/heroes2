@@ -236,5 +236,8 @@
     <ClCompile Include="szdup.cpp">
       <Filter>Утилиты</Filter>
     </ClCompile>
+    <ClCompile Include="sphinx.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

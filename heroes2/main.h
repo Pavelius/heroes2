@@ -292,9 +292,14 @@ struct costi {
 };
 struct namei {
 	const char*				name;
-	constexpr operator bool() const { return name[0] != 0; }
+	constexpr operator bool() const { return name != 0; }
 	const char*				getname() const { return name; }
 	void					setname(const char* v) { name = szdup(v); }
+};
+struct positioni {
+	short unsigned			index;
+	short unsigned			getpos() const { return index; }
+	void					setpos(short unsigned v) { index = v; }
 };
 struct mapinfoi {
 	short unsigned			index;
@@ -443,10 +448,9 @@ struct moveablei {
 	const shapei*			getshape() const;
 	bool					isonetime() const;
 };
-class heroi : public namei, public armyi {
+class heroi : public namei, public armyi, public positioni {
 	kind_s					kind;
 	unsigned char			level;
-	short unsigned			index;
 	short unsigned			index_move;
 	unsigned char			portrait;
 	player_s				player;
@@ -459,6 +463,7 @@ class heroi : public namei, public armyi {
 	static void				open_artifact();
 public:
 	void					add(artifact_s id);
+	void					add(const costi& v);
 	void					add(const variantcol& v);
 	void					add(monster_s id, short unsigned count) { armyi::add(id, count); }
 	void					addexperience(unsigned count, bool interactive = true);
@@ -484,7 +489,6 @@ public:
 	int						getlevel() const { return level; }
 	unsigned				getlearn(variantcol* skill, unsigned count) const;
 	unsigned char			getportrait() const { return portrait; }
-	short unsigned			getpos() const { return index; }
 	int						getspmax() const;
 	int						getsprefresh() const;
 	int						getskillscount() const;
@@ -493,7 +497,7 @@ public:
 	void					input(const playeri* player) const;
 	bool					interact(short unsigned index, const pvar& object);
 	bool					interact(moveablei& object);
-	bool					interact(moveablei& object, object_s type, const char* text);
+	bool					interact(moveablei& object, object_s type, const char* text, const char* text_fail);
 	bool					interact(interact_s type, const variantcol* variants, const char* text);
 	bool					is(spell_s v) const { return spellbook.is(v); }
 	bool					isadventure() const { return index != Blocked; }
@@ -510,16 +514,14 @@ public:
 	void					set(player_s v) { player = v; }
 	void					setmove(short unsigned i) { index_move = i; }
 	void					setportrait(unsigned char i) { portrait = i; }
-	void					setpos(short unsigned i) { index = i; }
 	void					show(bool allow_change = true) const;
 	void					showbook(spell_type_s mode);
 };
-class castlei : public namei, public armyi {
+class castlei : public namei, public armyi, public positioni {
 	cflags<building_s>		buildings;
 	spellbooki				mageguild;
 	kind_s					kind;
 	player_s				player;
-	short unsigned			index;
 	short unsigned			population[6];
 	building_s				getupgraded(building_s v) const;
 	void					paint_panel(int x, int y, const heroi* hero) const;
@@ -543,7 +545,6 @@ public:
 	kind_s					getkind() const { return kind; }
 	static monster_s		getmonster(building_s building, kind_s kind);
 	playeri*				getplayer() const { return bsmeta<playeri>::elements + player; }
-	short unsigned			getpos() const { return index; }
 	static cflags<building_s> getprereqisit(building_s v, kind_s k);
 	static int				getstatueincome() { return 250; }
 	static int				gettavernmorale() { return 1; }
@@ -570,7 +571,6 @@ public:
 	void					set(player_s v) { player = v; }
 	void					set(building_s v) { buildings.add(v); }
 	void					set(kind_s v) { kind = v; }
-	void					setpos(short unsigned v) { index = v; }
 	void					show();
 	void					well();
 	void					remove(building_s v) { buildings.remove(v); }
@@ -688,7 +688,7 @@ public:
 	artifact_s				artifact(int level = 0);
 	const char*				castlename();
 	monster_s				monster(int level = 0);
-	resource_s				resource();
+	static resource_s		resource();
 };
 struct casei {
 	unsigned short			chance;
@@ -699,6 +699,7 @@ struct casei {
 struct objecti {
 	const char*				name;
 	const char*				text;
+	const char*				text_fail;
 	const aref<casei>		actions;
 };
 class string : public stringbuilder {
@@ -722,8 +723,7 @@ struct shapei {
 	unsigned char			initialized;
 	bool					is(short unsigned index) const;
 };
-class eventi : public namei {
-	short unsigned			index;
+class eventi : public namei, public positioni {
 	playerf					players;
 	objectf					flags;
 	artifact_s				artifact;
@@ -737,7 +737,6 @@ public:
 	void					set(artifact_s v) { artifact = v; }
 	void					set(player_s v) { players.add(v); }
 	void					set(object_flag_s v) { flags.add(v); }
-	void					setpos(short unsigned v) { index = v; }
 	void					remove(player_s v) { players.remove(v); }
 	void					remove(object_flag_s v) { flags.remove(v); }
 };
@@ -760,6 +759,16 @@ public:
 	void					setsubsequenced(short unsigned v) { subsequenced = v; }
 	void					remove(player_s v) { players.remove(v); }
 	void					remove(object_flag_s v) { flags.remove(v); }
+};
+struct answeri {
+	const char*				answers[10];
+	const char*				getanswer(int i) const { return i<int(sizeof(answers) / sizeof(answers[0])) ? answers[i] : ""; }
+	void					setanswer(int i, const char* v) { if(i < int(sizeof(answers) / sizeof(answers[0]))) answers[i] = szdup(v); }
+};
+class sphinxi : public namei, public positioni, public answeri {
+	costi					resources;
+public:
+	costi & getresources() { return resources; }
 };
 namespace map {
 extern point				camera;

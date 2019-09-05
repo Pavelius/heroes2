@@ -550,6 +550,7 @@ public:
 	bool					is(castle_flag_s v) const { return flags.is(v); }
 	bool					isallow(monster_s v) const;
 	bool					iscoastal() const;
+	static bool				isdwelling(building_s v) { return (v >= Dwelving1 && v <= Dwelving6) || (v >= Dwelving1u && v <= Dwelving6u2); }
 	static void				information(building_s v, kind_s k);
 	void					paint() const;
 	static void				paint(int x, int y, landscape_s tile, kind_s race, bool castle, bool shadow);
@@ -647,6 +648,7 @@ struct rumori {
 struct variantcol {
 	variant					element;
 	int						count;
+	int						format;
 };
 struct pvar : variant {
 	union {
@@ -696,7 +698,7 @@ class string : public stringbuilder {
 public:
 	string() : stringbuilder(buffer) {}
 	void					addh(const char* format, ...);
-	void					addi(variant v, int value = 0);
+	void					addi(variant v, int value = 0, int format = 0);
 	void					addi(const costi& v);
 	static const char*		parse(const char* p, variantcol* source, unsigned& count);
 };

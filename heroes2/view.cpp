@@ -1339,6 +1339,12 @@ int draw::imagex(int x, int y, int width, const variantcol* source, unsigned cou
 		auto x1 = x + (width - w1) / 2;
 		for(auto p = source; p < pe; p++) {
 			picture a; a.set(p->element, p->count);
+			if(p->format) {
+				if(p->format == 1)
+					a.format = "%1i/день";
+				else if(p->format == 1)
+					a.format = "%1i/неделю";
+			}
 			a.paint(x1, y, h1, p->element, p->count);
 			x1 += a.size.x;
 		}

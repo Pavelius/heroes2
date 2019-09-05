@@ -67,7 +67,8 @@ void heroi::gainmine(const char* text, resource_s mine) {
 	string str;
 	str.add(text, mine_names_of[mine]);
 	str.addsep();
-	str.addi(mine, 1);
+	str.add("\n");
+	str.addi(mine, playeri::getmineincome(mine), 1);
 	message(str);
 }
 

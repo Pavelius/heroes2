@@ -22,13 +22,18 @@ const char* string::parse(const char* p, variantcol* source, unsigned& count) {
 		p += 2;
 		char nm[3] = {p[0], p[1], 0};
 		p += 2;
-		auto pn = 0, ppn = 0;
+		auto pn = 0, ppn = 0, ppf = 0;
 		while(stringbuilder::isnum(*p))
 			pn = pn * 10 + (*p++) - '0';
 		if(p[0] == '.') {
 			p++;
 			while(stringbuilder::isnum(*p))
 				ppn = ppn * 10 + (*p++) - '0';
+		}
+		if(p[0] == '.') {
+			p++;
+			while(stringbuilder::isnum(*p))
+				ppf = ppf * 10 + (*p++) - '0';
 		}
 		iconi* pi = 0;
 		for(auto& e : icons) {
@@ -41,16 +46,17 @@ const char* string::parse(const char* p, variantcol* source, unsigned& count) {
 			source[count].element.type = pi->variant;
 			source[count].element.value = pn;
 			source[count].count = ppn;
+			source[count].format = ppf;
 			count++;
 		}
 	}
 	return p;
 }
 
-void string::addi(variant v, int value) {
+void string::addi(variant v, int value, int format) {
 	for(auto& e : icons) {
 		if(e.variant == v.type) {
-			add("$$%3%1i.%2i", v.value, value, e.nm);
+			add("$$%3%1i.%2i.%4i", v.value, value, e.nm, format);
 			break;
 		}
 	}

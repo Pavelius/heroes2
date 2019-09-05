@@ -216,9 +216,10 @@ struct drawable : point, pvar {
 						hilite_var = moveable;
 					break;
 				case SawMill:
+				case AlchemyLab:
 					imags(x, y, moveable->value, moveable->index);
 					if(moveable->player != RandomPlayer)
-						image(x + 12, y - 48, FLAG32, moveable->player);
+						image(x + 12, y - 48, FLAG32, moveable->player*2);
 					if(moveable_hilite(moveable->index, hilite_index, moveable->value))
 						hilite_var = moveable;
 					break;

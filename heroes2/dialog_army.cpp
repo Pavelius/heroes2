@@ -37,10 +37,16 @@ static void unit_edit() {
 }
 
 static void choose_unit() {
-	auto s1 = *((squadi*)hot::param);
+	auto& s = *((squadi*)hot::param);
 	if(current_unit) {
-		*((squadi*)hot::param) = *current_unit;
-		*current_unit = s1;
+		if(s.unit == current_unit->unit) {
+			s.count += current_unit->count;
+			current_unit->clear();
+		} else {
+			auto s2 = *current_unit;
+			*current_unit = s;
+			s = s2;
+		}
 		current_unit = 0;
 	} else {
 		if(hot::param && ((squadi*)hot::param)->count)

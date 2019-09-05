@@ -66,6 +66,10 @@ bool castlei::build(building_s building, bool confirm) {
 	player->getresources() -= cost;
 	set(building);
 	set(AlreadyMoved);
+	if(building>=Dwelving1 && building<=Dwelving6) {
+		auto monster = getmonster(building, getkind());
+		population[building - Dwelving1] += bsmeta<monsteri>::elements[monster].grown;
+	}
 	paint();
 	screenshoot second;
 	first.blend(second);

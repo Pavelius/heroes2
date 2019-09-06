@@ -600,6 +600,10 @@ res_s draw::getres(unsigned char object) {
 	}
 }
 
+short unsigned drawobji::getid() const {
+	return this - bsmeta<drawobji>::elements;
+}
+
 void drawobji::initialize() {
 	// Initialize shapes
 	for(auto& e : bsmeta<drawobji>::elements) {

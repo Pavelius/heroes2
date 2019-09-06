@@ -18,12 +18,10 @@ static unsigned char random(const aref<casei>& source) {
 	return 0;
 }
 
-unsigned char gamei::getrandom(variant e) {
-	if(e.type == Object) {
-		auto& m = bsmeta<objecti>::elements[e.object];
-		if(m.actions)
-			return random(m.actions);
-	}
+unsigned char gamei::getrandom(object_s e) {
+	auto& m = bsmeta<objecti>::elements[e];
+	if(m.actions)
+		return random(m.actions);
 	return 0;
 }
 
@@ -138,7 +136,7 @@ void heroi::add(const variantcol& v) {
 }
 
 bool heroi::isvisited(const moveablei& object) const {
-	switch(object.type) {
+	switch(object.gettype()) {
 	case MagicWell:
 		return get(SpellPoints) >= getspmax();
 	case Shrine1:
@@ -163,7 +161,7 @@ bool heroi::interact(moveablei& object, object_s type, const char* text, const c
 	case PeasantHut:
 	case HalflingHole:
 		monster = getmonster(type);
-		if(!object.value2) {
+		if(!object.count) {
 			str.add(text_fail, bsmeta<monsteri>::elements[monster].multiname);
 			message(str);
 		} else {
@@ -171,23 +169,23 @@ bool heroi::interact(moveablei& object, object_s type, const char* text, const c
 			if(ask(str)) {
 				variantcol e;
 				e.element = monster;
-				e.count = object.value2;
+				e.count = object.count;
+				object.count = 0;
 				add(e);
-				object.value2 = 0;
 			}
 		}
 		break;
 	case Mines:
 		gainmine(text, object.getresource());
-		object.player = getplayer()->getid();
+		object.setowner(getplayer()->getid());
 		break;
 	case SawMill:
 		gainmine(text, Wood);
-		object.player = getplayer()->getid();
+		object.setowner(getplayer()->getid());
 		break;
 	case AlchemyLab:
 		gainmine(text, Mercury);
-		object.player = getplayer()->getid();
+		object.setowner(getplayer()->getid());
 		break;
 	case CampFire:
 		cost.clear();
@@ -223,16 +221,16 @@ bool heroi::interact(moveablei& object, object_s type, const char* text, const c
 }
 
 bool heroi::interact(moveablei& object) {
-	if(object.type == ResourceObject) {
-		gain(object.getresource(), object.value);
+	if(object.is(ResourceObject)) {
+		gain(object.getresource(), object.count);
 		return true;
 	}
-	const objecti* po = bsmeta<objecti>::elements + object.type;
+	const objecti* po = bsmeta<objecti>::elements + object.gettype();
 	if(po->actions) {
-		auto& e = po->actions.data[object.value2];
+		auto& e = po->actions.data[object.subtype];
 		return interact(e.type, e.variants, e.text ? e.text : po->text);
 	} else
-		return interact(object, object.type, po->text, po->text_fail);
+		return interact(object, object.gettype(), po->text, po->text_fail);
 	return true;
 }
 

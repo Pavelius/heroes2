@@ -184,7 +184,7 @@ static void update_map_flags(bool ship_master) {
 			auto& e = bsmeta<moveablei>::elements[i];
 			if(!e)
 				continue;
-			switch(e.type) {
+			switch(e.gettype()) {
 			case MonsterObject:
 				for(auto d : all_around) {
 					auto i = map::to(e.index, d);
@@ -236,7 +236,7 @@ void map::wave(short unsigned start, int skill, int ship_master) {
 	while(path_push != path_pop) {
 		auto pos = path_stack[path_pop++];
 		auto cost = path[pos];
-		if(cost >= BlockedPath - 1024)
+		if(cost >= Blocked - 1024)
 			break;
 		snode(pos, Left, cost, skill);
 		snode(pos, Right, cost, skill);

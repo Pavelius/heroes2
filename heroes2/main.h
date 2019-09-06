@@ -435,22 +435,43 @@ public:
 	void					remove(spell_s v) { data[v / size] &= ~(1 << (v % 32)); }
 	void					set(spell_s v) { data[v / size] |= (1 << (v % 32)); }
 };
-struct moveablei {
+struct shapei {
+	unsigned char			count;
+	point					size;
+	point					points[24];
+	unsigned char			animation[24];
+	unsigned char			content[24]; // 0 - shadow, 1 - passable, 2 - blocked
+	unsigned char			indecies[24];
+	point					offset;
+	unsigned char			zero;
+	unsigned char			initialized;
+	bool					is(short unsigned start, short unsigned index) const;
+};
+class moveablei {
 	object_s				type;
-	playerf					player1;
+	playerf					player;
+public:
+	unsigned char			subtype;
 	short unsigned			drawobj;
 	short unsigned			index;
-	short unsigned			value;
-	player_s				player;
-	unsigned char			value2;
+	short unsigned			count;
 	explicit constexpr operator bool() const { return index != Blocked; }
 	void					blockpath(unsigned* path) const;
 	void					clear();
-	monster_s				getmonster() const { return monster_s(value2); }
-	resource_s				getresource() const { return resource_s(value2); }
-	const shapei*			getshape() const;
-	spell_s					getspell() const;
+	object_s				gettype() const { return type; }
+	artifact_s				getartifact() const { return artifact_s(subtype); }
+	monster_s				getmonster() const { return monster_s(subtype); }
+	player_s				getplayer() const;
+	resource_s				getresource() const { return resource_s(subtype); }
+	const shapei&			getshape() const;
+	spell_s					getspell() const { return spell_s(subtype); }
+	bool					is(player_s v) const { return player.is(v); }
+	bool					is(object_s v) const { return type==v; }
 	bool					isonetime() const;
+	bool					isplayer() const { return player.data != 0; }
+	void					set(object_s v) { type = v; }
+	void					set(player_s v) { player.add(v); }
+	void					setowner(player_s v) { player.clear(); player.add(v); }
 };
 class heroi : public namei, public armyi, public positioni {
 	kind_s					kind;
@@ -636,7 +657,7 @@ struct gamei {
 	bool					choose();
 	void					clear();
 	int						getplayers() const;
-	static unsigned char	getrandom(variant e);
+	static unsigned char	getrandom(object_s e);
 	bool					isallow(int index) const { return types[index] != NotAllowed; }
 	static bool				isresource(unsigned char object);
 	bool					load(const char* filename);
@@ -719,18 +740,6 @@ public:
 	void					addi(variant v, int value = 0, int format = 0);
 	void					addi(const costi& v);
 	static const char*		parse(const char* p, variantcol* source, unsigned& count);
-};
-struct shapei {
-	unsigned char			count;
-	point					size;
-	point					points[24];
-	unsigned char			animation[24];
-	unsigned char			content[24]; // 0 - shadow, 1 - passable, 2 - blocked
-	unsigned char			indecies[24];
-	point					offset;
-	unsigned char			zero;
-	unsigned char			initialized;
-	bool					is(short unsigned index) const;
 };
 class eventi : public namei, public positioni {
 	playerf					players;

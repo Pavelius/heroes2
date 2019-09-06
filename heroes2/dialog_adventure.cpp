@@ -32,7 +32,7 @@ struct drawable : point, pvar {
 	}
 	int	getlevel() const {
 		if(type == Moveable) {
-			switch(moveable->type) {
+			switch(moveable->gettype()) {
 			case Road: return 3;
 			case Lake: case Cliff: case Hole: return 2;
 			case Stream: case StreamDelta: return 1;
@@ -43,7 +43,7 @@ struct drawable : point, pvar {
 	}
 	int	getzpos() const {
 		if(type == Moveable) {
-			if(moveable->type == TreeKnowledge)
+			if(moveable->is(TreeKnowledge))
 				return y + 1;
 		}
 		return y;
@@ -65,7 +65,7 @@ struct drawable : point, pvar {
 		rc.x1 = x;
 		rc.y1 = y;
 		if(type == Moveable) {
-			auto& sh = bsmeta<drawobji>::elements[moveable->value].shape;
+			auto& sh = moveable->getshape();
 			rc.x1 += sh.offset.x * 32;
 			rc.y1 += sh.offset.y * 32;
 			rc.x2 += rc.x1 + sh.size.x * 32;
@@ -177,81 +177,60 @@ struct drawable : point, pvar {
 		int i;
 		switch(type) {
 		case Moveable:
-			switch(moveable->type) {
+			switch(moveable->gettype()) {
 			case MonsterObject:
 				image(x + 16, y + 30, moveable->getmonster(), moveable->index, 0, getmode(moveable->getmonster()));
 				break;
-			//case ResourceObject:
-			//	i = decode_resource[moveable->getresource()];
-			//	image(x - 32, y, OBJNRSRC, i);
-			//	image(x, y, OBJNRSRC, i + 1);
-			//	break;
+			case ResourceObject:
+				i = decode_resource[moveable->getresource()];
+				image(x - 32, y, OBJNRSRC, i);
+				image(x, y, OBJNRSRC, i + 1);
+				break;
 			case ArtifactObject:
-				i = moveable->value2 * 2;
+				i = moveable->subtype * 2;
 				image(x - 32, y, OBJNARTI, i);
 				image(x, y, OBJNARTI, i + 1);
 				break;
-			//case TreasureChest:
-			//	image(x - 32, y, OBJNRSRC, 18);
-			//	image(x, y, OBJNRSRC, 19);
-			//	break;
-			//case AncientLamp:
-			//	image(x - 32, y, OBJNRSRC, 14);
-			//	image(x, y, OBJNRSRC, 15);
-			//	break;
+			case TreasureChest:
+				image(x - 32, y, OBJNRSRC, 18);
+				image(x, y, OBJNRSRC, 19);
+				break;
+			case AncientLamp:
+				image(x - 32, y, OBJNRSRC, 14);
+				image(x, y, OBJNRSRC, 15);
+				break;
 			case Road:
-				image(x, y, ROAD, moveable->value2);
+				image(x, y, ROAD, moveable->subtype);
 				break;
 			case Stream:
-				image(x, y, STREAM, moveable->value2);
+				image(x, y, STREAM, moveable->subtype);
 				break;
 			case Mines:
 				imags(x, y, moveable->drawobj, moveable->index);
-				if(moveable->player != RandomPlayer)
-					image(x + 6, y - 26, FLAG32, moveable->player * 2);
-				image(x, y, EXTRAOVR, decode_extraovr[moveable->value2]);
-				if(moveable_hilite(moveable->index, hilite_index, moveable->drawobj))
-					hilite_var = moveable;
+				if(moveable->isplayer())
+					image(x + 6, y - 26, FLAG32, moveable->getplayer() * 2);
+				image(x, y, EXTRAOVR, decode_extraovr[moveable->getresource()]);
 				break;
 			case SawMill:
 			case AlchemyLab:
 				imags(x, y, moveable->drawobj, moveable->index);
-				if(moveable->player != RandomPlayer)
-					image(x + 12, y - 48, FLAG32, moveable->player * 2);
-				if(moveable_hilite(moveable->index, hilite_index, moveable->drawobj))
-					hilite_var = moveable;
+				if(moveable->isplayer())
+					image(x + 12, y - 48, FLAG32, moveable->getplayer() * 2);
 				break;
 			default:
 				imags(x, y, moveable->drawobj, moveable->index);
-				if(moveable_hilite(moveable->index, hilite_index, moveable->drawobj))
-					hilite_var = moveable;
 				break;
 			}
-			if(moveable->index == hilite_index)
-				hilite_var = moveable;
 			break;
 		case Hero:
 			paint_hero(x, y, hero->getkind(), hero->getdirection(), false);
 			paint_flag(x, y, hero->getplayer()->getid(), hero->getdirection(), draw::counter, true);
 			paint_shad(x, y, hero->getdirection(), 0);
-			if(hilite_index == hero->getpos())
-				hilite_var = hero;
 			break;
 		case CastleVar:
 			castlei::paint(x - 32 * 2, y - 32 * 3,
 				map::gettile(castle->getpos()),
 				castle->getkind(), !castle->is(Castle), true);
-			if(hilite_index != Blocked) {
-				point p1, p2;
-				rect rc;
-				p1.x = map::i2x(hilite_index);
-				p1.y = map::i2y(hilite_index);
-				p2.x = map::i2x(castle->getpos());
-				p2.y = map::i2y(castle->getpos());
-				rc.set(p2.x - 1, p2.y - 2, p2.x + 1, p2.y);
-				if(p1.in(rc))
-					hilite_var = castle;
-			}
 			break;
 		default:
 			break;
@@ -512,11 +491,10 @@ static void paint_tiles() {
 			imagt(x1, y1, TisGROUND32, map::tiles[index], map::flags[index] & 0x03);
 			const rect rc = {x1, y1, x1 + 31, y1 + 31};
 			if(mousein(rc)) {
-				hilite_var = map::gettile(index);
 				hilite_index = index;
 #ifdef _DEBUG
-				if(hilite_index == index)
-					rectb(rc, 0x10);
+				//if(hilite_index == index)
+				//	rectb(rc, 0x10);
 #endif
 			}
 		}
@@ -741,32 +719,32 @@ static void tips_info(bool show_resource_count, bool show_monster_count, bool sh
 	//sb.add("%1i (%2i, %3i)", hilite_index, map::i2x(hilite_index), map::i2y(hilite_index));
 	switch(hilite_var.type) {
 	case Moveable:
-		switch(hilite_var.moveable->type) {
+		switch(hilite_var.moveable->gettype()) {
 		case MonsterObject:
 			if(show_monster_count)
 				sb.addn("%1i %2",
-					hilite_var.moveable->value,
+					hilite_var.moveable->count,
 					bsmeta<monsteri>::elements[hilite_var.moveable->getmonster()].multiname);
 			else
 				sb.addn("%1 %-2",
-					armysizei::find(hilite_var.moveable->value)->name,
+					armysizei::find(hilite_var.moveable->count)->name,
 					bsmeta<monsteri>::elements[hilite_var.moveable->getmonster()].multiname);
 			break;
 		case ArtifactObject:
 			if(show_artifact_name)
-				sb.addn(getstr(artifact_s(hilite_var.moveable->value2)));
+				sb.addn(getstr(artifact_s(hilite_var.moveable->subtype)));
 			else
 				sb.addn("Артефакт");
 			break;
 		case ResourceObject:
 			if(show_resource_count)
-				sb.addn("%1i %-2", hilite_var.moveable->value,
+				sb.addn("%1i %-2", hilite_var.moveable->count,
 					bsmeta<resourcei>::elements[hilite_var.moveable->getresource()].nameof);
 			else
 				sb.addn(getstr(hilite_var.moveable->getresource()));
 			break;
-		case Object:
-			sb.addn(getstr(hilite_var.moveable->type));
+		default:
+			sb.addn(getstr(hilite_var.moveable->gettype()));
 			break;
 		}
 		break;
@@ -986,6 +964,8 @@ static void paint_screen() {
 	//paint_block(rcmap, map::camera);
 	paint_route();
 	if(mousein(rcmap)) {
+		if(hilite_index != Blocked)
+			hilite_var = map::find(hilite_index, true);
 		update_cursor();
 		if(hot::key == MouseRight && hot::pressed)
 			execute(tips_info);

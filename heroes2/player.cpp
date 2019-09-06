@@ -251,7 +251,7 @@ int	playeri::getmines(resource_s id) const {
 		auto& e = bsmeta<moveablei>::elements[i];
 		if(!e)
 			continue;
-		if(e.player != player)
+		if(!e.is(player))
 			continue;
 		result++;
 	}
@@ -303,9 +303,9 @@ costi playeri::getprofit() const {
 		auto& e = bsmeta<moveablei>::elements[i];
 		if(!e)
 			continue;
-		if(e.player != player_id)
+		if(!e.is(player_id))
 			continue;
-		switch(e.type) {
+		switch(e.gettype()) {
 		case Mines:
 			result.add(e.getresource(), getmineincome(e.getresource()));
 			break;

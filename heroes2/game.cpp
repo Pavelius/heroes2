@@ -716,7 +716,7 @@ void gamei::prepare() {
 			break;
 		case mp2obj(TreasureChest):
 			if(isresource(tiles[i].objectName1))
-				add_moveable(i1, TreasureChest, 0);
+				add_moveable(i1, TreasureChest, gamei::getrandom(TreasureChest));
 			break;
 		}
 	}

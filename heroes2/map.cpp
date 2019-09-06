@@ -137,9 +137,19 @@ pvar map::find(short unsigned index, bool rich_find) {
 		if(e.index == index)
 			pf = &e;
 		else if(rich_find) {
-			auto ps = e.getshape();
-			if(ps && ps->is(index))
-				pf = &e;
+			switch(e.gettype()) {
+			case ArtifactObject:
+			case MonsterObject:
+			case ResourceObject:
+			case TreasureChest:
+			case Road:
+			case Stream:
+				break;
+			default:
+				if(e.getshape().is(e.index, index))
+					pf = &e;
+				break;
+			}
 		}
 	}
 	if(pf)

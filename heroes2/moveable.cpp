@@ -148,8 +148,8 @@ void moveablei::clear() {
 	player = RandomPlayer;
 }
 
-void draw::imags(int x, int y, unsigned short value, unsigned short index) {
-	auto& e = bsmeta<drawobji>::elements[value];
+void draw::imags(int x, int y, unsigned short drawobj, unsigned short index) {
+	auto& e = bsmeta<drawobji>::elements[drawobj];
 	auto& sh = e.shape;
 	for(int i = 0; i < sh.count; i++) {
 		auto px = x + sh.points[i].x * 32;
@@ -161,8 +161,8 @@ void draw::imags(int x, int y, unsigned short value, unsigned short index) {
 	}
 }
 
-void draw::imagb(int x, int y, unsigned short value) {
-	auto& e = bsmeta<drawobji>::elements[value];
+void draw::imagb(int x, int y, unsigned short drawobj) {
+	auto& e = bsmeta<drawobji>::elements[drawobj];
 	auto& sh = e.shape;
 	for(int i = 0; i < sh.count; i++) {
 		auto px = x + sh.points[i].x * 32;
@@ -184,7 +184,7 @@ bool gamei::isresource(unsigned char object) {
 }
 
 void moveablei::blockpath(unsigned* path) const {
-	auto& e = bsmeta<drawobji>::elements[value];
+	auto& e = bsmeta<drawobji>::elements[drawobj];
 	auto& sh = e.shape;
 	auto x = map::i2x(index);
 	auto y = map::i2y(index);

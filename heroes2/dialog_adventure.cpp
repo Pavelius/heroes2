@@ -158,8 +158,8 @@ struct drawable : point, pvar {
 		}
 		image(x, y, icn, index_sprite + (index % 9));
 	}
-	static bool moveable_hilite(unsigned short index, unsigned short index_hilite, unsigned short value) {
-		auto& e = bsmeta<drawobji>::elements[value];
+	static bool moveable_hilite(unsigned short index, unsigned short index_hilite, unsigned short drawobj) {
+		auto& e = bsmeta<drawobji>::elements[drawobj];
 		auto& sh = e.shape;
 		for(int i = 0; i < sh.count; i++) {
 			auto type = sh.content[i];
@@ -206,24 +206,24 @@ struct drawable : point, pvar {
 				image(x, y, STREAM, moveable->value2);
 				break;
 			case Mines:
-				imags(x, y, moveable->value, moveable->index);
+				imags(x, y, moveable->drawobj, moveable->index);
 				if(moveable->player != RandomPlayer)
 					image(x + 6, y - 26, FLAG32, moveable->player * 2);
 				image(x, y, EXTRAOVR, decode_extraovr[moveable->value2]);
-				if(moveable_hilite(moveable->index, hilite_index, moveable->value))
+				if(moveable_hilite(moveable->index, hilite_index, moveable->drawobj))
 					hilite_var = moveable;
 				break;
 			case SawMill:
 			case AlchemyLab:
-				imags(x, y, moveable->value, moveable->index);
+				imags(x, y, moveable->drawobj, moveable->index);
 				if(moveable->player != RandomPlayer)
 					image(x + 12, y - 48, FLAG32, moveable->player * 2);
-				if(moveable_hilite(moveable->index, hilite_index, moveable->value))
+				if(moveable_hilite(moveable->index, hilite_index, moveable->drawobj))
 					hilite_var = moveable;
 				break;
 			default:
-				imags(x, y, moveable->value, moveable->index);
-				if(moveable_hilite(moveable->index, hilite_index, moveable->value))
+				imags(x, y, moveable->drawobj, moveable->index);
+				if(moveable_hilite(moveable->index, hilite_index, moveable->drawobj))
 					hilite_var = moveable;
 				break;
 			}

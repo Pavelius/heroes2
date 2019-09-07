@@ -339,6 +339,7 @@ struct squadi {
 	void					clear();
 	int						get(ability_s v) const;
 	int						get(ability_s v, const heroi* hero) const;
+	unsigned				getstrenght() const;
 	monster_s				getupgrade() const;
 	bool					is(tag_s v) const;
 	void					information(const heroi* hero) { show(hero, true, false, false); }
@@ -349,6 +350,7 @@ struct armyi {
 	squadi					units[5];
 	squadi*					add(monster_s v, short unsigned count);
 	squadi*					getslowest();
+	unsigned				getstrenght() const;
 	const squadi*			find(monster_s v) const;
 	bool					is(monster_s v) const { return find(v) != 0; }
 	bool					is(tag_s v) const;
@@ -523,6 +525,7 @@ class heroi : public namei, public armyi, public positioni {
 	artifact_s				artifacts[14];
 	unsigned short			abilities[SpellPoints + 1];
 	unsigned char			skills[LastSkill + 1];
+	unsigned char			visited[64];
 	spellbooki				spellbook;
 	direction_s				direction;
 	static void				open_artifact();
@@ -586,6 +589,7 @@ public:
 	void					set(player_s v) { player = v; }
 	void					setmove(short unsigned i) { index_move = i; }
 	void					setportrait(unsigned char i) { portrait = i; }
+	void					setvisit(unsigned short index);
 	void					show(bool allow_change = true) const;
 	void					showbook(spell_type_s mode);
 };
@@ -846,6 +850,7 @@ landscape_s					gettile(short unsigned index);
 inline unsigned				getweek() { return day / 7; }
 inline unsigned				getweekday() { return day % 7; }
 inline unsigned				getmonthweek() { return getweek() % 4; }
+short unsigned				getvisit(short unsigned index);
 inline int					i2x(short unsigned i) { return i % 256; }
 inline int					i2y(short unsigned i) { return i >> 8; }
 bool						is(short unsigned index, map_flag_s v);

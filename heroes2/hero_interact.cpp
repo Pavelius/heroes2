@@ -132,9 +132,14 @@ bool heroi::isvisited(const moveablei& object) const {
 	case Shrine2:
 	case Shrine3:
 		return is(object.getspell());
-	default:
-		return false;
 	}
+	if(bsmeta<objecti>::elements[object.gettype()].use == HeroUse) {
+		auto i = map::getvisit(object.index);
+		if(i == Blocked)
+			return true;
+		return (visited[i / 8] & (1 << (i & 7))) != 0;
+	}
+	return false;
 }
 
 void moveablei::setup(generator& generate) {
@@ -236,6 +241,20 @@ bool heroi::interact(moveablei& object, object_s type, const char* text, const c
 			str.addi(a);
 			message(str);
 			add(object.getartifact());
+		}
+		break;
+	case Gazebo:
+		if(isvisited(object)) {
+			str.add(text_fail);
+			message(str);
+			return false;
+		} else {
+			str.add(text);
+			str.addsep();
+			str.addi(Experience, 1000);
+			message(str);
+			addexperience(1000);
+			setvisit(object.index);
 		}
 		break;
 	default:

@@ -353,3 +353,10 @@ bool heroi::is(artifact_s v) const {
 	}
 	return false;
 }
+
+void heroi::setvisit(unsigned short index) {
+	auto i = map::getvisit(index);
+	if(i == Blocked)
+		return;
+	visited[i / 8] |= (1 << (i & 7));
+}

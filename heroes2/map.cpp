@@ -8,11 +8,15 @@ unsigned char			map::obelisc_count;
 unsigned short			map::tiles[256 * 256];
 unsigned char			map::width;
 unsigned char			map::roads[256 * 256];
+static short unsigned	visited[512];
+static unsigned			visited_count;
 
 void map::clear() {
 	width = height = obelisc_count = 0;
 	memset(tiles, 0, sizeof(tiles));
 	memset(flags, 0, sizeof(flags));
+	memset(roads, 0, sizeof(roads));
+	visited_count = 0;
 }
 
 landscape_s map::gettile(short unsigned index) {
@@ -115,6 +119,20 @@ void map::set(short unsigned index, map_flag_s v) {
 	if(index == Blocked)
 		return;
 	flags[index] |= (4 << v);
+}
+
+short unsigned map::getvisit(short unsigned index) {
+	if(index == Blocked)
+		return Blocked;
+	for(unsigned i = 0; i < visited_count; i++) {
+		if(visited[i] == index)
+			return i;
+	}
+	if(visited_count < sizeof(visited) / sizeof(visited[0])) {
+		visited[visited_count] = index;
+		return visited_count++;
+	}
+	return Blocked;
 }
 
 pvar map::find(short unsigned index, bool rich_find) {

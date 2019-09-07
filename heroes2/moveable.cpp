@@ -71,6 +71,8 @@ moveablei* add_moveable(short unsigned index, object_s v, unsigned char subtype,
 	else if(!drawobj)
 		drawobj = drawobji::find(v)->getid();
 	p->setdraw(drawobj);
+	if(bsmeta<objecti>::elements[v].use == HeroUse)
+		map::getvisit(index);
 	return p;
 }
 

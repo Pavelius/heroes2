@@ -52,6 +52,10 @@ monster_s squadi::getupgrade() const {
 	return bsmeta<monsteri>::elements[unit].upgrade;
 }
 
+unsigned squadi::getstrenght() const {
+	return bsmeta<monsteri>::elements[unit].rating * count;
+}
+
 bool armyi::is(tag_s v) const {
 	for(auto& e : units) {
 		if(!e)
@@ -98,4 +102,14 @@ squadi*	armyi::getslowest() {
 			ps = &s;
 	}
 	return ps;
+}
+
+unsigned armyi::getstrenght() const {
+	unsigned r = 0;
+	for(auto& s : units) {
+		if(!s)
+			continue;
+		r += s.getstrenght();
+	}
+	return r;
 }

@@ -653,3 +653,11 @@ const drawobji* drawobji::find(res_s res, unsigned char frame) {
 	}
 	return 0;
 }
+
+const drawobji* drawobji::find(object_s v) {
+	for(auto& e : bsmeta<drawobji>::elements) {
+		if(e.object==v)
+			return &e;
+	}
+	return 0;
+}

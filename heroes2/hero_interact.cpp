@@ -161,7 +161,7 @@ bool heroi::interact(moveablei& object, object_s type, const char* text, const c
 	case PeasantHut:
 	case HalflingHole:
 		monster = getmonster(type);
-		if(!object.count) {
+		if(!object.getcount()) {
 			str.add(text_fail, bsmeta<monsteri>::elements[monster].multiname);
 			message(str);
 		} else {
@@ -169,8 +169,8 @@ bool heroi::interact(moveablei& object, object_s type, const char* text, const c
 			if(ask(str)) {
 				variantcol e;
 				e.element = monster;
-				e.count = object.count;
-				object.count = 0;
+				e.count = object.getcount();
+				object.setcount(0);
 				add(e);
 			}
 		}
@@ -222,15 +222,20 @@ bool heroi::interact(moveablei& object, object_s type, const char* text, const c
 
 bool heroi::interact(moveablei& object) {
 	if(object.is(ResourceObject)) {
-		gain(object.getresource(), object.count);
+		gain(object.getresource(), object.getcount());
 		return true;
 	}
 	const objecti* po = bsmeta<objecti>::elements + object.gettype();
 	if(po->actions) {
-		auto& e = po->actions.data[object.subtype];
+		auto& e = po->actions.data[object.getcount()];
 		return interact(e.type, e.variants, e.text ? e.text : po->text);
 	} else
 		return interact(object, object.gettype(), po->text, po->text_fail);
+	return true;
+}
+
+bool heroi::battle(moveablei& enemy) {
+	enemy.clear();
 	return true;
 }
 
@@ -238,7 +243,10 @@ bool heroi::interact(short unsigned index, const pvar& object) {
 	switch(object.type) {
 	case Hero: break;
 	case CastleVar: break;
-	case Moveable: return interact(*object.moveable);
+	case Moveable:
+		if(object.moveable->is(MonsterObject))
+			return battle(*object.moveable);
+		return interact(*object.moveable);
 	}
 	return true;
 }

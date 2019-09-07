@@ -58,14 +58,16 @@ static bool allow_artifact(unsigned char i, int level) {
 	return bsmeta<artifacti>::elements[i].level == level;
 }
 
+static bool allow_spell(unsigned char i, int level) {
+	if(level == 0)
+		return bsmeta<spelli>::elements[i].level != 5;
+	return bsmeta<spelli>::elements[i].level == level;
+}
+
 static bool allow_monster(unsigned char i, int level) {
 	if(level == 0)
 		return bsmeta<artifacti>::elements[i].level != 4;
 	return bsmeta<monsteri>::elements[i].level == level;
-}
-
-generator::generator() {
-	memset(this, 0, sizeof(*this));
 }
 
 artifact_s generator::artifact(int level) {
@@ -86,4 +88,8 @@ resource_s generator::resource() {
 
 const char* generator::castlename() {
 	return castle_names[(castle_index++)% (sizeof(castle_names) / sizeof(castle_names[0]))];
+}
+
+spell_s	generator::spell(int level) {
+	return (spell_s)get(spells, sizeof(spells), allow_spell, level);
 }

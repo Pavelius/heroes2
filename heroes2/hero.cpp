@@ -128,6 +128,19 @@ playeri* heroi::getplayer() const {
 	return bsmeta<playeri>::elements + player;
 }
 
+int heroi::getbonus(ability_s v) const {
+	auto r = 0;
+	for(auto e : artifacts) {
+		if(e == NoArtifact)
+			continue;
+		auto i = bsmeta<artifacti>::elements[e].effect;
+		auto t = bsmeta<artifacti>::elements[e].type;
+		if(t.type == Ability && t.ability == v)
+			r += i;
+	}
+	return r;
+}
+
 int heroi::get(ability_s v) const {
 	int r;
 	switch(v) {
@@ -135,6 +148,7 @@ int heroi::get(ability_s v) const {
 	case Defence:
 	case SpellPower:
 	case Knowledge:
+		return abilities[v] + getbonus(v);
 	case SpellPoints:
 	case MovePoints:
 		return abilities[v];
@@ -155,7 +169,12 @@ int	heroi::getspmax() const {
 }
 
 int	heroi::getmpmax() const {
-	return 1000;
+	unsigned r = 1000;
+	auto s = get(Logistics);
+	s += getbonus(MovePoints);
+	if(s)
+		r = (r * (100 + s * 10)) / 100;
+	return r;
 }
 
 void heroi::add(artifact_s id) {

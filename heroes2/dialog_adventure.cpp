@@ -187,7 +187,7 @@ struct drawable : point, pvar {
 				image(x, y, OBJNRSRC, i + 1);
 				break;
 			case ArtifactObject:
-				i = moveable->subtype * 2;
+				i = moveable->getartifact() * 2;
 				image(x - 32, y, OBJNARTI, i);
 				image(x, y, OBJNARTI, i + 1);
 				break;
@@ -200,25 +200,25 @@ struct drawable : point, pvar {
 				image(x, y, OBJNRSRC, 15);
 				break;
 			case Road:
-				image(x, y, ROAD, moveable->subtype);
+				image(x, y, ROAD, moveable->getframe());
 				break;
 			case Stream:
-				image(x, y, STREAM, moveable->subtype);
+				image(x, y, STREAM, moveable->getframe());
 				break;
 			case Mines:
-				imags(x, y, moveable->drawobj, moveable->index);
+				imags(x, y, moveable->getdraw(), moveable->index);
 				if(moveable->isplayer())
 					image(x + 6, y - 26, FLAG32, moveable->getplayer() * 2);
 				image(x, y, EXTRAOVR, decode_extraovr[moveable->getresource()]);
 				break;
 			case SawMill:
 			case AlchemyLab:
-				imags(x, y, moveable->drawobj, moveable->index);
+				imags(x, y, moveable->getdraw(), moveable->index);
 				if(moveable->isplayer())
 					image(x + 12, y - 48, FLAG32, moveable->getplayer() * 2);
 				break;
 			default:
-				imags(x, y, moveable->drawobj, moveable->index);
+				imags(x, y, moveable->getdraw(), moveable->index);
 				break;
 			}
 			break;
@@ -723,22 +723,22 @@ static void tips_info(bool show_resource_count, bool show_monster_count, bool sh
 		case MonsterObject:
 			if(show_monster_count)
 				sb.addn("%1i %2",
-					hilite_var.moveable->count,
+					hilite_var.moveable->getcount(),
 					bsmeta<monsteri>::elements[hilite_var.moveable->getmonster()].multiname);
 			else
 				sb.addn("%1 %-2",
-					armysizei::find(hilite_var.moveable->count)->name,
+					armysizei::find(hilite_var.moveable->getcount())->name,
 					bsmeta<monsteri>::elements[hilite_var.moveable->getmonster()].multiname);
 			break;
 		case ArtifactObject:
 			if(show_artifact_name)
-				sb.addn(getstr(artifact_s(hilite_var.moveable->subtype)));
+				sb.addn(getstr(hilite_var.moveable->getartifact()));
 			else
 				sb.addn("Артефакт");
 			break;
 		case ResourceObject:
 			if(show_resource_count)
-				sb.addn("%1i %-2", hilite_var.moveable->count,
+				sb.addn("%1i %-2", hilite_var.moveable->getcount(),
 					bsmeta<resourcei>::elements[hilite_var.moveable->getresource()].nameof);
 			else
 				sb.addn(getstr(hilite_var.moveable->getresource()));
@@ -1023,8 +1023,15 @@ void heroi::moveto() {
 			map::setcamera(getpos());
 			paint_screen();
 			updatescreen();
-			auto object = map::find(to);
-			auto onetime = (object.type == Moveable && object.moveable->isonetime());
+			bool onetime = false;
+			pvar object;
+			if(map::is(to, AttackTile)) {
+				auto m = moveablei::findnear(to, MonsterObject);
+				if(m)
+					object = m;
+			} else
+				object = map::find(to);
+			onetime = (object.type == Moveable && object.moveable->isonetime());
 			if(object) {
 				if(!onetime) {
 					setpos(to);
@@ -1032,6 +1039,9 @@ void heroi::moveto() {
 						update_lists();
 						map::setcamera(getpos());
 						paint_screen();
+						updatescreen();
+						if(object.moveable->gettype() == MonsterObject)
+							onetime = true;
 					}
 				}
 				auto action_result = interact(to, object);

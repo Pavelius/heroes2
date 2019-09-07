@@ -225,6 +225,12 @@ enum interact_s : unsigned char {
 	TreasureCase, TreasureArtifact,
 	FightArtifact, GuardSoldier, QuestArtifact, BuyArtifact,
 };
+enum object_use_s : unsigned char {
+	NoUse, NoBlock,
+	SingleUse, PlayerUse, PlayerOwned, HeroUse,
+	Dwelling, WeekBonus, ContentUse,
+	LearnUse, SpecialUse,
+};
 typedef cflags<player_s, unsigned char> playerf;
 typedef cflags<object_flag_s, unsigned char> objectf;
 class heroi;
@@ -447,19 +453,24 @@ struct shapei {
 	unsigned char			initialized;
 	bool					is(short unsigned start, short unsigned index) const;
 };
-class moveablei {
+class moveablei : public positioni {
 	object_s				type;
 	playerf					player;
-public:
 	unsigned char			subtype;
-	short unsigned			drawobj;
-	short unsigned			index;
 	short unsigned			count;
+	short unsigned			drawobj;
+public:
 	explicit constexpr operator bool() const { return index != Blocked; }
 	void					blockpath(unsigned* path) const;
 	void					clear();
+	static moveablei*		find(short unsigned i);
+	static moveablei*		find(short unsigned index, object_s type);
+	static moveablei*		findnear(short unsigned i, object_s type);
 	object_s				gettype() const { return type; }
 	artifact_s				getartifact() const { return artifact_s(subtype); }
+	short unsigned			getcount() const { return count; }
+	short unsigned			getdraw() const { return drawobj; }
+	unsigned char			getframe() const { return subtype; }
 	monster_s				getmonster() const { return monster_s(subtype); }
 	player_s				getplayer() const;
 	resource_s				getresource() const { return resource_s(subtype); }
@@ -469,8 +480,15 @@ public:
 	bool					is(object_s v) const { return type==v; }
 	bool					isonetime() const;
 	bool					isplayer() const { return player.data != 0; }
+	void					set(artifact_s v) { subtype = v; }
+	void					set(monster_s v) { subtype = v; }
 	void					set(object_s v) { type = v; }
 	void					set(player_s v) { player.add(v); }
+	void					set(resource_s v) { subtype = v; }
+	void					set(spell_s v) { subtype = v; }
+	void					setcount(short unsigned v) { count = v; }
+	void					setdraw(short unsigned v) { drawobj = v; }
+	void					setframe(unsigned char v) { subtype = v; }
 	void					setowner(player_s v) { player.clear(); player.add(v); }
 };
 class heroi : public namei, public armyi, public positioni {
@@ -486,6 +504,7 @@ class heroi : public namei, public armyi, public positioni {
 	spellbooki				spellbook;
 	direction_s				direction;
 	static void				open_artifact();
+	int						getbonus(ability_s v) const;
 public:
 	void					add(artifact_s id);
 	void					add(const costi& v);
@@ -494,6 +513,7 @@ public:
 	void					addexperience(unsigned count, bool interactive = true);
 	int						ask(const char* format);
 	int						ask(const char* format, const variantcol* source);
+	bool					battle(moveablei& enemy);
 	bool					buymagicbook();
 	void					clear();
 	void					choose();
@@ -708,10 +728,11 @@ struct pvar : variant {
 };
 class generator {
 	unsigned char			artifacts[LastArtifact + 1];
+	unsigned char			spells[LastSpell + 1];
 	unsigned char			monsters[WaterElement + 1];
 	unsigned				castle_index;
 public:
-	generator();
+	generator() { memset(this, 0, sizeof(*this)); }
 	artifact_s				add(artifact_s v) { artifacts[v]++; return v; }
 	monster_s				add(monster_s v) { monsters[v]++; return v; }
 	static artifact_s		any_artifact(int level = 0);
@@ -719,15 +740,19 @@ public:
 	const char*				castlename();
 	monster_s				monster(int level = 0);
 	static resource_s		resource();
+	spell_s					spell(int level);
 };
 struct casei {
+	typedef void(*caseproc)(moveablei& m, casei& e);
 	unsigned short			chance;
 	interact_s				type;
 	variantcol				variants[2];
 	const char*				text;
+	caseproc				initialize;
 };
 struct objecti {
 	const char*				name;
+	object_use_s			use;
 	const char*				text;
 	const char*				text_fail;
 	const aref<casei>		actions;

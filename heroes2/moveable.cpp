@@ -74,23 +74,36 @@ moveablei* add_moveable(short unsigned index, object_s v, unsigned char subtype,
 		break;
 	case MonsterObject:
 		switch(bsmeta<monsteri>::elements[subtype].level) {
-		case 2: count = xrand(8, 14); break;
+		case 2: count = xrand(8, 16); break;
 		case 3: count = xrand(4, 7); break;
 		case 4: count = xrand(1, 3); break;
-		default: count = xrand(12, 30); break;
+		default: count = xrand(17, 30); break;
 		}
 		break;
 	case TreasureChest:
-		drawobj = drawobji::find(OBJNRSRC, 18)->getid();
+		count = gamei::getrandom(TreasureChest);
+		break;
+	case GoblinHut:
+	case ThatchedHut:
+	case HalflingHole:
+	case SpriteHouse:
+		count = xrand(20, 30);
+		break;
+	case ArcherHouse:
+	case DwarfCottage:
+		count = xrand(15, 25);
 		break;
 	default:
+		count = gamei::getrandom(v);
 		break;
 	}
+	if(!drawobj)
+		drawobj = drawobji::find(v)->getid();
 	p->set(v);
-	p->index = index;
-	p->drawobj = drawobj;
-	p->subtype = subtype;
-	p->count = count;
+	p->setcount(count);
+	p->setframe(subtype);
+	p->setpos(index);
+	p->setdraw(drawobj);
 	return p;
 }
 
@@ -121,7 +134,7 @@ moveablei* add_object(unsigned short index, unsigned char object, unsigned char 
 		if(last_object) {
 			// Abandone mine and Mountain Mines has overlay just after their objects
 			if(last_object->is(Mines) || last_object->is(AbandoneMine))
-				last_object->subtype = maptbl(frame2resource, frame);
+				last_object->set(maptbl(frame2resource, frame));
 		}
 		return last_object;
 	case STREAM:
@@ -216,4 +229,37 @@ player_s moveablei::getplayer() const {
 			return i;
 	}
 	return RandomPlayer;
+}
+
+moveablei* moveablei::find(short unsigned index) {
+	for(unsigned i = 0; i < bsmeta<moveablei>::count; i++) {
+		if(bsmeta<moveablei>::elements[i].index == index)
+			return &bsmeta<moveablei>::elements[i];
+	}
+	return 0;
+}
+
+moveablei* moveablei::find(short unsigned index, object_s type) {
+	for(unsigned i = 0; i < bsmeta<moveablei>::count; i++) {
+		if(bsmeta<moveablei>::elements[i].index == index
+			&& bsmeta<moveablei>::elements[i].type==type)
+			return &bsmeta<moveablei>::elements[i];
+	}
+	return 0;
+}
+
+moveablei* moveablei::findnear(short unsigned i, object_s type) {
+	static direction_s all[] = {Left, Right, Up, Down, LeftUp, LeftDown, RightUp, RightDown};
+	auto p = find(i, type);
+	if(p)
+		return p;
+	for(auto d : all) {
+		auto i1 = map::to(i, d);
+		if(i1 == Blocked)
+			continue;
+		auto p = find(i1, type);
+		if(p)
+			return p;
+	}
+	return 0;
 }

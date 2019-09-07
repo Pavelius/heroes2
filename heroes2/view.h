@@ -174,6 +174,7 @@ struct drawobji			{
 	unsigned char			first;
 	unsigned char			last;
 	static const drawobji*	find(res_s res, unsigned char frame);
+	static const drawobji*	find(object_s v);
 	short unsigned			getid() const;
 	static void				initialize();
 };

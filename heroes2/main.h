@@ -677,7 +677,7 @@ struct monsteri {
 	costi					cost;
 	building_s				building;
 	monster_s				upgrade;
-	int						rating;
+	unsigned				rating;
 	//
 	constexpr bool			isarcher() const { return shoots != 0; }
 	monster_s				getid() const;

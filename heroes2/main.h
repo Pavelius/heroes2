@@ -222,8 +222,9 @@ enum object_flag_s : unsigned char {
 	Used, OneUse, AllowComputer,
 };
 enum interact_s : unsigned char {
-	TreasureCase, TreasureArtifact,
-	FightArtifact, GuardSoldier, QuestArtifact, BuyArtifact,
+	NoCase,
+	TreasureCase, TreasureArtifact, TreasureCost,
+	FightArtifact, GuardSoldier, BuyArtifact,
 };
 enum object_use_s : unsigned char {
 	NoUse, NoBlock,
@@ -453,6 +454,24 @@ struct shapei {
 	unsigned char			initialized;
 	bool					is(short unsigned start, short unsigned index) const;
 };
+class generator {
+	unsigned char			artifacts[LastArtifact + 1];
+	unsigned char			skills[LastSpell + 1];
+	unsigned char			spells[LastSpell + 1];
+	unsigned char			monsters[WaterElement + 1];
+	unsigned				castle_index;
+public:
+	generator() { memset(this, 0, sizeof(*this)); }
+	artifact_s				add(artifact_s v) { artifacts[v]++; return v; }
+	monster_s				add(monster_s v) { monsters[v]++; return v; }
+	static artifact_s		any_artifact(int level = 0);
+	artifact_s				artifact(int level = 0);
+	const char*				castlename();
+	monster_s				monster(int level = 0);
+	static resource_s		resource();
+	skill_s					skill();
+	spell_s					spell(int level);
+};
 class moveablei : public positioni {
 	object_s				type;
 	playerf					player;
@@ -478,7 +497,7 @@ public:
 	spell_s					getspell() const { return spell_s(subtype); }
 	bool					is(player_s v) const { return player.is(v); }
 	bool					is(object_s v) const { return type==v; }
-	bool					isonetime() const;
+	bool					is(object_use_s v) const;
 	bool					isplayer() const { return player.data != 0; }
 	void					set(artifact_s v) { subtype = v; }
 	void					set(monster_s v) { subtype = v; }
@@ -486,10 +505,12 @@ public:
 	void					set(player_s v) { player.add(v); }
 	void					set(resource_s v) { subtype = v; }
 	void					set(spell_s v) { subtype = v; }
+	void					set(skill_s v) { subtype = v; }
 	void					setcount(short unsigned v) { count = v; }
 	void					setdraw(short unsigned v) { drawobj = v; }
 	void					setframe(unsigned char v) { subtype = v; }
 	void					setowner(player_s v) { player.clear(); player.add(v); }
+	void					setup(generator& generate);
 };
 class heroi : public namei, public armyi, public positioni {
 	kind_s					kind;
@@ -518,7 +539,9 @@ public:
 	void					clear();
 	void					choose();
 	static const costi		cost;
+	void					disappear() const;
 	static heroi*			find(short unsigned index);
+	void					focusing() const;
 	void					gain(resource_s type, unsigned short count);
 	void					gainmine(const char* text, resource_s mine);
 	playeri*				getplayer() const;
@@ -677,7 +700,6 @@ struct gamei {
 	bool					choose();
 	void					clear();
 	int						getplayers() const;
-	static unsigned char	getrandom(object_s e);
 	bool					isallow(int index) const { return types[index] != NotAllowed; }
 	static bool				isresource(unsigned char object);
 	bool					load(const char* filename);
@@ -707,6 +729,7 @@ struct variantcol {
 	variant					element;
 	int						count;
 	int						format;
+	constexpr explicit operator bool() const { return element.type != NoVariant; }
 };
 struct pvar : variant {
 	union {
@@ -725,22 +748,6 @@ struct pvar : variant {
 	constexpr bool operator==(const pvar& e) const { return type == e.type && value == e.value; }
 	constexpr explicit operator bool() const { return type != NoVariant; }
 	void					clear() { type = NoVariant; variant::value = 0; value = 0; }
-};
-class generator {
-	unsigned char			artifacts[LastArtifact + 1];
-	unsigned char			spells[LastSpell + 1];
-	unsigned char			monsters[WaterElement + 1];
-	unsigned				castle_index;
-public:
-	generator() { memset(this, 0, sizeof(*this)); }
-	artifact_s				add(artifact_s v) { artifacts[v]++; return v; }
-	monster_s				add(monster_s v) { monsters[v]++; return v; }
-	static artifact_s		any_artifact(int level = 0);
-	artifact_s				artifact(int level = 0);
-	const char*				castlename();
-	monster_s				monster(int level = 0);
-	static resource_s		resource();
-	spell_s					spell(int level);
 };
 struct casei {
 	typedef void(*caseproc)(moveablei& m, casei& e);
@@ -764,6 +771,7 @@ public:
 	void					addh(const char* format, ...);
 	void					addi(variant v, int value = 0, int format = 0);
 	void					addi(const costi& v);
+	void					addi(const variantcol& v);
 	static const char*		parse(const char* p, variantcol* source, unsigned& count);
 };
 class eventi : public namei, public positioni {

@@ -999,6 +999,22 @@ void playeri::adventure() {
 	}
 }
 
+void heroi::disappear() const {
+	screenshoot first;
+	update_lists();
+	update_drawables();
+	paint_screen();
+	screenshoot second;
+	first.blend(second);
+}
+
+void heroi::focusing() const {
+	update_lists();
+	map::setcamera(getpos());
+	paint_screen();
+	updatescreen();
+}
+
 void heroi::moveto() {
 	if(map::getpathcount() < 2)
 		return;
@@ -1020,10 +1036,7 @@ void heroi::moveto() {
 		if(map::is(to, ActionTile) || map::is(to, AttackTile)) {
 			setmove(Blocked);
 			map::clearpath();
-			map::setcamera(getpos());
-			paint_screen();
-			updatescreen();
-			bool onetime = false;
+			focusing();
 			pvar object;
 			if(map::is(to, AttackTile)) {
 				auto m = moveablei::findnear(to, MonsterObject);
@@ -1031,34 +1044,19 @@ void heroi::moveto() {
 					object = m;
 			} else
 				object = map::find(to);
-			onetime = (object.type == Moveable && object.moveable->isonetime());
+			auto onetime = (object.type == Moveable && object.moveable->is(SingleUse));
 			if(object) {
 				if(!onetime) {
 					setpos(to);
-					if(interactive) {
-						update_lists();
-						map::setcamera(getpos());
-						paint_screen();
-						updatescreen();
-						if(object.moveable->gettype() == MonsterObject)
-							onetime = true;
-					}
+					focusing();
+					if(object.moveable->gettype() == MonsterObject)
+						onetime = true;
 				}
 				auto action_result = interact(to, object);
 				if(onetime && action_result) {
-					// If one time object taken then make it disapear
-					auto applied = false;
-					screenshoot first;
 					if(object.type == Moveable) {
 						object.moveable->clear();
-						applied = true;
-					}
-					if(applied) {
-						update_lists();
-						update_drawables();
-						paint_screen();
-						screenshoot second;
-						first.blend(second);
+						disappear();
 					}
 				}
 				break;
@@ -1067,12 +1065,7 @@ void heroi::moveto() {
 			setpos(to);
 			map::removestep();
 		}
-		if(interactive) {
-			update_lists();
-			map::setcamera(getpos());
-			paint_screen();
-			updatescreen();
-		}
+		focusing();
 	}
 	map::wave(getpos(), get(Pathfinding), 0);
 	if(getmove() != Blocked)

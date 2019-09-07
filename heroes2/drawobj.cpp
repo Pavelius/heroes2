@@ -24,6 +24,7 @@ static shapei sh3x2a3 = {6, {3, 2}, {{-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {0, 0}
 static shapei sh3x2u1a6 = {6, {3, 2}, {{0, -1}, {1, -1}, {-1, 0}, {0, 0}, {1, 0}, {0, 0}}, {6, 6, 0, 6, 6, 0}};
 static shapei sh3x2u1a6v2 = {5, {3, 2}, {{-1, -1}, {0, -1}, {-2, 0}, {-1, 0}, {0, 0}}, {6, 6, 6, 0, 0, 0}};
 static shapei sh3x2u2 = {4, {3, 2}, {{1, -1}, {-1, 0}, {0, 0}, {1, 0}}};
+static shapei sh3x2u2wt = {4, {3, 2}, {{0, -1}, {-2, 0}, {-1, 0}, {0, 0}}, {}, {1, 0, 0, 2}};
 static shapei sh3x2a6 = {6, {3, 2}, {{-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {0, 0}, {1, 0}}, {0, 0, 0, 6, 6, 6}};
 static shapei sh3x2a15 = {6, {3, 2}, {{-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {0, 0}, {1, 0}}, {15, 15, 15, 15, 0, 0}};
 static shapei sh3x2u1 = {5, {3, 2}, {{0, -1}, {1, -1}, {-1, 0}, {0, 0}, {1, 0}}};
@@ -529,7 +530,7 @@ drawobji bsmeta<drawobji>::elements[] = {{OBJNGRAS, AbandoneMine, sh4x2}, // Hau
 {OBJNMUL2, FreemanFoundry, sh3x2u1a6v2},
 {OBJNMUL2, MagicGarden, sh2x1},
 {OBJNMUL2, MagicGarden, sh1x1a6}, // Lephrechaunt here
-{OBJNMUL2, WatchTower, sh3x2u2},
+{OBJNMUL2, WatchTower, sh3x2u2wt},
 {OBJNMUL2, Graveyard, sh4x2gr},
 {OBJNMUL2, SawMill, sh4x2sm}, // Green grass
 {OBJNRSRC, ResourceObject, sh2x1},

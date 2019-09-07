@@ -58,56 +58,23 @@ static unsigned char getroad(unsigned char object, unsigned char index) {
 	}
 }
 
-moveablei* add_moveable(short unsigned index, object_s v, unsigned char subtype, unsigned short drawobj) {
+moveablei* add_moveable(short unsigned index, object_s v, unsigned char subtype, generator& generate, unsigned short drawobj) {
 	static unsigned char encode_resource[] = {12, 0, 2, 4, 6, 8, 10, 16};
 	auto p = bsmeta<moveablei>::add();
 	p->clear();
-	short unsigned count = 0;
-	switch(v) {
-	case ResourceObject:
-		switch(subtype) {
-		case Ore: case Wood: count = xrand(5, 10); break;
-		case Gold: count = 100 * xrand(3, 9); break;
-		default: count = xrand(3, 6); break;
-		}
-		drawobj = drawobji::find(OBJNRSRC, encode_resource[subtype])->getid();
-		break;
-	case MonsterObject:
-		switch(bsmeta<monsteri>::elements[subtype].level) {
-		case 2: count = xrand(8, 16); break;
-		case 3: count = xrand(4, 7); break;
-		case 4: count = xrand(1, 3); break;
-		default: count = xrand(17, 30); break;
-		}
-		break;
-	case TreasureChest:
-		count = gamei::getrandom(TreasureChest);
-		break;
-	case GoblinHut:
-	case ThatchedHut:
-	case HalflingHole:
-	case SpriteHouse:
-		count = xrand(20, 30);
-		break;
-	case ArcherHouse:
-	case DwarfCottage:
-		count = xrand(15, 25);
-		break;
-	default:
-		count = gamei::getrandom(v);
-		break;
-	}
-	if(!drawobj)
-		drawobj = drawobji::find(v)->getid();
 	p->set(v);
-	p->setcount(count);
 	p->setframe(subtype);
 	p->setpos(index);
+	p->setup(generate);
+	if(v==ResourceObject)
+		drawobj = drawobji::find(OBJNRSRC, encode_resource[subtype])->getid();
+	else if(!drawobj)
+		drawobj = drawobji::find(v)->getid();
 	p->setdraw(drawobj);
 	return p;
 }
 
-moveablei* add_object(unsigned short index, unsigned char object, unsigned char frame) {
+moveablei* add_object(unsigned short index, unsigned char object, unsigned char frame, generator& generate) {
 	static moveablei* last_object;
 	const drawobji* pi = 0;
 	auto icn = getres(object);
@@ -138,10 +105,10 @@ moveablei* add_object(unsigned short index, unsigned char object, unsigned char 
 		}
 		return last_object;
 	case STREAM:
-		return add_moveable(index, Stream, frame, 0);
+		return add_moveable(index, Stream, frame, generate, 0);
 	case ROAD:
 		map::roads[index] = getroad(object, frame);
-		return add_moveable(index, Road, frame, 0);
+		return add_moveable(index, Road, frame, generate, 0);
 	default:
 		pi = drawobji::find(icn, frame);
 		break;
@@ -153,7 +120,7 @@ moveablei* add_object(unsigned short index, unsigned char object, unsigned char 
 	}
 	// В конце добави новый подвижный объект
 	if(pi) {
-		last_object = add_moveable(index, pi->object, 0, pi->getid());
+		last_object = add_moveable(index, pi->object, 0, generate, pi->getid());
 		return last_object;
 	}
 	return 0;

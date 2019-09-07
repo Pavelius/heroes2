@@ -18,32 +18,28 @@ static unsigned char random(const aref<casei>& source) {
 	return 0;
 }
 
-unsigned char gamei::getrandom(object_s e) {
-	auto& m = bsmeta<objecti>::elements[e];
-	if(m.actions)
-		return random(m.actions);
-	return 0;
-}
-
 bool heroi::interact(interact_s type, const variantcol* variants, const char* text) {
 	string str;
-	artifact_s artifact;
-	int choose;
 	switch(type) {
 	case TreasureCase:
 		str.add(text);
-		choose = ask(str, variants) ? 0 : 1;
-		add(variants[choose]);
+		add(variants[ask(str, variants) ? 0 : 1]);
 		break;
 	case TreasureArtifact:
-		artifact = variants[0].element.artifact;
-		if(artifact == ThunderMace)
-			artifact = generator::any_artifact(1);
-		str.add(text, getstr(artifact));
+		str.add(text, getstr(variants[0].element.artifact));
 		str.addsep();
-		str.addi(artifact);
+		str.addi(variants[0].element.artifact);
 		message(str);
-		add(artifact);
+		add(variants[0].element.artifact);
+		break;
+	case TreasureCost:
+		str.add(text);
+		str.addsep();
+		str.addi(variants[0]);
+		str.addi(variants[1]);
+		message(str);
+		add(variants[0]);
+		add(variants[1]);
 		break;
 	}
 	return true;
@@ -61,15 +57,8 @@ monster_s getmonster(object_s type) {
 	}
 }
 
-bool moveablei::isonetime() const {
-	switch(type) {
-	case ArtifactObject: return true;
-	case ResourceObject: return true;
-	case TreasureChest: return true;
-	case CampFire: return true;
-	case WaterChest: return true;
-	}
-	return false;
+bool moveablei::is(object_use_s v) const {
+	return bsmeta<objecti>::elements[type].use==v;
 }
 
 void heroi::gainmine(const char* text, resource_s mine) {
@@ -148,8 +137,36 @@ bool heroi::isvisited(const moveablei& object) const {
 	}
 }
 
+void moveablei::setup(generator& generate) {
+	auto& m = bsmeta<objecti>::elements[type];
+	if(m.actions)
+		count = random(m.actions);
+	switch(type) {
+	case ResourceObject:
+		switch(subtype) {
+		case Ore: case Wood: count = xrand(5, 10); break;
+		case Gold: count = 100 * xrand(3, 9); break;
+		default: count = xrand(3, 6); break;
+		}
+		break;
+	case MonsterObject:
+		switch(bsmeta<monsteri>::elements[subtype].level) {
+		case 2: count = xrand(8, 16); break;
+		case 3: count = xrand(4, 7); break;
+		case 4: count = xrand(1, 3); break;
+		default: count = xrand(17, 30); break;
+		}
+		break;
+	case GoblinHut: case ThatchedHut: case HalflingHole: case SpriteHouse: count = 20; break;
+	case ArcherHouse: case DwarfCottage: count = 10; break;
+	case Shrine1: set(generate.spell(1)); break;
+	case Shrine2: set(generate.spell(2)); break;
+	case Shrine3: set(generate.spell(3)); break;
+	case WitchHut: set(generate.skill()); break;
+	}
+}
+
 bool heroi::interact(moveablei& object, object_s type, const char* text, const char* text_fail) {
-	costi cost;
 	string str;
 	monster_s monster;
 	bool allok;
@@ -187,16 +204,6 @@ bool heroi::interact(moveablei& object, object_s type, const char* text, const c
 		gainmine(text, Mercury);
 		object.setowner(getplayer()->getid());
 		break;
-	case CampFire:
-		cost.clear();
-		cost.add(Gold, xrand(5, 10) * 100);
-		cost.add(resource_s(xrand(Wood, Gems)), xrand(3, 6));
-		str.add(text);
-		str.addsep();
-		str.addi(cost);
-		message(str);
-		add(cost);
-		break;
 	case Shrine1:
 	case Shrine2:
 	case Shrine3:
@@ -214,6 +221,23 @@ bool heroi::interact(moveablei& object, object_s type, const char* text, const c
 		message(str);
 		add(variantcol{object.getspell(), 1});
 		break;
+	case WatchTower:
+		str.add(text);
+		message(str);
+		break;
+	case ArtifactObject:
+		if(true) {
+			auto a = object.getartifact();
+			auto p = bsmeta<artifacti>::elements[a].text;
+			if(!p)
+				p = text;
+			str.add(p, getstr(a));
+			str.addsep();
+			str.addi(a);
+			message(str);
+			add(object.getartifact());
+		}
+		break;
 	default:
 		return false;
 	}
@@ -228,10 +252,10 @@ bool heroi::interact(moveablei& object) {
 	const objecti* po = bsmeta<objecti>::elements + object.gettype();
 	if(po->actions) {
 		auto& e = po->actions.data[object.getcount()];
-		return interact(e.type, e.variants, e.text ? e.text : po->text);
-	} else
-		return interact(object, object.gettype(), po->text, po->text_fail);
-	return true;
+		if(e.type != NoCase)
+			return interact(e.type, e.variants, e.text ? e.text : po->text);
+	}
+	return interact(object, object.gettype(), po->text, po->text_fail);
 }
 
 bool heroi::battle(moveablei& enemy) {

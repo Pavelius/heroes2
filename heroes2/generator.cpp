@@ -93,3 +93,11 @@ const char* generator::castlename() {
 spell_s	generator::spell(int level) {
 	return (spell_s)get(spells, sizeof(spells), allow_spell, level);
 }
+
+static bool allow_all(unsigned char i, int level) {
+	return true;
+}
+
+skill_s generator::skill() {
+	return (skill_s)get(skills, sizeof(skills), allow_all, 0);
+}

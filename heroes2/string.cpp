@@ -72,6 +72,10 @@ void string::addi(const costi& v) {
 	}
 }
 
+void string::addi(const variantcol& v) {
+	addi(v.element, v.count);
+}
+
 void string::addh(const char* format, ...) {
 	addsep('\n');
 	add("##");

@@ -268,7 +268,7 @@ struct drawable : point, pvar {
 			*(static_cast<pvar*>(p)) = &e;
 			auto index = e.getpos();
 			p->x = map::i2x(index) * 32 - camera.x + rcmap.x1;
-			p->y = map::i2y(index) * 32 + 30 - camera.y + rcmap.y1;
+			p->y = map::i2y(index) * 32 + 27 - camera.y + rcmap.y1;
 			if(!p->in(rc))
 				continue;
 			if(p < pe)

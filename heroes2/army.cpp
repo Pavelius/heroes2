@@ -92,16 +92,16 @@ squadi* armyi::add(monster_s v, short unsigned count) {
 	return p;
 }
 
-squadi*	armyi::getslowest() {
+squadi*	armyi::getslowest() const {
 	auto speed = UltraFastSpeed;
-	squadi* ps = 0;
+	const squadi* ps = 0;
 	for(auto& s : units) {
 		if(!s)
 			continue;
 		if(bsmeta<monsteri>::elements[s.unit].speed <= speed)
 			ps = &s;
 	}
-	return ps;
+	return const_cast<squadi*>(ps);
 }
 
 unsigned armyi::getstrenght() const {

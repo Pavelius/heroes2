@@ -349,7 +349,7 @@ struct squadi {
 struct armyi {
 	squadi					units[5];
 	squadi*					add(monster_s v, short unsigned count);
-	squadi*					getslowest();
+	squadi*					getslowest() const;
 	unsigned				getstrenght() const;
 	const squadi*			find(monster_s v) const;
 	bool					is(monster_s v) const { return find(v) != 0; }

@@ -177,11 +177,22 @@ int	heroi::getspmax() const {
 }
 
 int	heroi::getmpmax() const {
-	unsigned r = 1000;
+	unsigned r = 1500;
+	auto sw = getslowest();
+	if(sw) {
+		switch(bsmeta<monsteri>::elements[sw->unit].speed) {
+		case UltraFastSpeed: r = 1500; break;
+		case VeryFastSpeed: r = 1400; break;
+		case FastSpeed: r = 1300; break;
+		case AverageSpeed: r = 1200; break;
+		case SlowSpeed: r = 1100; break;
+		default: r = 1000; break;
+		}
+	}
 	auto s = get(Logistics);
-	s += getbonus(MovePoints);
 	if(s)
 		r = (r * (100 + s * 10)) / 100;
+	s += getbonus(MovePoints)*100;
 	return r;
 }
 

@@ -18,7 +18,7 @@ static unsigned char random(const aref<casei>& source) {
 	return 0;
 }
 
-bool heroi::interact(interact_s type, const variantcol* variants, const char* text) {
+bool heroi::interact(interact_s type, const variantcol* variants, const char* text, unsigned char param) {
 	string str;
 	switch(type) {
 	case TreasureCase:

@@ -87,3 +87,15 @@ squadi* armyi::add(monster_s v, short unsigned count) {
 	p->count += count;
 	return p;
 }
+
+squadi*	armyi::getslowest() {
+	auto speed = UltraFastSpeed;
+	squadi* ps = 0;
+	for(auto& s : units) {
+		if(!s)
+			continue;
+		if(bsmeta<monsteri>::elements[s.unit].speed <= speed)
+			ps = &s;
+	}
+	return ps;
+}

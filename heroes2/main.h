@@ -348,6 +348,7 @@ struct squadi {
 struct armyi {
 	squadi					units[5];
 	squadi*					add(monster_s v, short unsigned count);
+	squadi*					getslowest();
 	const squadi*			find(monster_s v) const;
 	bool					is(monster_s v) const { return find(v) != 0; }
 	bool					is(tag_s v) const;
@@ -567,7 +568,7 @@ public:
 	bool					interact(short unsigned index, const pvar& object);
 	bool					interact(moveablei& object);
 	bool					interact(moveablei& object, object_s type, const char* text, const char* text_fail);
-	bool					interact(interact_s type, const variantcol* variants, const char* text);
+	bool					interact(interact_s type, const variantcol* variants, const char* text, unsigned char param);
 	bool					is(artifact_s v) const;
 	bool					is(spell_s v) const { return spellbook.is(v); }
 	bool					isadventure() const { return index != Blocked; }

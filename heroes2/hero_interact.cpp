@@ -253,7 +253,7 @@ bool heroi::interact(moveablei& object) {
 	if(po->actions) {
 		auto& e = po->actions.data[object.getcount()];
 		if(e.type != NoCase)
-			return interact(e.type, e.variants, e.text ? e.text : po->text);
+			return interact(e.type, e.variants, e.text ? e.text : po->text, object.getframe());
 	}
 	return interact(object, object.gettype(), po->text, po->text_fail);
 }

@@ -76,11 +76,12 @@ void castlei::paint_monster(int x, int y, int height, int width, int level) {
 	y += field(x + 210, y, sq, Defence);
 	y += field(x + 210, y, sq, DamageMin, DamageMax, "Урон", "%1i-%2i");
 	y += field(x + 210, y, sq, HitPointsMax);
-	//y += field(x + 210, y, monster, Rating, szt("Rate", "Рейт"));
 	y += draw::texth();
-	y += field(x + 210, y, 0, bsmeta<speedi>::elements[sq.get(Speed)].name);
-	if(allow)
+	y += field(x + 210, y, 0, getstr(speed_s(sq.get(Speed))));
+	if(allow) {
 		y += field(x + 210, y, 0, "Прирост +%1i", getgrowth(dwl));
+		y += field(x + 210, y, 0, "Рейт %1i", bsmeta<monsteri>::elements[sq.unit].rating);
+	}
 }
 
 void castlei::well() {

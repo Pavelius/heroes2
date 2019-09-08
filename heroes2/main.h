@@ -225,7 +225,7 @@ enum interact_s : unsigned char {
 	NoCase,
 	TreasureCase, TreasureArtifact, TreasureCost,
 	FightArtifact, GuardSoldier, BuyArtifact,
-	JoinDwelling,
+	JoinDwelling, IncreaseAbility,
 };
 enum reaction_s : unsigned char {
 	ReactionHostile, ReactionIndifferent, ReactionFriendly,

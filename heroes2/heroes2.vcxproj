@@ -158,6 +158,7 @@
     <ClCompile Include="generator.cpp" />
     <ClCompile Include="hero_interact.cpp" />
     <ClCompile Include="indexes.cpp" />
+    <ClCompile Include="interact.cpp" />
     <ClCompile Include="kind.cpp" />
     <ClCompile Include="landscape.cpp" />
     <ClCompile Include="level.cpp" />

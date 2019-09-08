@@ -225,6 +225,10 @@ enum interact_s : unsigned char {
 	NoCase,
 	TreasureCase, TreasureArtifact, TreasureCost,
 	FightArtifact, GuardSoldier, BuyArtifact,
+	JoinDwelling,
+};
+enum reaction_s : unsigned char {
+	ReactionHostile, ReactionIndifferent, ReactionFriendly,
 };
 enum object_use_s : unsigned char {
 	NoUse, NoBlock,
@@ -294,6 +298,7 @@ struct costi {
 	void					clear();
 	void					correct();
 	int						get(resource_s v) const { return data[v]; }
+	costi					getonly(resource_s id) const;
 	int						mindiv(const costi& e) const;
 	void					paint(int x, int y) const;
 };
@@ -349,6 +354,7 @@ struct squadi {
 struct armyi {
 	squadi					units[5];
 	squadi*					add(monster_s v, short unsigned count);
+	squadi*					getsquad(monster_s v) const;
 	squadi*					getslowest() const;
 	unsigned				getstrenght() const;
 	const squadi*			find(monster_s v) const;
@@ -478,6 +484,7 @@ public:
 class moveablei : public positioni {
 	object_s				type;
 	playerf					player;
+	reaction_s				reaction;
 	unsigned char			subtype;
 	short unsigned			count;
 	short unsigned			drawobj;
@@ -495,6 +502,7 @@ public:
 	unsigned char			getframe() const { return subtype; }
 	monster_s				getmonster() const { return monster_s(subtype); }
 	player_s				getplayer() const;
+	reaction_s				getreaction() const { return reaction; }
 	resource_s				getresource() const { return resource_s(subtype); }
 	const shapei&			getshape() const;
 	spell_s					getspell() const { return spell_s(subtype); }
@@ -506,6 +514,7 @@ public:
 	void					set(monster_s v) { subtype = v; }
 	void					set(object_s v) { type = v; }
 	void					set(player_s v) { player.add(v); }
+	void					set(reaction_s v) { reaction = v; }
 	void					set(resource_s v) { subtype = v; }
 	void					set(spell_s v) { subtype = v; }
 	void					set(skill_s v) { subtype = v; }
@@ -715,8 +724,9 @@ private:
 	void					updatebase();
 };
 struct interacti {
-	const char*				id;
+	interact_s				id;
 	const char*				text;
+	const char*				fail;
 };
 struct hightscore {
 	char					name[32];

@@ -239,5 +239,8 @@
     <ClCompile Include="sphinx.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="interact.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -278,6 +278,63 @@ bool heroi::interact(moveablei& object) {
 }
 
 bool heroi::battle(moveablei& enemy) {
+	string str;
+	auto unit_total = enemy.getcount();
+	auto unit_type = enemy.getmonster();
+	auto& opponent = bsmeta<heroi>::elements[RandomHero];
+	opponent.clear();
+	opponent.add(enemy.getmonster(), unit_total);
+	auto pf = getsquad(unit_type);
+	auto s1 = getstrenght();
+	auto s2 = opponent.getstrenght();
+	auto ra = enemy.getreaction();
+	auto player = getplayer();
+	if(!s2 || !s1)
+		return false;
+	auto kf = s1 / s2;
+	if(!is(HideousMask)) {
+		if(ra >= ReactionIndifferent) {
+			if(ra == ReactionFriendly || kf >= 2) {
+				str.add("%1 впечатены вашей армией и хотят присоединиться к вашему войску. Согласны ли вы их принять?");
+				if(ask(str)) {
+					pf->unit = unit_type;
+					pf->count += unit_total;
+					enemy.clear();
+					return true;
+				}
+			}
+		}
+		if(get(Diplomacy) && unit_total>1) {
+			auto gold_cost = bsmeta<monsteri>::elements[enemy.getmonster()].cost.get(Gold) * unit_total;
+			auto unit_join = 0;
+			switch(get(Diplomacy)) {
+			case 1: unit_join = unit_total * 25 / 100; break;
+			case 2: unit_join = unit_total * 50 / 100; break;
+			case 3: unit_join = unit_total * 75 / 100; break;
+			}
+			if(unit_join < 1)
+				unit_join = 1;
+			if(player->getresources().get(Gold) >= gold_cost) {
+				str.add("Воины покорены вашим шармом и выдвинули предложение:\n\n");
+				str.adds("%1i из %2i %-3 вступят в ряды вашей армии, а оставшиеся оставят вас в покое за %4i золотых.",
+					unit_join, unit_total, bsmeta<monsteri>::elements[unit_type].multiname, gold_cost);
+				str.adds("Вы согласны?");
+				if(ask(str)) {
+					pf->unit = unit_type;
+					pf->count += unit_join;
+					player->getresources().data[Gold] -= gold_cost;
+					enemy.clear();
+				}
+			}
+		}
+	}
+	if(kf >= 5) {
+		str.add("%1 испуганы силой вашей армии и пытаются бежать. Будете ли вы их приследовать?");
+		if(!ask(str)) {
+			enemy.clear();
+			return false;
+		}
+	}
 	enemy.clear();
 	return true;
 }

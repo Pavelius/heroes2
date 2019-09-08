@@ -435,6 +435,31 @@ moveablei* add_object(unsigned short index, unsigned char object, unsigned char 
 
 static resource_s decode_resource[] = {Wood, Mercury, Ore, Sulfur, Crystal, Gems, Gold};
 
+static void update_monsters() {
+	moveablei* source[1024];
+	auto pb = source;
+	auto pe = pb + sizeof(source)/ sizeof(source[0]);
+	for(unsigned i = 0; i<bsmeta<moveablei>::count; i++) {
+		auto& e = bsmeta<moveablei>::elements[i];
+		if(!e)
+			continue;
+		if(e.gettype() == MonsterObject) {
+			if(pb < pe)
+				*pb++ = &e;
+		}
+	}
+	auto total = pb - source;
+	auto total_friendly = total / 15;
+	auto total_indifferent = total / 5;
+	zshuffle(source, total);
+	for(auto i = 0; i < total_indifferent; i++) {
+		if(i < total_friendly)
+			source[i]->set(ReactionFriendly);
+		else
+			source[i]->set(ReactionIndifferent);
+	}
+}
+
 void gamei::prepare() {
 	generator generate;
 	char temp[260]; zprint(temp, "maps/%1.mp2", file);
@@ -738,4 +763,5 @@ void gamei::prepare() {
 	}
 	delete tiles;
 	delete addons;
+	update_monsters();
 }

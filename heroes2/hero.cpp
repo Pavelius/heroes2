@@ -76,6 +76,8 @@ static struct heroin {
 {"Капитан", Sorcerer},
 {"Капитан", Warlock},
 {"Капитан", Wizard},
+//
+{"Случайные", RandomKind},
 };
 heroi bsmeta<heroi>::elements[CaptainWizard + 1];
 const char*	skill_level_name[] = {"нет", "Базово", "Продвинуто", "Эксперт"};
@@ -89,7 +91,7 @@ static unsigned level_experience[41] = {0,
 };
 
 void heroi::initialize() {
-	for(auto i = 0; i <= CaptainWizard; i++)
+	for(auto i = 0; i <= RandomKind; i++)
 		bsmeta<heroi>::elements[i].clear();
 }
 

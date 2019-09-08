@@ -113,3 +113,14 @@ unsigned armyi::getstrenght() const {
 	}
 	return r;
 }
+
+squadi* armyi::getsquad(monster_s v) const {
+	auto p = find(v);
+	if(p)
+		return const_cast<squadi*>(p);
+	for(auto& s : units) {
+		if(!s)
+			return const_cast<squadi*>(&s);
+	}
+	return 0;
+}

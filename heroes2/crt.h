@@ -3,6 +3,7 @@
 template<class T> inline T			imax(T a, T b) { return a > b ? a : b; }
 template<class T> inline T			imin(T a, T b) { return a < b ? a : b; }
 template<class T> inline T			iabs(T a) { return a > 0 ? a : -a; }
+template<class T> inline void		iswap(T& a, T& b) { T i = a; a = b; b = i; }
 //
 const char*							szdup(const char* text);
 char*								szprint(char* result, const char* result_maximum, const char* format, ...);
@@ -15,6 +16,7 @@ template<class T> inline void		zcat(T* p1, const T e) { p1 = zend(p1); p1[0] = e
 template<class T> inline void		zcat(T* p1, const T* p2) { zcpy(zend(p1), p2); }
 template<class T> inline int		zlen(T* p) { return zend(p) - p; }
 template<unsigned N> inline char*	zprint(char(&result)[N], const char* format, ...) { return szprintv(result, result + N - 1, format, (const char*)&format + sizeof(format)); }
+template<class T> inline void		zshuffle(T* p, int count) { for(int i = 0; i < count; i++) iswap(p[i], p[rand() % count]); }
 //
 extern "C" void						abort();
 extern "C" int						atexit(void(*func)(void));

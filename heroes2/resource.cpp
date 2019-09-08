@@ -69,6 +69,13 @@ int costi::mindiv(const costi& e) const {
 	return m;
 }
 
+costi costi::getonly(resource_s id) const {
+	costi result;
+	result.clear();
+	result.data[id] = data[id];
+	return result;
+}
+
 void costi::correct() {
 	for(auto i = 0; i <= Gems; i++) {
 		if(data[i] < 0)

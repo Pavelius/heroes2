@@ -44,8 +44,8 @@ const char* string::parse(const char* p, variantcol* source, unsigned& count) {
 			}
 		}
 		if(pi) {
-			source[count].element.type = pi->variant;
-			source[count].element.value = pn;
+			source[count].type = pi->variant;
+			source[count].value = pn;
 			source[count].count = ppn;
 			source[count].format = ppf;
 			count++;
@@ -73,7 +73,7 @@ void string::addi(const costi& v) {
 }
 
 void string::addi(const variantcol& v) {
-	addi(v.element, v.count);
+	addi(v, v.count, v.format);
 }
 
 void string::addh(const char* format, ...) {
@@ -81,4 +81,15 @@ void string::addh(const char* format, ...) {
 	add("##");
 	addv(format, xva_start(format));
 	add("\n");
+}
+
+void string::addt(const costi& v) {
+	auto n = 0;
+	for(auto i = FirstResource; i <= Gems; i = resource_s(i + 1)) {
+		if(!v.data[i])
+			continue;
+		if(n != 0)
+			adds(" è ");
+		adds("%1i %-2", v.data[i], bsmeta<resourcei>::elements[i].nameof);
+	}
 }

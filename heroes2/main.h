@@ -224,7 +224,7 @@ enum object_flag_s : unsigned char {
 enum interact_s : unsigned char {
 	NoCase,
 	TreasureCase, TreasureArtifact, TreasureCost,
-	FightArtifact, GuardSoldier, BuyArtifact,
+	QuestArtifact, FightArtifact, GuardSoldier, BuyArtifact,
 	JoinDwelling, IncreaseAbility,
 	CaptureObject, LearnAbility, LookAround,
 };
@@ -496,10 +496,10 @@ public:
 	static moveablei*		find(short unsigned i);
 	static moveablei*		find(short unsigned index, object_s type);
 	static moveablei*		findnear(short unsigned i, object_s type);
-	object_s				gettype() const { return type; }
 	artifact_s				getartifact() const { return artifact_s(subtype); }
 	short unsigned			getcount() const { return count; }
 	short unsigned			getdraw() const { return drawobj; }
+	interact_s				getinteract() const;
 	unsigned char			getframe() const { return subtype; }
 	monster_s				getmonster() const { return monster_s(subtype); }
 	player_s				getplayer() const;
@@ -507,6 +507,7 @@ public:
 	resource_s				getresource() const { return resource_s(subtype); }
 	const shapei&			getshape() const;
 	spell_s					getspell() const { return spell_s(subtype); }
+	object_s				gettype() const { return type; }
 	bool					is(player_s v) const { return player.is(v); }
 	bool					is(object_s v) const { return type==v; }
 	bool					isplayer() const { return player.data != 0; }
@@ -580,8 +581,8 @@ public:
 	void					input(const playeri* player) const;
 	bool					interact(short unsigned index, const pvar& object);
 	bool					interact(moveablei& object);
-	bool					interact(moveablei& object, object_s type, const char* text, const char* text_fail);
-	bool					interact(interact_s type, const variantcol* variants, const char* text, unsigned char param);
+	//bool					interact(moveablei& object, object_s type, const char* text, const char* text_fail);
+	bool					interact(moveablei& object, interact_s type, variantcol v1, variantcol v2, const char* text, const char* fail);
 	bool					is(artifact_s v) const;
 	bool					is(spell_s v) const { return spellbook.is(v); }
 	bool					isadventure() const { return index != Blocked; }
@@ -741,11 +742,12 @@ struct rumori {
 	char					text[128];
 	void					settext(const char* v) { zcpy(text, v, sizeof(text) - 1); }
 };
-struct variantcol {
-	variant					element;
+struct variantcol : variant {
 	int						count;
 	int						format;
-	constexpr explicit operator bool() const { return element.type != NoVariant; }
+	constexpr variantcol() : variant(), count(0), format(0) {}
+	constexpr variantcol(const variant& element) : variant(element), count(0), format(0) {}
+	constexpr variantcol(const variant& element, int c1) : variant(element), count(c1), format(0) {}
 };
 struct pvar : variant {
 	union {
@@ -782,7 +784,7 @@ struct objecti {
 	const aref<casei>		actions;
 	constexpr objecti(const char* name) : name(name), type(NoCase), param(), text(0), fail(0), actions() {}
 	constexpr objecti(const char* name, interact_s type, variant param, const char* text = 0, const char* fail = 0) : name(name), type(type), param(param), text(text), fail(fail), actions() {}
-	constexpr objecti(const char* name, const aref<casei>& actions, const char* text = 0, const char* fail = 0) : name(name), type(NoCase), param(), text(0), fail(0), actions(actions) {}
+	constexpr objecti(const char* name, const aref<casei>& actions, const char* text = 0, const char* fail = 0) : name(name), type(NoCase), param(), text(text), fail(fail), actions(actions) {}
 	bool					isvisitable() const;
 };
 class string : public stringbuilder {
@@ -793,6 +795,7 @@ public:
 	void					addi(variant v, int value = 0, int format = 0);
 	void					addi(const costi& v);
 	void					addi(const variantcol& v);
+	void					addt(const costi& v);
 	static const char*		parse(const char* p, variantcol* source, unsigned& count);
 };
 class eventi : public namei, public positioni {

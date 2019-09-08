@@ -83,17 +83,13 @@ static void main_menu() {
 void util_main();
 
 int main() {
-	//setevil(true);
-	//return 0;
-	//auto p0 = bsmeta<objecti>::elements[WaterBue].name;
-	//auto p1 = bsmeta<objecti>::elements[RndTown].name;
-	//auto p2 = bsmeta<objecti>::elements[SawMill].name;
+	variantcol n = {Experience, 1000};
+	setevil(true);
 	draw::initialize();
 	drawobji::initialize();
 	if(!draw::create("test", 190, false))
 		return -1;
 	srand(21837);
-	//show_test();
 	util_main();
 	main_menu();
 	return 0;

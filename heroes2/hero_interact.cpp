@@ -18,33 +18,6 @@ static unsigned char random(const aref<casei>& source) {
 	return 0;
 }
 
-bool heroi::interact(interact_s type, const variantcol* variants, const char* text, unsigned char param) {
-	string str;
-	switch(type) {
-	case TreasureCase:
-		str.add(text);
-		add(variants[ask(str, variants) ? 0 : 1]);
-		break;
-	case TreasureArtifact:
-		str.add(text, getstr(variants[0].element.artifact));
-		str.addsep();
-		str.addi(variants[0].element.artifact);
-		message(str);
-		add(variants[0].element.artifact);
-		break;
-	case TreasureCost:
-		str.add(text);
-		str.addsep();
-		str.addi(variants[0]);
-		str.addi(variants[1]);
-		message(str);
-		add(variants[0]);
-		add(variants[1]);
-		break;
-	}
-	return true;
-}
-
 monster_s getmonster(object_s type) {
 	switch(type) {
 	case GoblinHut: return Goblin;
@@ -89,25 +62,25 @@ void heroi::add(const costi& v) {
 
 void heroi::add(const variantcol& v) {
 	costi cost;
-	switch(v.element.type) {
+	switch(v.type) {
 	case Resource:
 		cost.clear();
-		cost.add(v.element.resource, v.count);
+		cost.add(v.resource, v.count);
 		add(cost);
 		break;
 	case Artifact:
-		add(v.element.artifact);
+		add(v.artifact);
 		break;
 	case Monster:
-		armyi::add(v.element.monster, v.count);
+		armyi::add(v.monster, v.count);
 		break;
 	case Ability:
-		switch(v.element.ability) {
+		switch(v.ability) {
 		case Attack:
 		case Defence:
 		case Wisdow:
 		case Knowledge:
-			abilities[v.element.ability]++;
+			abilities[v.ability]++;
 			break;
 		case Experience:
 			addexperience(v.count);
@@ -115,7 +88,7 @@ void heroi::add(const variantcol& v) {
 		}
 		break;
 	case Spell:
-		set(v.element.spell);
+		set(v.spell);
 		break;
 	}
 }
@@ -167,97 +140,129 @@ void moveablei::setup(generator& generate) {
 	}
 }
 
-bool heroi::interact(moveablei& object, object_s type, const char* text, const char* text_fail) {
+bool heroi::interact(moveablei& object, interact_s type, variantcol v1, variantcol v2, const char* text, const char* fail) {
 	string str;
-	monster_s monster;
-	bool allok;
+	auto player = getplayer();
 	switch(type) {
-	case GoblinHut:
-	case DwarfCottage:
-	case ArcherHouse:
-	case SpriteHouse:
-	case PeasantHut:
-	case HalflingHole:
-		monster = getmonster(type);
+	case TreasureCase:
+		str.add(text);
+		if(true) {
+			variantcol variants[2] = {v1, v2};
+			add(variants[ask(str, variants) ? 0 : 1]);
+		}
+		break;
+	case QuestArtifact:
+		if(bsmeta<artifacti>::elements[object.getartifact()].text)
+			text = bsmeta<artifacti>::elements[object.getartifact()].text;
+		str.add(text, getstr(v1.artifact));
+		str.addsep();
+		str.addi(v1);
+		message(str);
+		add(v1);
+		break;
+	case TreasureArtifact:
+		str.add(text, getstr(v1.artifact));
+		str.addsep();
+		str.addi(v1.artifact);
+		message(str);
+		add(v1);
+		break;
+	case TreasureCost:
+		str.add(text);
+		str.addsep();
+		str.addi(v1);
+		str.addi(v2);
+		message(str);
+		add(v1);
+		add(v2);
+		break;
+	case JoinDwelling:
 		if(!object.getcount()) {
-			str.add(text_fail, bsmeta<monsteri>::elements[monster].multiname);
+			str.add(fail, bsmeta<monsteri>::elements[v1.monster].multiname);
 			message(str);
 		} else {
-			str.add(text, bsmeta<monsteri>::elements[monster].multiname);
+			str.add(text, bsmeta<monsteri>::elements[v1.monster].multiname);
 			if(ask(str)) {
-				variantcol e;
-				e.element = monster;
+				variantcol e(v1);
 				e.count = object.getcount();
 				object.setcount(0);
 				add(e);
 			}
 		}
 		break;
-	case Mines:
-		gainmine(text, object.getresource());
-		object.setowner(getplayer()->getid());
-		break;
-	case SawMill:
-		gainmine(text, Wood);
-		object.setowner(getplayer()->getid());
-		break;
-	case AlchemyLab:
-		gainmine(text, Mercury);
-		object.setowner(getplayer()->getid());
-		break;
-	case Shrine1:
-	case Shrine2:
-	case Shrine3:
-		allok = false;
-		str.add(text, getstr(object.getspell()));
-		if(!is(MagicBook))
-			str.adds("К сожелению у вас нету Волшебной книги, чтобы записать заклинание в нее.");
-		else if(isvisited(object))
-			str.adds("Однако, это заклиание вы уже и так знаете, поэтому их помощь вам была не нужна.");
+	case CaptureObject:
+		if(v1.type == Object && v1.object == ResourceObject)
+			gainmine(text, object.getresource());
+		else if(v1.type == Resource)
+			gainmine(text, v1.resource);
 		else {
-			allok = true;
-			str.add("\n\n");
-			str.addi(object.getspell());
-		}
-		message(str);
-		add(variantcol{object.getspell(), 1});
-		break;
-	case WatchTower:
-		str.add(text);
-		message(str);
-		break;
-	case ArtifactObject:
-		if(true) {
-			auto a = object.getartifact();
-			auto p = bsmeta<artifacti>::elements[a].text;
-			if(!p)
-				p = text;
-			str.add(p, getstr(a));
-			str.addsep();
-			str.addi(a);
+			str.add(text);
 			message(str);
-			add(object.getartifact());
 		}
+		object.setowner(getplayer()->getid());
 		break;
-	case Gazebo:
+	case LookAround:
+		message(text);
+		break;
+	case IncreaseAbility:
+		if(v1.type == Ability && v1.ability == Experience)
+			v1.count = 1000;
 		if(isvisited(object)) {
-			str.add(text_fail);
+			str.add(fail);
 			message(str);
 			return false;
 		} else {
 			str.add(text);
 			str.addsep();
-			str.addi(Experience, 1000);
+			str.addi(v1);
 			message(str);
-			addexperience(1000);
+			add(v1);
 			setvisit(object.index);
 		}
 		break;
-	default:
+	case BuyArtifact:
+		if(player) {
+			auto a = object.getartifact();
+			costi cost;
+			cost.clear();
+			cost.add(v1.resource, v1.count);
+			cost.add(v2.resource, v2.count);
+			string rstr; rstr.addt(cost);
+			str.add(text, getstr(a), rstr.begin());
+			str.addsep();
+			str.addi(a);
+			str.addi(v1);
+			str.addi(v2);
+			if(player->getresources() >= cost) {
+				if(ask(str)) {
+					player->getresources() -= cost;
+					add(a);
+					return true;
+				}
+			}
+		}
 		return false;
 	}
 	return true;
 }
+
+//	case Shrine1:
+//	case Shrine2:
+//	case Shrine3:
+//		allok = false;
+//		str.add(text, getstr(object.getspell()));
+//		if(!is(MagicBook))
+//			str.adds("К сожелению у вас нету Волшебной книги, чтобы записать заклинание в нее.");
+//		else if(isvisited(object))
+//			str.adds("Однако, это заклиание вы уже и так знаете, поэтому их помощь вам была не нужна.");
+//		else {
+//			allok = true;
+//			str.add("\n\n");
+//			str.addi(object.getspell());
+//		}
+//		message(str);
+//		add(variantcol{object.getspell(), 1});
+//		break;
 
 bool heroi::interact(moveablei& object) {
 	if(object.is(ResourceObject)) {
@@ -267,10 +272,25 @@ bool heroi::interact(moveablei& object) {
 	const objecti* po = bsmeta<objecti>::elements + object.gettype();
 	if(po->actions) {
 		auto& e = po->actions.data[object.getcount()];
-		if(e.type != NoCase)
-			return interact(e.type, e.variants, e.text ? e.text : po->text, object.getframe());
+		if(e.type != NoCase) {
+			auto text = bsmeta<interacti>::elements[e.type].text;
+			auto fail = bsmeta<interacti>::elements[e.type].fail;
+			if(po->text)
+				text = po->text;
+			if(po->fail)
+				text = po->fail;
+			if(e.text)
+				text = e.text;
+			return interact(object, e.type, e.variants[0], e.variants[1], text, fail);
+		}
 	}
-	return interact(object, object.gettype(), po->text, po->fail);
+	auto text = bsmeta<interacti>::elements[object.getinteract()].text;
+	auto fail = bsmeta<interacti>::elements[object.getinteract()].fail;
+	if(po->text)
+		text = po->text;
+	if(po->fail)
+		fail = po->fail;
+	return interact(object, object.getinteract(), po->param, {}, text, fail);
 }
 
 bool heroi::battle(moveablei& enemy) {
@@ -300,7 +320,7 @@ bool heroi::battle(moveablei& enemy) {
 				}
 			}
 		}
-		if(get(Diplomacy) && unit_total>1) {
+		if(get(Diplomacy) && unit_total > 1) {
 			auto gold_cost = bsmeta<monsteri>::elements[enemy.getmonster()].cost.get(Gold) * unit_total;
 			auto unit_join = 0;
 			switch(get(Diplomacy)) {

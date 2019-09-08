@@ -1226,7 +1226,7 @@ unsigned picture::getsize(unsigned count, int& width, int& height, int width_per
 static unsigned getsize(const variantcol* source, const variantcol* pe, int& width, int& height, int width_per_line) {
 	auto p = source;
 	while(p < pe) {
-		picture a; a.set(p->element, p->count);
+		picture a; a.set(*p, p->count);
 		if(width_per_line && (width + a.size.x) > width_per_line)
 			break;
 		width += a.size.x;
@@ -1342,14 +1342,14 @@ int draw::imagex(int x, int y, int width, const variantcol* source, unsigned cou
 		auto pe = source + line_count;
 		auto x1 = x + (width - w1) / 2;
 		for(auto p = source; p < pe; p++) {
-			picture a; a.set(p->element, p->count);
+			picture a; a.set(*p, p->count);
 			if(p->format) {
 				if(p->format == 1)
 					a.format = "%1i/день";
 				else if(p->format == 1)
 					a.format = "%1i/неделю";
 			}
-			a.paint(x1, y, h1, p->element, p->count);
+			a.paint(x1, y, h1, *p, p->count);
 			x1 += a.size.x;
 		}
 		y += h1;
@@ -1364,7 +1364,7 @@ static int addcost(variantcol* result, const costi& source) {
 	for(auto i = Gold; i <= Gems; i = (resource_s)(i + 1)) {
 		if(!source.data[i])
 			continue;
-		result[count].element = i;
+		*((variant*)(result+count)) = i;
 		result[count].count = source.data[i];
 		count++;
 	}
@@ -1412,9 +1412,9 @@ int draw::message(const char* format, const variantcol* source, unsigned count, 
 			auto n = x;
 			for(unsigned i = 0; i < count; i++) {
 				picture vr;
-				vr.set(source[i].element, source[i].count);
+				vr.set(source[i], source[i].count);
 				vr.paint(n + (vw - vr.size.x) / 2, y1 - variant_height - 8, variant_height,
-					source[i].element, source[i].count);
+					source[i], source[i].count);
 				n += vw;
 			}
 			if(count == 2) {

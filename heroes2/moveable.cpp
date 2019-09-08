@@ -239,7 +239,12 @@ bool moveablei::issingleuse() const {
 	case TreasureChest:
 	case ResourceObject:
 	case MonsterObject:
+	case ArtifactObject:
 		return true;
 	default: return false;
 	}
+}
+
+interact_s moveablei::getinteract() const {
+	return bsmeta<objecti>::elements[type].type;
 }

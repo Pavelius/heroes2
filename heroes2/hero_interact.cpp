@@ -90,6 +90,9 @@ void heroi::add(const variantcol& v) {
 	case Spell:
 		set(v.spell);
 		break;
+	case Skill:
+		set(v.skill, v.count);
+		break;
 	}
 }
 
@@ -101,6 +104,8 @@ bool heroi::isvisited(const moveablei& object) const {
 	case Shrine2:
 	case Shrine3:
 		return is(object.getspell());
+	case WitchHut:
+		return is(object.getskill());
 	}
 	if(bsmeta<objecti>::elements[object.gettype()].isvisitable()) {
 		auto i = map::getvisit(object.index);
@@ -154,18 +159,18 @@ bool heroi::interact(moveablei& object, interact_s type, variantcol v1, variantc
 	case QuestArtifact:
 		if(bsmeta<artifacti>::elements[object.getartifact()].text)
 			text = bsmeta<artifacti>::elements[object.getartifact()].text;
-		str.add(text, getstr(v1.artifact));
+		str.add(text, getstr(object.getartifact()));
 		str.addsep();
-		str.addi(v1);
+		str.addi(object.getartifact());
 		message(str);
-		add(v1);
+		add(object.getartifact());
 		break;
 	case TreasureArtifact:
-		str.add(text, getstr(v1.artifact));
+		str.add(text, getstr(object.getartifact()));
 		str.addsep();
-		str.addi(v1.artifact);
+		str.addi(object.getartifact());
 		message(str);
-		add(v1);
+		add(object.getartifact());
 		break;
 	case TreasureCost:
 		str.add(text);
@@ -218,6 +223,23 @@ bool heroi::interact(moveablei& object, interact_s type, variantcol v1, variantc
 			message(str);
 			add(v1);
 			setvisit(object.index);
+		}
+		break;
+	case LearnAbility:
+		switch(v1.type) {
+		case Spell: v1.spell = object.getspell(); break;
+		case Skill: v1.skill = object.getskill(); v1.count = 1; break;
+		}
+		if(isvisited(object)) {
+			str.add(fail, v1.getname());
+			message(str);
+			return false;
+		} else {
+			str.add(text, v1.getname());
+			str.addsep();
+			str.addi(v1);
+			message(str);
+			add(v1);
 		}
 		break;
 	case BuyArtifact:
@@ -311,7 +333,8 @@ bool heroi::battle(moveablei& enemy) {
 	if(!is(HideousMask)) {
 		if(ra >= ReactionIndifferent) {
 			if(ra == ReactionFriendly || kf >= 2) {
-				str.add("%1 впечатены вашей армией и хотят присоединиться к вашему войску. Согласны ли вы их принять?");
+				str.add("%1 впечатены вашей армией и хотят присоединиться к вашему войску. Согласны ли вы их принять?",
+					bsmeta<monsteri>::elements[unit_type].multiname);
 				if(ask(str)) {
 					pf->unit = unit_type;
 					pf->count += unit_total;

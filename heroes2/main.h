@@ -276,6 +276,7 @@ struct variant {
 	constexpr variant(tag_s v) : type(Tag), tag(v) {}
 	constexpr bool operator==(const variant& e) const { return type == e.type && value == e.value; }
 	constexpr explicit operator bool() const { return type != NoVariant; }
+	const char*				getname() const;
 };
 struct resourcei {
 	const char*				name;
@@ -466,7 +467,7 @@ struct shapei {
 };
 class generator {
 	unsigned char			artifacts[LastArtifact + 1];
-	unsigned char			skills[LastSpell + 1];
+	unsigned char			skills[LastSkill + 1];
 	unsigned char			spells[LastSpell + 1];
 	unsigned char			monsters[WaterElement + 1];
 	unsigned				castle_index;
@@ -507,6 +508,7 @@ public:
 	resource_s				getresource() const { return resource_s(subtype); }
 	const shapei&			getshape() const;
 	spell_s					getspell() const { return spell_s(subtype); }
+	skill_s					getskill() const { return skill_s(subtype); }
 	object_s				gettype() const { return type; }
 	bool					is(player_s v) const { return player.is(v); }
 	bool					is(object_s v) const { return type==v; }
@@ -585,6 +587,7 @@ public:
 	bool					interact(moveablei& object, interact_s type, variantcol v1, variantcol v2, const char* text, const char* fail);
 	bool					is(artifact_s v) const;
 	bool					is(spell_s v) const { return spellbook.is(v); }
+	bool					is(skill_s v) const { return get(v)>0; }
 	bool					isadventure() const { return index != Blocked; }
 	bool					isvisited(const moveablei& object) const;
 	static int				learn(const char* format, const variantcol* v1, unsigned count);

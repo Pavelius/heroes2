@@ -189,6 +189,7 @@
     <ClCompile Include="stringbuilder.cpp" />
     <ClCompile Include="szdup.cpp" />
     <ClCompile Include="util.cpp" />
+    <ClCompile Include="variant.cpp" />
     <ClCompile Include="view.cpp" />
     <ClCompile Include="point.cpp" />
     <ClCompile Include="spells.cpp" />

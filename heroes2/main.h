@@ -190,7 +190,7 @@ enum spell_type_s : unsigned char {
 enum variant_s : unsigned char {
 	NoVariant,
 	Ability, Artifact, Building, CastleVar, Hero, Index, Landscape, Object, Monster, Moveable,
-	Player, Resource, Skill, Spell, Stat, Tag,
+	Player, Resource, Skill, Spell, Stat, Tag, Variant,
 };
 enum activity_s : unsigned char {
 	NotAllowed,
@@ -226,6 +226,7 @@ enum interact_s : unsigned char {
 	TreasureCase, TreasureArtifact, TreasureCost,
 	FightArtifact, GuardSoldier, BuyArtifact,
 	JoinDwelling, IncreaseAbility,
+	CaptureObject, LearnAbility, LookAround,
 };
 enum reaction_s : unsigned char {
 	ReactionHostile, ReactionIndifferent, ReactionFriendly,
@@ -508,8 +509,8 @@ public:
 	spell_s					getspell() const { return spell_s(subtype); }
 	bool					is(player_s v) const { return player.is(v); }
 	bool					is(object_s v) const { return type==v; }
-	bool					is(object_use_s v) const;
 	bool					isplayer() const { return player.data != 0; }
+	bool					issingleuse() const;
 	void					set(artifact_s v) { subtype = v; }
 	void					set(monster_s v) { subtype = v; }
 	void					set(object_s v) { type = v; }
@@ -774,10 +775,15 @@ struct casei {
 };
 struct objecti {
 	const char*				name;
-	object_use_s			use;
+	interact_s				type;
+	variant					param;
 	const char*				text;
-	const char*				text_fail;
+	const char*				fail;
 	const aref<casei>		actions;
+	constexpr objecti(const char* name) : name(name), type(NoCase), param(), text(0), fail(0), actions() {}
+	constexpr objecti(const char* name, interact_s type, variant param, const char* text = 0, const char* fail = 0) : name(name), type(type), param(param), text(text), fail(fail), actions() {}
+	constexpr objecti(const char* name, const aref<casei>& actions, const char* text = 0, const char* fail = 0) : name(name), type(NoCase), param(), text(0), fail(0), actions(actions) {}
+	bool					isvisitable() const;
 };
 class string : public stringbuilder {
 	char					buffer[512];

@@ -57,10 +57,6 @@ monster_s getmonster(object_s type) {
 	}
 }
 
-bool moveablei::is(object_use_s v) const {
-	return bsmeta<objecti>::elements[type].use==v;
-}
-
 void heroi::gainmine(const char* text, resource_s mine) {
 	string str;
 	str.add(text, mine_names_of[mine]);
@@ -133,7 +129,7 @@ bool heroi::isvisited(const moveablei& object) const {
 	case Shrine3:
 		return is(object.getspell());
 	}
-	if(bsmeta<objecti>::elements[object.gettype()].use == HeroUse) {
+	if(bsmeta<objecti>::elements[object.gettype()].isvisitable()) {
 		auto i = map::getvisit(object.index);
 		if(i == Blocked)
 			return true;
@@ -274,7 +270,7 @@ bool heroi::interact(moveablei& object) {
 		if(e.type != NoCase)
 			return interact(e.type, e.variants, e.text ? e.text : po->text, object.getframe());
 	}
-	return interact(object, object.gettype(), po->text, po->text_fail);
+	return interact(object, object.gettype(), po->text, po->fail);
 }
 
 bool heroi::battle(moveablei& enemy) {

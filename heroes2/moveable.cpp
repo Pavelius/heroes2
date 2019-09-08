@@ -71,7 +71,7 @@ moveablei* add_moveable(short unsigned index, object_s v, unsigned char subtype,
 	else if(!drawobj)
 		drawobj = drawobji::find(v)->getid();
 	p->setdraw(drawobj);
-	if(bsmeta<objecti>::elements[v].use == HeroUse)
+	if(bsmeta<objecti>::elements[v].isvisitable())
 		map::getvisit(index);
 	return p;
 }
@@ -231,4 +231,15 @@ moveablei* moveablei::findnear(short unsigned i, object_s type) {
 			return p;
 	}
 	return 0;
+}
+
+bool moveablei::issingleuse() const {
+	switch(type) {
+	case CampFire:
+	case TreasureChest:
+	case ResourceObject:
+	case MonsterObject:
+		return true;
+	default: return false;
+	}
 }

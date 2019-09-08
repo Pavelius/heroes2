@@ -1044,7 +1044,7 @@ void heroi::moveto() {
 					object = m;
 			} else
 				object = map::find(to);
-			auto onetime = (object.type == Moveable && object.moveable->is(SingleUse));
+			auto onetime = (object.type == Moveable && object.moveable->issingleuse());
 			if(object) {
 				if(!onetime) {
 					setpos(to);

@@ -1272,6 +1272,19 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 		render(x, z, RESOURCE, 7);
 		render(x, z + 6, res, frame + 1);
 		break;
+	case Ability:
+		if(element.ability <= Knowledge) {
+			render(x, z, PRIMSKIL, 4);
+			render(x, z + 6, res, frame);
+			auto p = getstr(element.ability);
+			text(x + (size.x - textw(p)) / 2, z + 14, p);
+			zprint(temp, "+1");
+			draw::state push;
+			font = FONT;
+			text(x + (size.x - textw(temp))/2, y + h1 - texth() - 7, temp);
+		} else
+			render(x, z, res, frame);
+		break;
 	case Monster:
 		render(x, z + 6, STRIP, index_by_type(bsmeta<monsteri>::elements[element.monster].type));
 		render(x, y + h1 - getheight(res, frame) - 10, res, frame);
@@ -1293,13 +1306,6 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 			text(x + (size.x - textw(p)) / 2, y + 61, p);
 			font = pf;
 		}
-		break;
-	case Ability:
-		if(element.ability <= Knowledge) {
-			render(x, z, PRIMSKIL, 4);
-			render(x, z + 6, res, frame);
-		} else
-			render(x, z, res, frame);
 		break;
 	case Skill:
 		render(x, z, SECSKILL, 15);

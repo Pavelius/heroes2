@@ -786,7 +786,7 @@ struct objecti {
 	const char*				fail;
 	const aref<casei>		actions;
 	constexpr objecti(const char* name) : name(name), type(NoCase), param(), text(0), fail(0), actions() {}
-	constexpr objecti(const char* name, interact_s type, variant param, const char* text = 0, const char* fail = 0) : name(name), type(type), param(param), text(text), fail(fail), actions() {}
+	constexpr objecti(const char* name, interact_s type, variantcol param, const char* text = 0, const char* fail = 0) : name(name), type(type), param(param), text(text), fail(fail), actions() {}
 	constexpr objecti(const char* name, const aref<casei>& actions, const char* text = 0, const char* fail = 0) : name(name), type(NoCase), param(), text(text), fail(fail), actions(actions) {}
 	bool					isvisitable() const;
 };

@@ -146,20 +146,21 @@ bool heroi::interact(moveablei& object, interact_s type, variantcol v1, variantc
 		}
 		break;
 	case QuestArtifact:
-		if(bsmeta<artifacti>::elements[object.getartifact()].text)
-			text = bsmeta<artifacti>::elements[object.getartifact()].text;
-		str.add(text, getstr(object.getartifact()));
+		v1 = variantcol(object.getartifact());
+		if(bsmeta<artifacti>::elements[v1.artifact].text)
+			text = bsmeta<artifacti>::elements[v1.artifact].text;
+		str.add(text, v1.getname());
 		str.addsep();
-		str.addi(object.getartifact());
+		str.addi(v1);
 		message(str);
-		add(object.getartifact());
+		add(v1);
 		break;
 	case TreasureArtifact:
-		str.add(text, getstr(object.getartifact()));
+		str.add(text, v1.getname());
 		str.addsep();
-		str.addi(object.getartifact());
+		str.addi(v1);
 		message(str);
-		add(object.getartifact());
+		add(v1);
 		break;
 	case TreasureCost:
 		str.add(text);
@@ -199,8 +200,6 @@ bool heroi::interact(moveablei& object, interact_s type, variantcol v1, variantc
 		message(text);
 		break;
 	case IncreaseAbility:
-		if(v1.type == Ability && v1.ability == Experience)
-			v1.count = 1000;
 		if(isvisited(object)) {
 			str.add(fail);
 			message(str);

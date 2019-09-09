@@ -1,7 +1,5 @@
 #include "main.h"
 
-static const char* mine_names_of[] = {"Золотой", "Деревянной", "Ртутной", "Рудной", "Серной", "Кристальной", "Изумрудной"};
-
 static unsigned char random(const aref<casei>& source) {
 	auto total_weight = 0;
 	for(auto& e : source)
@@ -18,24 +16,15 @@ static unsigned char random(const aref<casei>& source) {
 	return 0;
 }
 
-monster_s getmonster(object_s type) {
-	switch(type) {
-	case GoblinHut: return Goblin;
-	case DwarfCottage: return Dwarf;
-	case ArcherHouse: return Archer;
-	case SpriteHouse: return Sprite;
-	case PeasantHut: return Peasant;
-	case HalflingHole: return Halfling;
-	default: return RandomMonster;
-	}
-}
-
 void heroi::gainmine(const char* text, resource_s mine) {
+	static const char* mine_names_of[] = {"Золотой", "Деревянной", "Ртутной", "Рудной", "Серной", "Кристальной", "Изумрудной"};
+	static const char* res_names_of[] = {"1000 золотых", "два дерева", "одну ртуть", "две руды", "одну серу", "один кристалл", "один самоцвет"};
+	auto count = playeri::getmineincome(mine);
 	string str;
-	str.add(text, mine_names_of[mine]);
+	str.add(text, mine_names_of[mine], maptbl(res_names_of, mine));
 	str.addsep();
 	str.add("\n");
-	str.addi(mine, playeri::getmineincome(mine), 1);
+	str.addi(mine, count, 1);
 	message(str);
 }
 
@@ -227,16 +216,29 @@ bool heroi::interact(moveablei& object, interact_s type, variantcol v1, variantc
 		break;
 	case LearnAbility:
 		switch(v1.type) {
-		case Spell: v1.spell = object.getspell(); break;
-		case Skill: v1.skill = object.getskill(); v1.count = 1; break;
+		case Spell:
+			v1.spell = object.getspell();
+			break;
+		case Skill:
+			v1.skill = object.getskill();
+			v1.count = 1;
+			break;
 		}
-		if(isvisited(object)) {
-			str.add(fail, v1.getname());
+		object.set(player->getid());
+		if(v1.type==Spell && !is(MagicBook)) {
+			str.add(text, v1.getname());
+			str.adds("К сожелению у вас нету Волшебной книги, чтобы записать заклинание в нее.");
+			message(str);
+			return false;
+		} else if(isvisited(object)) {
+			str.add(fail ? fail : text, v1.getname());
+			if(v1.type == Spell)
+				str.adds("Однако, вы уже и так знаете это заклинание, поэтому ничего нового вы не узнали.");
 			message(str);
 			return false;
 		} else {
 			str.add(text, v1.getname());
-			str.addsep();
+			str.add("\n\n");
 			str.addi(v1);
 			message(str);
 			add(v1);
@@ -267,24 +269,6 @@ bool heroi::interact(moveablei& object, interact_s type, variantcol v1, variantc
 	}
 	return true;
 }
-
-//	case Shrine1:
-//	case Shrine2:
-//	case Shrine3:
-//		allok = false;
-//		str.add(text, getstr(object.getspell()));
-//		if(!is(MagicBook))
-//			str.adds("К сожелению у вас нету Волшебной книги, чтобы записать заклинание в нее.");
-//		else if(isvisited(object))
-//			str.adds("Однако, это заклиание вы уже и так знаете, поэтому их помощь вам была не нужна.");
-//		else {
-//			allok = true;
-//			str.add("\n\n");
-//			str.addi(object.getspell());
-//		}
-//		message(str);
-//		add(variantcol{object.getspell(), 1});
-//		break;
 
 bool heroi::interact(moveablei& object) {
 	if(object.is(ResourceObject)) {

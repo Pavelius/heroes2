@@ -16,7 +16,6 @@ template<class T> inline void		zcat(T* p1, const T e) { p1 = zend(p1); p1[0] = e
 template<class T> inline void		zcat(T* p1, const T* p2) { zcpy(zend(p1), p2); }
 template<class T> inline int		zlen(T* p) { return zend(p) - p; }
 template<unsigned N> inline char*	zprint(char(&result)[N], const char* format, ...) { return szprintv(result, result + N - 1, format, (const char*)&format + sizeof(format)); }
-template<class T> inline void		zshuffle(T* p, int count) { for(int i = 0; i < count; i++) iswap(p[i], p[rand() % count]); }
 //
 extern "C" void						abort();
 extern "C" int						atexit(void(*func)(void));
@@ -36,3 +35,4 @@ extern "C" int						system(const char* command); // Execute system command
 //
 inline int							xrand(int v1, int v2) { return v1 + (rand() % (v2 - v1 + 1)); }
 inline int							d100() { return rand() % 100; }
+template<class T> inline void		zshuffle(T* p, int count) { for(int i = 0; i < count; i++) iswap(p[i], p[rand() % count]); }

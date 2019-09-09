@@ -781,7 +781,7 @@ struct casei {
 struct objecti {
 	const char*				name;
 	interact_s				type;
-	variant					param;
+	variantcol				param;
 	const char*				text;
 	const char*				fail;
 	const aref<casei>		actions;

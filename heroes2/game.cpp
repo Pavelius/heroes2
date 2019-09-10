@@ -435,7 +435,7 @@ moveablei* add_object(unsigned short index, unsigned char object, unsigned char 
 
 static resource_s decode_resource[] = {Wood, Mercury, Ore, Sulfur, Crystal, Gems, Gold};
 
-static void update_monsters() {
+void gamei::update_monsters() {
 	moveablei* source[1024];
 	auto pb = source;
 	auto pe = pb + sizeof(source)/ sizeof(source[0]);
@@ -460,7 +460,15 @@ static void update_monsters() {
 	}
 }
 
-void gamei::prepare() {
+void gamei::update_castle_spells() {
+	for(unsigned i = 0; i < bsmeta<castlei>::count; i++) {
+		auto& e = bsmeta<castlei>::elements[i];
+		if(!e)
+			continue;
+	}
+}
+
+void gamei::update_map() {
 	generator generate;
 	char temp[260]; zprint(temp, "maps/%1.mp2", file);
 	io::file st(temp);
@@ -763,5 +771,10 @@ void gamei::prepare() {
 	}
 	delete tiles;
 	delete addons;
+}
+
+void gamei::prepare() {
+	update_map();
 	update_monsters();
+	update_castle_spells();
 }

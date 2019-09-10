@@ -727,6 +727,9 @@ struct gamei {
 	bool					setupmap();
 private:
 	void					updatebase();
+	void					update_castle_spells();
+	void					update_map();
+	void					update_monsters();
 };
 struct interacti {
 	interact_s				id;

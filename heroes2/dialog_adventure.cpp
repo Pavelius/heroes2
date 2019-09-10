@@ -1044,13 +1044,11 @@ void heroi::moveto() {
 					object = m;
 			} else
 				object = map::find(to);
-			auto onetime = (object.type == Moveable && object.moveable->issingleuse());
 			if(object) {
-				if(!onetime) {
+				auto onetime = (object.type == Moveable && object.moveable->issingleuse());
+				if(!onetime || (map::is(to, AttackTile) && !map::is(to, BlockedTile))) {
 					setpos(to);
 					focusing();
-					if(object.moveable->gettype() == MonsterObject)
-						onetime = true;
 				}
 				auto action_result = interact(to, object);
 				if(onetime && action_result) {

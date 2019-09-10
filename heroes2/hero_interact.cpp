@@ -316,8 +316,8 @@ bool heroi::battle(moveablei& enemy) {
 	if(!is(HideousMask)) {
 		if(ra >= ReactionIndifferent) {
 			if(ra == ReactionFriendly || kf >= 2) {
-				str.add("%1 впечатены вашей армией и хотят присоединиться к вашему войску. Согласны ли вы их принять?",
-					bsmeta<monsteri>::elements[unit_type].multiname);
+				str.add("%2i %-1 впечатены вашей армией и хотят присоединиться к вашему войску. Согласны ли вы их принять?",
+					bsmeta<monsteri>::elements[unit_type].multiname, unit_total);
 				if(ask(str)) {
 					pf->unit = unit_type;
 					pf->count += unit_total;

@@ -241,6 +241,8 @@ static void update_drawables() {
 	if(hot::key == InputTimer) {
 		for(unsigned i = 0; i < units_count; i++)
 			units[i].update();
+		attacker_image.update();
+		defender_image.update();
 	}
 }
 

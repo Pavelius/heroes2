@@ -98,7 +98,7 @@ static void paint_grid(const squadi* squad) {
 	if(setting::cursor) {
 		if(hilite_index != -1) {
 			auto pt = i2h(hilite_index);
-			hexagonf(pt.x, pt.y, 0);
+			//hexagonf(pt.x, pt.y, 0);
 		}
 	}
 	// Show grid
@@ -127,6 +127,17 @@ void heroi::setup_battle(heroi* enemy) {
 	prepare_background(Dirt, true);
 }
 
+static void skip_turn() {
+}
+
+static void open_setting() {
+
+}
+
+static void start_autocombat() {
+
+}
+
 static void paint_field(squadi* squad) {
 	auto h1 = getheight(TEXTBAR, 4);
 	auto h2 = getheight(TEXTBAR, 6);
@@ -140,9 +151,9 @@ static void paint_field(squadi* squad) {
 	image(x, height - h8 - h9, TEXTBAR, 8);
 	image(x, height - h9, TEXTBAR, 9);
 	status({x + 32, draw::height - h8 - h9 + 1, draw::width - w3, draw::height - 1});
-	//draw::button(0, draw::height - h1 - h2, res::TEXTBAR, AutoCombat, 4, 4, 5, Alpha + 'A', 0, szt("Run auto-combat", "Запустить автоматический бой"));
-	//draw::button(0, draw::height - h2, res::TEXTBAR, Setting, 6, 6, 7, KeyEscape, 0, szt("Open combat setting", "Открыть настройки"));
-	//draw::button(draw::width - w3, draw::height - h3, res::TEXTBAR, Skip, 0, 0, 1, KeySpace, 0, szt("Skip current turn", "Пропустить текущий ход"));
+	button(0, height - h1 - h2, TEXTBAR, start_autocombat, {4, 4, 5}, Alpha + 'A', "Запустить автоматический бой");
+	button(0, height - h2, TEXTBAR, open_setting, {6, 6, 7}, KeyEscape, "Открыть настройки");
+	button(width - w3, height - h3, TEXTBAR, skip_turn, {0, 0, 1}, KeySpace, "Пропустить текущий ход");
 	//hittest_grid();
 	if(frng != NoRes)
 		image(0, 0, frng, 0);

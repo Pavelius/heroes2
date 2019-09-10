@@ -543,6 +543,7 @@ class heroi : public namei, public armyi, public positioni {
 	direction_s				direction;
 	static void				open_artifact();
 	int						getbonus(ability_s v) const;
+	void					setup_battle(heroi* defender);
 public:
 	void					add(artifact_s id);
 	void					add(const costi& v);
@@ -552,6 +553,7 @@ public:
 	int						ask(const char* format);
 	int						ask(const char* format, const variantcol* source);
 	bool					battle(moveablei& enemy);
+	void					battlemove();
 	bool					buymagicbook();
 	void					clear();
 	void					choose();
@@ -581,10 +583,9 @@ public:
 	void					moveto();
 	static void				initialize();
 	void					input(const playeri* player) const;
-	bool					interact(short unsigned index, const pvar& object);
 	bool					interact(moveablei& object);
-	//bool					interact(moveablei& object, object_s type, const char* text, const char* text_fail);
 	bool					interact(moveablei& object, interact_s type, variantcol v1, variantcol v2, const char* text, const char* fail);
+	bool					interact(short unsigned index, const pvar& object);
 	bool					is(artifact_s v) const;
 	bool					is(spell_s v) const { return spellbook.is(v); }
 	bool					is(skill_s v) const { return get(v)>0; }
@@ -889,6 +890,15 @@ void						setcamera(short unsigned index);
 short unsigned				to(short unsigned i, direction_s d);
 direction_s					to(direction_s f, direction_s d);
 void						wave(short unsigned start, int skill, int ship_master);
+}
+namespace battle {
+namespace setting {
+extern bool					movement, cursor, distance, grid, index;
+}
+const int					awd = 11;
+const int					ahd = 9;
+unsigned					getcost(short unsigned index);
+point						i2h(short unsigned index);
 }
 const char*					getstr(building_s id, kind_s kind);
 DECLENUM(ability);

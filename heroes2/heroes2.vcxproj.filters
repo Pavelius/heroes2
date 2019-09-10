@@ -245,5 +245,11 @@
     <ClCompile Include="variant.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="dialog_battle.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
+    <ClCompile Include="battle.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

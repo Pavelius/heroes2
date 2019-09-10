@@ -136,10 +136,12 @@
     <ClCompile Include="army.cpp" />
     <ClCompile Include="armysize.cpp" />
     <ClCompile Include="artifacts.cpp" />
+    <ClCompile Include="battle.cpp" />
     <ClCompile Include="castle.cpp" />
     <ClCompile Include="castle_names.cpp" />
     <ClCompile Include="dialog_adventure.cpp" />
     <ClCompile Include="dialog_army.cpp" />
+    <ClCompile Include="dialog_battle.cpp" />
     <ClCompile Include="dialog_castle.cpp" />
     <ClCompile Include="dialog_city.cpp" />
     <ClCompile Include="dialog_game.cpp" />

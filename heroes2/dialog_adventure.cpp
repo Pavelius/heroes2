@@ -344,9 +344,12 @@ static void open_dialog() {
 static void standart_input() {
 	switch(hilite_var.type) {
 	case CastleVar:
-		if(hot::key == MouseLeft && hot::pressed)
-			draw::execute(choose_castle, (int)hilite_var.castle);
-		else if(hot::key == MouseLeftDBL && hot::pressed) {
+		if(hot::key == MouseLeft && hot::pressed) {
+			if(current_var.type == Hero && hilite_index == hilite_var.castle->getpos()) {
+				execute(route_path, hilite_index);
+			} else
+				execute(choose_castle, (int)hilite_var.castle);
+		} else if(hot::key == MouseLeftDBL && hot::pressed) {
 			if(!current_player || hilite_var.castle->getplayer() == current_player)
 				execute(open_dialog, (int)hilite_var.castle);
 		}

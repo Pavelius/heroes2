@@ -89,6 +89,14 @@ struct animation {
 	void					set(res_s id, unsigned char frame);
 	bool					update();
 };
+struct battleimage : animation, variant, positioni {
+	squadi					squad;
+	squadi*					squad_source;
+	void					operator=(const variant& e);
+	void					clear();
+	void					paint() const;
+	void					set(action_s action);
+};
 struct screenshoot {
 	screenshoot();
 	~screenshoot();

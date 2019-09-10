@@ -178,7 +178,7 @@ enum tag_s : unsigned char {
 	Fly, Twice, Stealth, MeleeArcher, Wide,
 };
 enum action_s : unsigned char {
-	Wait, Warn, Move, PalmFace, AttackAction, FlyAction, Shoot, Damaged, Dead, Killed,
+	Wait, Warn, Move, PalmFace, AttackAction, FlyAction, Shoot, Damaged, Dead, Killed, Cast,
 };
 enum map_flag_s : unsigned char {
 	AttackTile, BlockedTile, ActionTile,

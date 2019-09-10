@@ -9,11 +9,9 @@ static unsigned char	hexagon_color;
 static res_s			back, frng;
 static unsigned short	hilite_index;
 
-namespace {
-struct drawablei : animation, pvar {
-
-};
-}
+static battleimage		units[32];
+static unsigned			units_count;
+static battleimage		attacker_image, defender_image;
 
 inline int sin_a(int a) {
 	return a * 38 / 43;
@@ -80,9 +78,10 @@ static void prepare_background(landscape_s area, bool trees) {
 	hexagon_color = light ? 0xE0 : 0xE5;
 }
 
-static void prepare_leader(drawablei& e, heroi* hero, bool defender) {
+static void prepare_leader(battleimage& e, heroi* hero, bool defender) {
 	e.clear();
-	*((pvar*)&e) = hero;
+	e = hero->getid();
+	e.set(Wait);
 	if(defender) {
 		e.pos.x = 606;
 		e.pos.y = 156;
@@ -96,7 +95,7 @@ static void prepare_leader(drawablei& e, heroi* hero, bool defender) {
 static void paint_grid(const squadi* squad) {
 	// Shadow movement indecies
 	if(setting::movement) {
-		draw::state push;
+		state push;
 		font = SMALFONT;
 		unsigned radius = squad->get(Speed) + 2;
 		for(auto i = 0; i < awd*ahd; i++) {
@@ -128,12 +127,12 @@ static void paint_grid(const squadi* squad) {
 	}
 	// Show index (only debug)
 	if(setting::index) {
-		draw::state push;
+		state push;
 		font = SMALFONT;
 		for(auto i = 0; i < awd*ahd; i++) {
 			auto pt = i2h(i);
 			char temp[8]; zprint(temp, "%1i", i);
-			draw::text(pt.x - 4, pt.y - 4, temp);
+			text(pt.x - 4, pt.y - 4, temp);
 		}
 	}
 }
@@ -143,6 +142,8 @@ void heroi::setup_battle(heroi* enemy) {
 	defender = enemy;
 	auto pos = defender->getpos();
 	prepare_background(Dirt, true);
+	prepare_leader(attacker_image, attacker, false);
+	prepare_leader(defender_image, defender, true);
 }
 
 static void skip_turn() {
@@ -228,11 +229,34 @@ static void paint_field(squadi* squad) {
 		image(0, 0, frng, 0);
 }
 
+static unsigned select_drawables(battleimage** source, unsigned count) {
+	auto pb = source;
+	auto pe = source + count;
+	*pb++ = &attacker_image;
+	*pb++ = &defender_image;
+	return pb - source;
+}
+
+static void update_drawables() {
+	if(hot::key == InputTimer) {
+		for(unsigned i = 0; i < units_count; i++)
+			units[i].update();
+	}
+}
+
+static void paint_drawables(battleimage** source, unsigned count) {
+	for(unsigned i = 0; i < count; i++)
+		source[i]->paint();
+}
+
 static void paint_screen(squadi* squad) {
+	battleimage* source[32];
+	auto count = select_drawables(source, sizeof(source)/ sizeof(source[0]));
 	hilite_index = Blocked;
 	paint_field(squad);
 	hittest_grid();
 	paint_grid(squad);
+	paint_drawables(source, count);
 }
 
 void heroi::battlemove() {
@@ -240,5 +264,6 @@ void heroi::battlemove() {
 	while(ismodal()) {
 		paint_screen(p);
 		domodal();
+		update_drawables();
 	}
 }

@@ -543,7 +543,6 @@ class heroi : public namei, public armyi, public positioni {
 	direction_s				direction;
 	static void				open_artifact();
 	int						getbonus(ability_s v) const;
-	void					setup_battle(heroi* defender);
 public:
 	void					add(artifact_s id);
 	void					add(const costi& v);
@@ -604,6 +603,7 @@ public:
 	void					set(player_s v) { player = v; }
 	void					setmove(short unsigned i) { index_move = i; }
 	void					setportrait(unsigned char i) { portrait = i; }
+	void					setup_battle(heroi* defender);
 	void					setvisit(unsigned short index);
 	void					show(bool allow_change = true) const;
 	void					showbook(spell_type_s mode);

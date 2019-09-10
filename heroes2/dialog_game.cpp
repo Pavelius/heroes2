@@ -334,6 +334,11 @@ void gamei::newgame() {
 		//	return;
 		game.prepare();
 		playeri::prepare(game.difficult);
-		bsmeta<playeri>::elements[PlayerRed].adventure();
+		//bsmeta<playeri>::elements[PlayerRed].adventure();
+		auto ph = map::find(6435);
+		auto pd = bsmeta<heroi>::elements + RandomHero;
+		pd->setpos(4640);
+		ph.hero->setup_battle(pd);
+		ph.hero->battlemove();
 	}
 }

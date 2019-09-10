@@ -719,7 +719,7 @@ static void paint_block(const rect& rcmap, point camera) {
 
 static void tips_info(bool show_resource_count, bool show_monster_count, bool show_artifact_name) {
 	char temp[260]; stringbuilder sb(temp); temp[0] = 0;
-	//sb.add("%1i (%2i, %3i)", hilite_index, map::i2x(hilite_index), map::i2y(hilite_index));
+	sb.add("%1i (%2i, %3i)", hilite_index, map::i2x(hilite_index), map::i2y(hilite_index));
 	switch(hilite_var.type) {
 	case Moveable:
 		switch(hilite_var.moveable->gettype()) {

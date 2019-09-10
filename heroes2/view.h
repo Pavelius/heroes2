@@ -122,6 +122,8 @@ typedef void(*eventproc)();
 //
 const int					cell_wd = 45;
 const int					cell_hd = 52;
+const int					cell_wr = 22;
+const int					cell_hr = 13;
 extern rect					clipping;
 extern unsigned				counter;
 extern eventproc			domodal;

@@ -9,6 +9,12 @@ static unsigned char	hexagon_color;
 static res_s			back, frng;
 static unsigned short	hilite_index;
 
+namespace {
+struct drawablei : animation, pvar {
+
+};
+}
+
 inline int sin_a(int a) {
 	return a * 38 / 43;
 }
@@ -74,6 +80,18 @@ static void prepare_background(landscape_s area, bool trees) {
 	hexagon_color = light ? 0xE0 : 0xE5;
 }
 
+static void prepare_leader(drawablei& e, heroi* hero, bool defender) {
+	e.clear();
+	*((pvar*)&e) = hero;
+	if(defender) {
+		e.pos.x = 606;
+		e.pos.y = 156;
+		e.flags = AFMirror;
+	} else {
+		e.pos.x = 32;
+		e.pos.y = 186;
+	}
+}
 
 static void paint_grid(const squadi* squad) {
 	// Shadow movement indecies
@@ -96,9 +114,9 @@ static void paint_grid(const squadi* squad) {
 	}
 	// Shadow cursor index
 	if(setting::cursor) {
-		if(hilite_index != -1) {
+		if(hilite_index != Blocked) {
 			auto pt = i2h(hilite_index);
-			//hexagonf(pt.x, pt.y, 0);
+			hexagonf(pt.x, pt.y, 0);
 		}
 	}
 	// Show grid
@@ -128,6 +146,7 @@ void heroi::setup_battle(heroi* enemy) {
 }
 
 static void skip_turn() {
+
 }
 
 static void open_setting() {
@@ -138,6 +157,58 @@ static void start_autocombat() {
 
 }
 
+static void hittest_grid() {
+	for(int i = 0; i < awd*ahd; i++) {
+		auto pt = i2h(i);
+		rect rc = {pt.x - cell_wd / 2, pt.y - cell_hr, pt.x + cell_wd / 2, pt.y + cell_hr};
+		point cooru[] =
+		{
+			{(short)(pt.x - cell_wd / 2), (short)(pt.y - cell_hr)},
+		{pt.x, (short)(pt.y - cell_hd / 2)},
+		{(short)(pt.x + cell_wd / 2), (short)(pt.y - cell_hr)},
+		};
+		point coord[] =
+		{
+			{(short)(pt.x + cell_wd / 2), (short)(pt.y + cell_hr)},
+		{(short)pt.x, (short)(pt.y + cell_hd / 2)},
+		{(short)(pt.x - cell_wd / 2), (short)(pt.y + cell_hr)},
+		};
+		if(mousein(rc)
+			|| hot::mouse.in(cooru[0], cooru[1], cooru[2])
+			|| hot::mouse.in(coord[0], coord[1], coord[2])) {
+			hilite_index = i;
+			return;
+		}
+	}
+}
+
+static direction_s hex_direction(int x1, int y1, point pt) {
+	const int INFL = 12;
+	point coord[7] = {{(short)x1, (short)y1},
+	{(short)x1, (short)(y1 - cell_hd * INFL / 2)}, // u
+	{(short)(x1 + cell_wd * INFL / 2), (short)(y1 - cell_hr * INFL)}, // ru
+	{(short)(x1 + cell_wd * INFL / 2), (short)(y1 + cell_hr * INFL)}, // rd
+	{(short)x1, (short)(y1 + cell_hd * INFL / 2)}, // d
+	{(short)(x1 - cell_wd * INFL / 2), (short)(y1 + cell_hr * INFL)}, // ld
+	{(short)(x1 - cell_wd * INFL / 2), (short)(y1 - cell_hr * INFL)}, // lu
+	};
+	if(pt == coord[0])
+		return Up;
+	else if(pt.in(coord[0], coord[1], coord[2]))
+		return RightUp;
+	else if(pt.in(coord[0], coord[2], coord[3]))
+		return Right;
+	else if(pt.in(coord[0], coord[3], coord[4]))
+		return RightDown;
+	else if(pt.in(coord[0], coord[4], coord[5]))
+		return LeftDown;
+	else if(pt.in(coord[0], coord[5], coord[6]))
+		return Left;
+	else if(pt.in(coord[0], coord[1], coord[6]))
+		return LeftUp;
+	return Up;
+}
+
 static void paint_field(squadi* squad) {
 	auto h1 = getheight(TEXTBAR, 4);
 	auto h2 = getheight(TEXTBAR, 6);
@@ -145,7 +216,6 @@ static void paint_field(squadi* squad) {
 	auto h8 = getheight(TEXTBAR, 8);
 	auto h9 = getheight(TEXTBAR, 9);
 	auto w3 = getwidth(TEXTBAR, 0);
-	hilite_index = Blocked;
 	image(0, 0, back, 0);
 	auto x = getwidth(TEXTBAR, 4);
 	image(x, height - h8 - h9, TEXTBAR, 8);
@@ -154,13 +224,14 @@ static void paint_field(squadi* squad) {
 	button(0, height - h1 - h2, TEXTBAR, start_autocombat, {4, 4, 5}, Alpha + 'A', "Запустить автоматический бой");
 	button(0, height - h2, TEXTBAR, open_setting, {6, 6, 7}, KeyEscape, "Открыть настройки");
 	button(width - w3, height - h3, TEXTBAR, skip_turn, {0, 0, 1}, KeySpace, "Пропустить текущий ход");
-	//hittest_grid();
 	if(frng != NoRes)
 		image(0, 0, frng, 0);
 }
 
 static void paint_screen(squadi* squad) {
+	hilite_index = Blocked;
 	paint_field(squad);
+	hittest_grid();
 	paint_grid(squad);
 }
 

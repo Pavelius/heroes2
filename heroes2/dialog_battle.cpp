@@ -3,6 +3,14 @@
 using namespace draw;
 using namespace battle;
 
+heroi*					battle::attacker;
+heroi*					battle::defender;
+bool					battle::setting::movement = true;
+bool					battle::setting::cursor = true;
+bool					battle::setting::distance = true;
+bool					battle::setting::grid = true;
+bool					battle::setting::index = true;
+
 static unsigned char	hexagon_color;
 static res_s			back, frng;
 static unsigned short	hilite_index;
@@ -10,6 +18,7 @@ static unsigned short	hilite_index;
 static battleimage		units[32];
 static unsigned			units_count;
 static battleimage		attacker_image, defender_image;
+static short unsigned position_wide[2][5] = {{0, 22, 44, 66, 88}, {10, 32, 54, 76, 98}};
 
 void battle::add(short unsigned index, squadi& squad, heroi* leader) {
 	if(units_count >= sizeof(units) / sizeof(units[0]))
@@ -20,8 +29,32 @@ void battle::add(short unsigned index, squadi& squad, heroi* leader) {
 	e.pos = i2h(index);
 	e.squad = squad;
 	e.squad_source = &squad;
+	e.leader = leader;
 	e.setpos(index);
 	e.set(Wait);
+}
+
+bool battle::iscontinue() {
+	heroi* leader = 0;
+	for(unsigned i = 0; i < units_count; i++) {
+		if(!leader)
+			leader = units[i].leader;
+		else if(units[i].leader != leader)
+			return false;
+	}
+	return true;
+}
+
+void battle::start() {
+	static speed_s speeds[] = {UltraFastSpeed, VeryFastSpeed, FastSpeed, AverageSpeed, SlowSpeed, VerySlowSpeed, CrawlingSpeed};
+	while(iscontinue()) {
+		for(auto s : speeds) {
+			for(unsigned i = 0; i < units_count; i++) {
+				if(units[i].squad.get(Speed) != s)
+					continue;
+			}
+		}
+	}
 }
 
 inline int sin_a(int a) {
@@ -283,5 +316,30 @@ void heroi::battlemove() {
 		paint_screen(p);
 		domodal();
 		update_drawables();
+	}
+}
+
+unsigned battle::getcost(short unsigned index) {
+	return Blocked;
+}
+
+bool battle::isattacker(const heroi* hero) {
+	return hero == attacker;
+}
+
+static int getside(const heroi* leader) {
+	return (battle::attacker == leader) ? 0 : 1;
+}
+
+void battle::add(armyi& army, heroi* leader) {
+	auto index = 0;
+	auto side = getside(leader);
+	for(auto& e : army.units) {
+		if(!e)
+			continue;
+		add(position_wide[side][index], e, leader);
+		index++;
+		if(index >= 5)
+			break;
 	}
 }

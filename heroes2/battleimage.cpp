@@ -114,12 +114,45 @@ void battleimage::clear() {
 	index = Blocked;
 }
 
+static int getbarframe() {
+	bool isboosted = false;
+	bool ispenalized = false;
+	if(isboosted && ispenalized)
+		return 13;
+	else if(isboosted)
+		return 12;
+	else if(ispenalized)
+		return 14;
+	return 10;
+}
+
 void battleimage::paint() const {
 	image(pos.x, pos.y, res, frame, flags);
 	if(type == Hero && hero != RandomHero) {
 		auto player = bsmeta<heroi>::elements[hero].getplayer()->getid();
 		auto icn = res_s(HEROFL00 + player - PlayerBlue);
 		draw::image(pos.x, pos.y, icn, draw::counter % 5, flags);
+	} else if(type == Monster) {
+		auto count = squad.count;
+		if(count) {
+			state push;
+			font = SMALFONT;
+			char temp[32]; zprint(temp, "%1i", count);
+			auto x = pos.x;
+			auto y = pos.y;
+			auto frame = getbarframe();
+			auto x1 = x;
+			auto y1 = y;
+			if(true) {
+				x1 += 12;
+				y1 -= draw::getheight(TEXTBAR, frame);
+			} else {
+				x1 -= 32;
+				y1 -= draw::getheight(TEXTBAR, frame) * 2;
+			}
+			image(x1, y1, TEXTBAR, frame);
+			text(x1 + (draw::getwidth(TEXTBAR, frame) - textw(temp)) / 2, y1 + 2, temp);
+		}
 	}
 }
 
@@ -146,13 +179,9 @@ void battleimage::set(action_s action, int param) {
 					count = e.idle[1] / 2;
 					start = e.idle[0] + e.idle[1] - count;
 				}
-				wait = xrand(1, 3);
+				wait = xrand(4, 10);
 				break;
 			}
-			break;
-		case Warn:
-			start = e.idle[0];
-			count = e.idle[1];
 			break;
 		case Move:
 			start = e.move[0];
@@ -231,8 +260,7 @@ void battleimage::set(action_s action, int param) {
 		case Barbarian:
 			res = CMBTHROB;
 			switch(value) {
-			case Wait: start = 15; count = 1; break;
-			case Warn: start = xrand(15, 18); count = 1; break;
+			case Wait: start = xrand(15, 18); count = 1; break;
 			case PalmFace: start = 1; count = 5; break;
 			case Cast: start = 6; count = 9; break;
 			default: break;
@@ -241,7 +269,7 @@ void battleimage::set(action_s action, int param) {
 		case Knight:
 			res = CMBTHROK;
 			switch(action) {
-			case Warn: case Wait: start = 15; count = 5; break;
+			case Wait: start = 15; count = 5; break;
 			case PalmFace: start = 1; count = 5; break;
 			case Cast: start = 12; count = 2; break;
 			default: break;
@@ -250,8 +278,7 @@ void battleimage::set(action_s action, int param) {
 		case Necromancer:
 			res = CMBTHRON;
 			switch(action) {
-			case Wait: start = 19; count = 1; break;
-			case Warn: start = xrand(17, 19); count = 1; break;
+			case Wait: start = xrand(17, 19); count = 1; break;
 			case PalmFace: start = 1; count = 5; break;
 			case Cast: start = 6; count = 9; break;
 			default: break;
@@ -260,7 +287,7 @@ void battleimage::set(action_s action, int param) {
 		case Sorcerer:
 			res = CMBTHROS;
 			switch(action) {
-			case Warn: case Wait: start = 13; count = 4; break;
+			case Wait: start = 13; count = 4; break;
 			case PalmFace: start = 1; count = 5; break;
 			case Cast: start = 6; count = 7; break;
 			default: break;
@@ -269,7 +296,7 @@ void battleimage::set(action_s action, int param) {
 		case Warlock:
 			res = CMBTHROW;
 			switch(action) {
-			case Warn: case Wait: start = 14; count = 3; break;
+			case Wait: start = 14; count = 3; break;
 			case PalmFace: start = 1; count = 5; break;
 			case Cast: start = 6; count = 8; break;
 			default: break;
@@ -278,7 +305,7 @@ void battleimage::set(action_s action, int param) {
 		case Wizard:
 			res = CMBTHROZ;
 			switch(action) {
-			case Warn: case Wait: start = 16; count = 3; break;
+			case Wait: start = 16; count = 3; break;
 			case PalmFace: start = 1; count = 5; break;
 			case Cast: start = 12; count = 7; break;
 			default: break;
@@ -286,6 +313,13 @@ void battleimage::set(action_s action, int param) {
 			break;
 		default: res = NoRes; start = 0; count = 0; break;
 		}
+		if(action==Wait)
+			wait = xrand(3, 8);
 	}
 	frame = start;
+}
+
+void battleimage::update() {
+	if(animation::update())
+		set(Wait);
 }

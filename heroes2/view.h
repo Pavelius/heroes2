@@ -91,10 +91,12 @@ struct animation {
 struct battleimage : animation, variant, positioni {
 	squadi					squad;
 	squadi*					squad_source;
+	heroi*					leader;
 	void					operator=(const variant& e);
 	void					clear();
 	void					paint() const;
 	void					set(action_s action, int param = 0);
+	void					update();
 };
 struct screenshoot {
 	screenshoot();

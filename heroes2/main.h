@@ -178,7 +178,7 @@ enum tag_s : unsigned char {
 	Fly, Twice, Stealth, MeleeArcher, Wide,
 };
 enum action_s : unsigned char {
-	Wait, Warn, Move, PalmFace, AttackAction, FlyAction, Shoot, Damaged, Dead, Killed, Cast,
+	Wait, Move, PalmFace, AttackAction, FlyAction, Shoot, Damaged, Dead, Killed, Cast,
 };
 enum map_flag_s : unsigned char {
 	AttackTile, BlockedTile, ActionTile,
@@ -903,6 +903,8 @@ const int					awd = 11, ahd = 9;
 unsigned					getcost(short unsigned index);
 point						i2h(short unsigned index);
 bool						isattacker(const heroi* hero);
+bool						iscontinue();
+void						start();
 }
 const char*					getstr(building_s id, kind_s kind);
 DECLENUM(ability);

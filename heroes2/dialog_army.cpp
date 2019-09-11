@@ -225,7 +225,7 @@ void squadi::show(const heroi* hero, bool info_mode, bool allow_dismiss, bool al
 	if(is(Fly))
 		mon.set(FlyAction, 1);
 	else
-		mon.set((d100()<30) ? Warn : Wait);
+		mon.set(Wait);
 	mon.pos.x = x + 24 + 146 - (is(Wide) ? cell_wd / 2 : 0);
 	mon.pos.y = y + 170;
 	while(ismodal()) {
@@ -259,11 +259,11 @@ void squadi::show(const heroi* hero, bool info_mode, bool allow_dismiss, bool al
 			setcursor(NoRes, 0);
 		domodal();
 		if(hot::key == InputTimer) {
-			if(mon.update()) {
+			if(mon.animation::update()) {
 				if(is(Fly))
 					mon.set(FlyAction, 1);
 				else
-					mon.set((d100()<30) ? Warn : Wait);
+					mon.set(Wait);
 			}
 		}
 		if(info_mode) {

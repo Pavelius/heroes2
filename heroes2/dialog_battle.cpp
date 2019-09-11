@@ -3,8 +3,6 @@
 using namespace draw;
 using namespace battle;
 
-static heroi*			attacker;
-static heroi*			defender;
 static unsigned char	hexagon_color;
 static res_s			back, frng;
 static unsigned short	hilite_index;
@@ -12,6 +10,19 @@ static unsigned short	hilite_index;
 static battleimage		units[32];
 static unsigned			units_count;
 static battleimage		attacker_image, defender_image;
+
+void battle::add(short unsigned index, squadi& squad, heroi* leader) {
+	if(units_count >= sizeof(units) / sizeof(units[0]))
+		return;
+	auto& e = units[units_count++];
+	e.clear();
+	e = squad.unit;
+	e.pos = i2h(index);
+	e.squad = squad;
+	e.squad_source = &squad;
+	e.setpos(index);
+	e.set(Wait);
+}
 
 inline int sin_a(int a) {
 	return a * 38 / 43;
@@ -141,6 +152,7 @@ void heroi::setup_battle(heroi* enemy) {
 	attacker = this;
 	defender = enemy;
 	auto pos = defender->getpos();
+	battle::add(*this, this);
 	prepare_background(Dirt, true);
 	prepare_leader(attacker_image, attacker, false);
 	prepare_leader(defender_image, defender, true);
@@ -234,6 +246,10 @@ static unsigned select_drawables(battleimage** source, unsigned count) {
 	auto pe = source + count;
 	*pb++ = &attacker_image;
 	*pb++ = &defender_image;
+	for(unsigned i = 0; i < units_count; i++) {
+		if(pb < pe)
+			*pb++ = &units[i];
+	}
 	return pb - source;
 }
 

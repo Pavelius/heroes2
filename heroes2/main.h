@@ -895,10 +895,14 @@ namespace battle {
 namespace setting {
 extern bool					movement, cursor, distance, grid, index;
 }
-const int					awd = 11;
-const int					ahd = 9;
+extern heroi*				attacker;
+extern heroi*				defender;
+void						add(short unsigned index, squadi& squad, heroi* leader);
+void						add(armyi& e, heroi* leader);
+const int					awd = 11, ahd = 9;
 unsigned					getcost(short unsigned index);
 point						i2h(short unsigned index);
+bool						isattacker(const heroi* hero);
 }
 const char*					getstr(building_s id, kind_s kind);
 DECLENUM(ability);

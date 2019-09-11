@@ -85,7 +85,6 @@ struct animation {
 	static int				getanimate(res_s id, int start, int ticket, bool quantity);
 	int						getwidth() const;
 	void					paint(int x, int y, unsigned flags = 0) const;
-	void					set(monster_s id, action_s a, int param = 0);
 	void					set(res_s id, unsigned char frame);
 	bool					update();
 };
@@ -95,7 +94,7 @@ struct battleimage : animation, variant, positioni {
 	void					operator=(const variant& e);
 	void					clear();
 	void					paint() const;
-	void					set(action_s action);
+	void					set(action_s action, int param = 0);
 };
 struct screenshoot {
 	screenshoot();

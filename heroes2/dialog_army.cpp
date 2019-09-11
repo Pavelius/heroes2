@@ -220,11 +220,14 @@ void squadi::show(const heroi* hero, bool info_mode, bool allow_dismiss, bool al
 	int h1 = getheight(back, 0);
 	int x = (width - w1) / 2 - 16;
 	int y = (height - h1) / 2;
-	animation mon;
+	battleimage mon;
+	mon = this->unit;
 	if(is(Fly))
-		mon.set(unit, FlyAction, 1);
+		mon.set(FlyAction, 1);
 	else
-		mon.set(unit, (d100()<30) ? Warn : Wait);
+		mon.set((d100()<30) ? Warn : Wait);
+	mon.pos.x = x + 24 + 146 - (is(Wide) ? cell_wd / 2 : 0);
+	mon.pos.y = y + 170;
 	while(ismodal()) {
 		surface.restore();
 		image(x, y, back, 7);
@@ -237,7 +240,7 @@ void squadi::show(const heroi* hero, bool info_mode, bool allow_dismiss, bool al
 		const char* p = getstr(unit);
 		draw::text(x1 + 140 - draw::textw(p) / 2, y1 + 40, p);
 		// avatar
-		mon.paint(x1 + 146 - (is(Wide) ? cell_wd / 2 : 0), y1 + 170);
+		mon.paint();
 		if(count) {
 			char temp[32]; zprint(temp, "%1i", count);
 			text(x1 + 140 - textw(temp) / 2, y1 + 227, temp);
@@ -258,9 +261,9 @@ void squadi::show(const heroi* hero, bool info_mode, bool allow_dismiss, bool al
 		if(hot::key == InputTimer) {
 			if(mon.update()) {
 				if(is(Fly))
-					mon.set(unit, FlyAction, 1);
+					mon.set(FlyAction, 1);
 				else
-					mon.set(unit, (d100()<30) ? Warn : Wait);
+					mon.set((d100()<30) ? Warn : Wait);
 			}
 		}
 		if(info_mode) {

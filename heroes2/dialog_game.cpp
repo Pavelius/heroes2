@@ -337,7 +337,10 @@ void gamei::newgame() {
 		//bsmeta<playeri>::elements[PlayerRed].adventure();
 		auto ph = map::find(6435);
 		auto pd = bsmeta<heroi>::elements + RandomHero;
+		pd->clear();
 		pd->setpos(4640);
+		pd->armyi::clear();
+		pd->add(Skeleton, 40);
 		ph.hero->setup_battle(pd);
 		ph.hero->battlemove();
 	}

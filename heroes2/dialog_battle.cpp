@@ -3,8 +3,10 @@
 using namespace draw;
 using namespace battle;
 
-heroi*					battle::attacker;
-heroi*					battle::defender;
+const int				awd = 11, ahd = 9;
+static heroi*			attacker;
+static heroi*			defender;
+static battleimage*		current_image;
 bool					battle::setting::movement = true;
 bool					battle::setting::cursor = true;
 bool					battle::setting::distance = true;
@@ -20,13 +22,32 @@ static unsigned			units_count;
 static battleimage		attacker_image, defender_image;
 static short unsigned position_wide[2][5] = {{0, 22, 44, 66, 88}, {10, 32, 54, 76, 98}};
 
-void battle::add(short unsigned index, squadi& squad, heroi* leader) {
+static point i2h(short unsigned index) {
+	int x = 20 + 88 - ((index / awd) % 2 ? cell_wd / 2 : 0) + (cell_wd - 1) * (index % awd);
+	int y = 20 + 85 + ((cell_hd / 4) * 3 - 1) * (index / awd);
+	return{(short)x, (short)y};
+}
+
+static unsigned getcost(short unsigned index) {
+	return Blocked;
+}
+
+static bool isattacker(const heroi* hero) {
+	return hero == attacker;
+}
+
+static int getside(const heroi* leader) {
+	return (attacker == leader) ? 0 : 1;
+}
+
+static void add_squad(short unsigned index, squadi& squad, heroi* leader) {
 	if(units_count >= sizeof(units) / sizeof(units[0]))
 		return;
 	auto& e = units[units_count++];
 	e.clear();
 	e = squad.unit;
 	e.pos = i2h(index);
+	e.flags = isattacker(leader) ? 0 : AFMirror;
 	e.squad = squad;
 	e.squad_source = &squad;
 	e.leader = leader;
@@ -34,7 +55,20 @@ void battle::add(short unsigned index, squadi& squad, heroi* leader) {
 	e.set(Wait);
 }
 
-bool battle::iscontinue() {
+static void add_squad(armyi& army, heroi* leader) {
+	auto index = 0;
+	auto side = getside(leader);
+	for(auto& e : army.units) {
+		if(!e)
+			continue;
+		add_squad(position_wide[side][index], e, leader);
+		index++;
+		if(index >= 5)
+			break;
+	}
+}
+
+static bool iscontinue() {
 	heroi* leader = 0;
 	for(unsigned i = 0; i < units_count; i++) {
 		if(!leader)
@@ -45,7 +79,7 @@ bool battle::iscontinue() {
 	return true;
 }
 
-void battle::start() {
+static void start() {
 	static speed_s speeds[] = {UltraFastSpeed, VeryFastSpeed, FastSpeed, AverageSpeed, SlowSpeed, VerySlowSpeed, CrawlingSpeed};
 	while(iscontinue()) {
 		for(auto s : speeds) {
@@ -63,12 +97,6 @@ inline int sin_a(int a) {
 
 inline int cos_a(int a) {
 	return a * 22 / 43;
-}
-
-point battle::i2h(short unsigned index) {
-	int x = 20 + 88 - ((index / awd) % 2 ? cell_wd / 2 : 0) + (cell_wd - 1) * (index % awd);
-	int y = 20 + 85 + ((cell_hd / 4) * 3 - 1) * (index / awd);
-	return{(short)x, (short)y};
 }
 
 static void prepare_background(landscape_s area, bool trees) {
@@ -185,7 +213,8 @@ void heroi::setup_battle(heroi* enemy) {
 	attacker = this;
 	defender = enemy;
 	auto pos = defender->getpos();
-	battle::add(*this, this);
+	add_squad(*this, this);
+	add_squad(*enemy, enemy);
 	prepare_background(Dirt, true);
 	prepare_leader(attacker_image, attacker, false);
 	prepare_leader(defender_image, defender, true);
@@ -296,8 +325,10 @@ static void update_drawables() {
 }
 
 static void paint_drawables(battleimage** source, unsigned count) {
-	for(unsigned i = 0; i < count; i++)
+	for(unsigned i = 0; i < count; i++) {
 		source[i]->paint();
+	}
+	source[0]->stroke();
 }
 
 static void paint_screen(squadi* squad) {
@@ -316,30 +347,5 @@ void heroi::battlemove() {
 		paint_screen(p);
 		domodal();
 		update_drawables();
-	}
-}
-
-unsigned battle::getcost(short unsigned index) {
-	return Blocked;
-}
-
-bool battle::isattacker(const heroi* hero) {
-	return hero == attacker;
-}
-
-static int getside(const heroi* leader) {
-	return (battle::attacker == leader) ? 0 : 1;
-}
-
-void battle::add(armyi& army, heroi* leader) {
-	auto index = 0;
-	auto side = getside(leader);
-	for(auto& e : army.units) {
-		if(!e)
-			continue;
-		add(position_wide[side][index], e, leader);
-		index++;
-		if(index >= 5)
-			break;
 	}
 }

@@ -96,6 +96,7 @@ struct battleimage : animation, variant, positioni {
 	void					clear();
 	void					paint() const;
 	void					set(action_s action, int param = 0);
+	void					stroke() const;
 	void					update();
 };
 struct screenshoot {
@@ -238,6 +239,7 @@ void						shadow(int x1, int y1, int x2, int y2, int intense);
 void						splitter(int x, int y, res_s res, int& value, int from, int to);
 void						status(const rect& rc);
 void						status(const char* format, ...);
+void						stroke(int x, int y, res_s res, int frame, int flags, unsigned char thin, unsigned char color);
 void						tooltips(const char* header, const char* format, ...);
 void						text(int x, int y, const char* string, int count = -1);
 void						text(int x, int y, int width, align_s align, const char* string, int count = -1);

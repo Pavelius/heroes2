@@ -126,6 +126,10 @@ static int getbarframe() {
 	return 10;
 }
 
+void battleimage::stroke() const {
+	draw::stroke(pos.x, pos.y, res, frame, flags, 1, 219);
+}
+
 void battleimage::paint() const {
 	image(pos.x, pos.y, res, frame, flags);
 	if(type == Hero && hero != RandomHero) {
@@ -143,12 +147,11 @@ void battleimage::paint() const {
 			auto frame = getbarframe();
 			auto x1 = x;
 			auto y1 = y;
-			if(true) {
+			if((flags&AFMirror)==0) {
 				x1 += 12;
 				y1 -= draw::getheight(TEXTBAR, frame);
 			} else {
 				x1 -= 32;
-				y1 -= draw::getheight(TEXTBAR, frame) * 2;
 			}
 			image(x1, y1, TEXTBAR, frame);
 			text(x1 + (draw::getwidth(TEXTBAR, frame) - textw(temp)) / 2, y1 + 2, temp);

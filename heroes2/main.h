@@ -356,6 +356,7 @@ struct squadi {
 struct armyi {
 	squadi					units[5];
 	squadi*					add(monster_s v, short unsigned count);
+	void					clear();
 	squadi*					getsquad(monster_s v) const;
 	squadi*					getslowest() const;
 	unsigned				getstrenght() const;
@@ -895,16 +896,6 @@ namespace battle {
 namespace setting {
 extern bool					movement, cursor, distance, grid, index;
 }
-extern heroi*				attacker;
-extern heroi*				defender;
-void						add(short unsigned index, squadi& squad, heroi* leader);
-void						add(armyi& e, heroi* leader);
-const int					awd = 11, ahd = 9;
-unsigned					getcost(short unsigned index);
-point						i2h(short unsigned index);
-bool						isattacker(const heroi* hero);
-bool						iscontinue();
-void						start();
 }
 const char*					getstr(building_s id, kind_s kind);
 DECLENUM(ability);

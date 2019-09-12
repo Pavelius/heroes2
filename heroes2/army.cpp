@@ -124,3 +124,7 @@ squadi* armyi::getsquad(monster_s v) const {
 	}
 	return 0;
 }
+
+void armyi::clear() {
+	memset(this, 0, sizeof(*this));
+}

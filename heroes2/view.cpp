@@ -855,6 +855,79 @@ void draw::image(const rect& rc, resource_s id, int count, const char* tips) {
 	//rectb(rc, 0x10);
 }
 
+void draw::stroke(int x, int y, res_s res, int frame, int flags, unsigned char thin, unsigned char color) {
+	auto p = (icn*)get(res);
+	if(!p || !p->count)
+		return;
+	const unsigned char tr = 0xFF;
+	rect rc = get(res, frame, x, y, flags);
+	auto w1 = rc.width();
+	auto h1 = rc.height();
+	auto sz = w1 * h1;
+	unsigned char* canvas = new unsigned char[sz];
+	memset(canvas, tr, sz);
+	icn::record& r = p->records[frame % p->count];
+	unsigned char* d = (unsigned char*)p->records + r.offset;
+	if(flags&AFMirror) {
+		sprite_v1m(canvas, w1, d, h1,
+			canvas,
+			canvas + w1,
+			0);
+	} else {
+		sprite_v1(canvas, w1, d, h1,
+			canvas,
+			canvas + w1,
+			0);
+	}
+	for(int y1 = 0; y1 < h1; y1++) {
+		bool inside = false;
+		for(int x1 = 0; x1 < w1; x1++) {
+			auto m = canvas[x1 + y1 * w1];
+			if(!inside) {
+				if(m == tr)
+					continue;
+				auto px = rc.x1 + x1 - 1;
+				auto py = rc.y1 + y1 - 1;
+				for(auto n = 0; n < thin; n++, px--)
+					pixel(px, py, color);
+				inside = true;
+			} else {
+				if(m != tr)
+					continue;
+				auto px = rc.x1 + x1 - 2;
+				auto py = rc.y1 + y1 - 1;
+				for(auto n = 0; n < thin; n++, px++)
+					pixel(px, py, color);
+				inside = false;
+			}
+		}
+	}
+	for(int x1 = 0; x1 < w1; x1++) {
+		bool inside = false;
+		for(int y1 = 0; y1 < h1; y1++) {
+			auto m = canvas[x1 + y1 * w1];
+			if(!inside) {
+				if(m == tr)
+					continue;
+				auto px = rc.x1 + x1 - 1;
+				auto py = rc.y1 + y1 - 1;
+				for(auto n = 0; n < thin; n++, py--)
+					pixel(px, py, color);
+				inside = true;
+			} else {
+				if(m != tr)
+					continue;
+				auto px = rc.x1 + x1 - 1;
+				auto py = rc.y1 + y1 - 2;
+				for(auto n = 0; n < thin; n++, py++)
+					pixel(px, py, color);
+				inside = false;
+			}
+		}
+	}
+	delete canvas;
+}
+
 static void show_tooltips() {
 	message(tooltips_text, 0, 0, NoButtons);
 }
@@ -1281,7 +1354,7 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 			zprint(temp, "+1");
 			draw::state push;
 			font = FONT;
-			text(x + (size.x - textw(temp))/2, y + h1 - texth() - 7, temp);
+			text(x + (size.x - textw(temp)) / 2, y + h1 - texth() - 7, temp);
 		} else
 			render(x, z, res, frame);
 		break;
@@ -1370,7 +1443,7 @@ static int addcost(variantcol* result, const costi& source) {
 	for(auto i = Gold; i <= Gems; i = (resource_s)(i + 1)) {
 		if(!source.data[i])
 			continue;
-		*((variant*)(result+count)) = i;
+		*((variant*)(result + count)) = i;
 		result[count].count = source.data[i];
 		count++;
 	}

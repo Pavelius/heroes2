@@ -11,3 +11,9 @@ const char* variant::getname() const {
 	default: return "";
 	}
 }
+
+heroi* variant::gethero() const {
+	if(hero == RandomHero)
+		return 0;
+	return bsmeta<heroi>::elements + hero;
+}

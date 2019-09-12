@@ -123,8 +123,7 @@ static unsigned char* skip_v1(unsigned char* src, int dy) {
 			return src;
 		else if(c < 0xC0) // 0xBF - skip data
 			src++;
-		else if(c == 0xC0)// 0xC0 - shadow
-		{
+		else if(c == 0xC0) { // 0xC0 - shadow
 			++src;
 			unsigned char c = *src % 4 ? *src % 4 : *(++src);
 			if(c) {

@@ -277,6 +277,7 @@ struct variant {
 	constexpr bool operator==(const variant& e) const { return type == e.type && value == e.value; }
 	constexpr explicit operator bool() const { return type != NoVariant; }
 	const char*				getname() const;
+	heroi*					gethero() const;
 };
 struct resourcei {
 	const char*				name;
@@ -553,7 +554,8 @@ public:
 	int						ask(const char* format);
 	int						ask(const char* format, const variantcol* source);
 	bool					battle(moveablei& enemy);
-	void					battlemove();
+	void					battlemove(squadi* squad);
+	void					battlestart();
 	bool					buymagicbook();
 	void					clear();
 	void					choose();

@@ -68,7 +68,7 @@ static void add_squad(armyi& army, heroi* leader) {
 	}
 }
 
-static bool iscontinue() {
+static bool isend() {
 	heroi* leader = 0;
 	for(unsigned i = 0; i < units_count; i++) {
 		if(!leader)
@@ -77,18 +77,6 @@ static bool iscontinue() {
 			return false;
 	}
 	return true;
-}
-
-static void start() {
-	static speed_s speeds[] = {UltraFastSpeed, VeryFastSpeed, FastSpeed, AverageSpeed, SlowSpeed, VerySlowSpeed, CrawlingSpeed};
-	while(iscontinue()) {
-		for(auto s : speeds) {
-			for(unsigned i = 0; i < units_count; i++) {
-				if(units[i].squad.get(Speed) != s)
-					continue;
-			}
-		}
-	}
 }
 
 inline int sin_a(int a) {
@@ -324,28 +312,68 @@ static void update_drawables() {
 	}
 }
 
-static void paint_drawables(battleimage** source, unsigned count) {
+static void paint_drawables(battleimage** source, unsigned count, const squadi* squad) {
 	for(unsigned i = 0; i < count; i++) {
 		source[i]->paint();
+		if(&source[i]->squad == squad)
+			source[i]->stroke();
 	}
-	source[0]->stroke();
+}
+
+static void hittest_drawable(battleimage** source, unsigned count) {
+	for(unsigned i = 0; i < count; i++) {
+		auto p = source[i];
+		if(hilite_index != Blocked && p->index == hilite_index)
+			current_image = p;
+		else if(p->type == Hero) {
+			if(mousein({p->pos.x - 32, p->pos.y - 96, p->pos.x + 32, p->pos.y+ 8}))
+				current_image = p;
+		}
+	}
+}
+
+static void paint_status() {
+	if(!current_image)
+		return;
+	if(current_image->type == Hero) {
+		auto p = current_image->gethero();
+		status(p->getname());
+	} else if(current_image->type == Monster) {
+		auto p = &current_image->squad;
+		status("%1i %2", p->count, bsmeta<monsteri>::elements[p->unit].multiname);
+	}
 }
 
 static void paint_screen(squadi* squad) {
 	battleimage* source[32];
 	auto count = select_drawables(source, sizeof(source)/ sizeof(source[0]));
 	hilite_index = Blocked;
-	paint_field(squad);
+	current_image = 0;
 	hittest_grid();
+	hittest_drawable(source, count);
+	paint_field(squad);
 	paint_grid(squad);
-	paint_drawables(source, count);
+	paint_status();
+	paint_drawables(source, count, squad);
 }
 
-void heroi::battlemove() {
-	auto p = getslowest();
+void heroi::battlemove(squadi* squad) {
 	while(ismodal()) {
-		paint_screen(p);
+		paint_screen(squad);
 		domodal();
 		update_drawables();
+	}
+}
+
+void heroi::battlestart() {
+	static speed_s speeds[] = {UltraFastSpeed, VeryFastSpeed, FastSpeed, AverageSpeed, SlowSpeed, VerySlowSpeed, CrawlingSpeed};
+	while(!isend()) {
+		for(auto s : speeds) {
+			for(unsigned i = 0; i < units_count; i++) {
+				if(::units[i].squad.get(Speed) != s)
+					continue;
+				::units[i].leader->battlemove(&::units[i].squad);
+			}
+		}
 	}
 }

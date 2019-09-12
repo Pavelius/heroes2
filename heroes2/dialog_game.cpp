@@ -342,6 +342,6 @@ void gamei::newgame() {
 		pd->armyi::clear();
 		pd->add(Skeleton, 40);
 		ph.hero->setup_battle(pd);
-		ph.hero->battlemove();
+		ph.hero->battlestart();
 	}
 }

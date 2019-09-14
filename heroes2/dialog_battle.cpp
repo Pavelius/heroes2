@@ -1,21 +1,23 @@
 #include "view.h"
 
 using namespace draw;
-using namespace battle;
 
 const int				awd = 11, ahd = 9;
 static heroi*			attacker;
 static heroi*			defender;
 static battleimage*		current_image;
-bool					battle::setting::movement = true;
-bool					battle::setting::cursor = true;
-bool					battle::setting::distance = true;
-bool					battle::setting::grid = true;
-bool					battle::setting::index = true;
+battlei					battle;
 
 static unsigned char	hexagon_color;
 static res_s			back, frng;
 static unsigned short	hilite_index;
+static unsigned short	path[awd * ahd];
+static unsigned short	path_stack[256 * 256];
+static unsigned short	path_push;
+static unsigned short	path_pop;
+static unsigned short	path_goal;
+static unsigned short	path_start;
+static const direction_s all_around[] = {Left, Right, LeftUp, LeftDown, RightUp, RightDown};
 
 static battleimage		units[32];
 static unsigned			units_count;
@@ -152,19 +154,19 @@ static void prepare_leader(battleimage& e, heroi* hero, bool defender) {
 	}
 }
 
-static void paint_grid(const squadi* squad) {
+static void paint_grid(const battleimage* bi) {
 	// Shadow movement indecies
-	if(setting::movement) {
+	if(battle.movement) {
 		state push;
 		font = SMALFONT;
-		unsigned radius = squad->get(Speed) + 2;
+		unsigned radius = bi->squad.get(Speed) + 2;
 		for(auto i = 0; i < awd*ahd; i++) {
 			auto m = getcost(i);
 			if(m) {
 				auto pt = i2h(i);
 				if(m <= radius)
 					draw::hexagonf(pt.x, pt.y, 0);
-				if(m < Blocked && setting::distance) {
+				if(m < Blocked && battle.distance) {
 					char temp[32]; zprint(temp, "%1i", m - 1);
 					text(pt.x - draw::textw(temp) / 2, pt.y - 5, temp);
 				}
@@ -172,21 +174,21 @@ static void paint_grid(const squadi* squad) {
 		}
 	}
 	// Shadow cursor index
-	if(setting::cursor) {
+	if(battle.cursor) {
 		if(hilite_index != Blocked) {
 			auto pt = i2h(hilite_index);
 			hexagonf(pt.x, pt.y, 0);
 		}
 	}
 	// Show grid
-	if(setting::grid) {
+	if(battle.grid) {
 		for(int i = 0; i < awd*ahd; i++) {
 			auto pt = i2h(i);
 			hexagon(pt.x, pt.y, hexagon_color);
 		}
 	}
 	// Show index (only debug)
-	if(setting::index) {
+	if(battle.index) {
 		state push;
 		font = SMALFONT;
 		for(auto i = 0; i < awd*ahd; i++) {
@@ -272,7 +274,7 @@ static direction_s hex_direction(int x1, int y1, point pt) {
 	return Up;
 }
 
-static void paint_field(squadi* squad) {
+static void paint_field(battleimage* squad) {
 	auto h1 = getheight(TEXTBAR, 4);
 	auto h2 = getheight(TEXTBAR, 6);
 	auto h3 = getheight(TEXTBAR, 0);
@@ -312,10 +314,10 @@ static void update_drawables() {
 	}
 }
 
-static void paint_drawables(battleimage** source, unsigned count, const squadi* squad) {
+static void paint_drawables(battleimage** source, unsigned count, const battleimage* squad) {
 	for(unsigned i = 0; i < count; i++) {
 		source[i]->paint();
-		if(&source[i]->squad == squad)
+		if(source[i]==squad)
 			source[i]->stroke();
 	}
 }
@@ -344,7 +346,7 @@ static void paint_status() {
 	}
 }
 
-static void paint_screen(squadi* squad) {
+static void paint_screen(battleimage* squad) {
 	battleimage* source[32];
 	auto count = select_drawables(source, sizeof(source)/ sizeof(source[0]));
 	hilite_index = Blocked;
@@ -357,7 +359,7 @@ static void paint_screen(squadi* squad) {
 	paint_drawables(source, count, squad);
 }
 
-void heroi::battlemove(squadi* squad) {
+static void battlemove(battleimage* squad) {
 	while(ismodal()) {
 		paint_screen(squad);
 		domodal();
@@ -365,15 +367,19 @@ void heroi::battlemove(squadi* squad) {
 	}
 }
 
-void heroi::battlestart() {
+static void makebattle() {
 	static speed_s speeds[] = {UltraFastSpeed, VeryFastSpeed, FastSpeed, AverageSpeed, SlowSpeed, VerySlowSpeed, CrawlingSpeed};
 	while(!isend()) {
 		for(auto s : speeds) {
 			for(unsigned i = 0; i < units_count; i++) {
-				if(::units[i].squad.get(Speed) != s)
+				if(units[i].squad.get(Speed) != s)
 					continue;
-				::units[i].leader->battlemove(&::units[i].squad);
+				battlemove(&units[i]);
 			}
 		}
 	}
+}
+
+void heroi::battlestart() {
+	makebattle();
 }

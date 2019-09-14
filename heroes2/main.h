@@ -855,6 +855,9 @@ class sphinxi : public namei, public positioni, public answeri {
 public:
 	costi & getresources() { return resources; }
 };
+struct battlei {
+	bool					movement, cursor, distance, grid, index;
+};
 namespace map {
 extern point				camera;
 extern unsigned				day;
@@ -894,11 +897,7 @@ short unsigned				to(short unsigned i, direction_s d);
 direction_s					to(direction_s f, direction_s d);
 void						wave(short unsigned start, int skill, int ship_master);
 }
-namespace battle {
-namespace setting {
-extern bool					movement, cursor, distance, grid, index;
-}
-}
+extern battlei				battle;
 const char*					getstr(building_s id, kind_s kind);
 DECLENUM(ability);
 DECLENUM(artifact);

@@ -868,7 +868,7 @@ void draw::stroke(int x, int y, res_s res, int frame, int flags, unsigned char t
 	icn::record& r = p->records[frame % p->count];
 	unsigned char* d = (unsigned char*)p->records + r.offset;
 	if(flags&AFMirror) {
-		sprite_v1m(canvas, w1, d, h1,
+		sprite_v1m(canvas + w1 - 1, w1, d, h1,
 			canvas,
 			canvas + w1,
 			0);

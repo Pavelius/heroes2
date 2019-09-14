@@ -1006,8 +1006,8 @@ void draw::status(const rect& rc) {
 	status_rect = rc;
 }
 
-void draw::setcursor(res_s res, unsigned char frame) {
-	current_cursor.set(res, frame);
+void draw::setcursor(res_s res, unsigned char frame, point pos) {
+	current_cursor.set(res, frame, pos);
 }
 
 static void standart_domodal() {

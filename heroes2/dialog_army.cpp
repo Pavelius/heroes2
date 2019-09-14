@@ -221,7 +221,11 @@ void squadi::show(const heroi* hero, bool info_mode, bool allow_dismiss, bool al
 	int x = (width - w1) / 2 - 16;
 	int y = (height - h1) / 2;
 	battleimage mon;
-	mon = this->unit;
+	mon.clear();
+	mon.type = Monster;
+	mon.monster = this->unit;
+	mon.unit = this->unit;
+	mon.uniti::count = 0;
 	if(is(Fly))
 		mon.set(FlyAction, 1);
 	else

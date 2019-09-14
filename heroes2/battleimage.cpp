@@ -104,11 +104,6 @@ static monsterai monsters[] = {{PEASANT, {1, 4}, {5, 8}, /*Fly*/{0, 0}, {0, 0}, 
 {NoRes, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, NoRes, NoRes, NoRes, NoRes},
 };
 
-void battleimage::operator=(const variant& e) {
-	type = e.type;
-	value = e.value;
-}
-
 void battleimage::clear() {
 	memset(this, 0, sizeof(*this));
 	index = Blocked;
@@ -137,7 +132,7 @@ void battleimage::paint() const {
 		auto icn = res_s(HEROFL00 + player - PlayerBlue);
 		draw::image(pos.x, pos.y, icn, draw::counter % 5, flags);
 	} else if(type == Monster) {
-		auto count = squad.count;
+		auto count = this->uniti::count;
 		if(count) {
 			state push;
 			font = SMALFONT;
@@ -161,7 +156,7 @@ void battleimage::paint() const {
 
 void battleimage::set(action_s action, int param) {
 	start = 0;
-	count = 0;
+	animation::count = 0;
 	wait = 0;
 	if(type == Monster) {
 		auto& e = monsters[monster];
@@ -172,15 +167,15 @@ void battleimage::set(action_s action, int param) {
 			case Zombie:
 			case MutantZombie:
 				start = e.idle[0] + 7;
-				count = 5;
+				animation::count = 5;
 				break;
 			default:
 				if(d100() < 60) {
 					start = e.idle[0];
-					count = e.idle[1] / 2;
+					animation::count = e.idle[1] / 2;
 				} else {
-					count = e.idle[1] / 2;
-					start = e.idle[0] + e.idle[1] - count;
+					animation::count = e.idle[1] / 2;
+					start = e.idle[0] + e.idle[1] - animation::count;
 				}
 				wait = xrand(4, 10);
 				break;
@@ -188,33 +183,33 @@ void battleimage::set(action_s action, int param) {
 			break;
 		case Move:
 			start = e.move[0];
-			count = e.move[1];
+			animation::count = e.move[1];
 			break;
 		case Damaged:
 			start = e.wcne[0];
-			count = e.wcne[1];
+			animation::count = e.wcne[1];
 			break;
 		case Killed:
 			start = e.kill[0];
-			count = e.kill[1];
+			animation::count = e.kill[1];
 			break;
 		case AttackAction:
 			switch(param) {
 			case 0:
 				start = e.attk0[0];
-				count = e.attk0[1];
+				animation::count = e.attk0[1];
 				break;
 			case 1:
 				start = e.attk1[0];
-				count = e.attk1[1];
+				animation::count = e.attk1[1];
 				break;
 			case 2:
 				start = e.attk2[0];
-				count = e.attk2[1];
+				animation::count = e.attk2[1];
 				break;
 			default:
 				start = e.attk3[0];
-				count = e.attk3[1];
+				animation::count = e.attk3[1];
 				break;
 			}
 			break;
@@ -222,19 +217,19 @@ void battleimage::set(action_s action, int param) {
 			switch(param) {
 			case 0:
 				start = e.shot0[0];
-				count = e.shot0[1];
+				animation::count = e.shot0[1];
 				break;
 			case 1:
 				start = e.shot1[0];
-				count = e.shot1[1];
+				animation::count = e.shot1[1];
 				break;
 			case 2:
 				start = e.shot2[0];
-				count = e.shot2[1];
+				animation::count = e.shot2[1];
 				break;
 			default:
 				start = e.shot3[0];
-				count = e.shot3[1];
+				animation::count = e.shot3[1];
 				break;
 			}
 			break;
@@ -242,15 +237,15 @@ void battleimage::set(action_s action, int param) {
 			switch(param) {
 			case 0:
 				start = e.fly1[0];
-				count = e.fly1[1];
+				animation::count = e.fly1[1];
 				break;
 			case 1:
 				start = e.fly2[0];
-				count = e.fly2[1];
+				animation::count = e.fly2[1];
 				break;
 			case 2:
 				start = e.fly3[0];
-				count = e.fly3[1];
+				animation::count = e.fly3[1];
 				break;
 			}
 			break;
@@ -263,58 +258,58 @@ void battleimage::set(action_s action, int param) {
 		case Barbarian:
 			res = CMBTHROB;
 			switch(value) {
-			case Wait: start = xrand(15, 18); count = 1; break;
-			case PalmFace: start = 1; count = 5; break;
-			case Cast: start = 6; count = 9; break;
+			case Wait: start = xrand(15, 18); animation::count = 1; break;
+			case PalmFace: start = 1; animation::count = 5; break;
+			case Cast: start = 6; animation::count = 9; break;
 			default: break;
 			}
 			break;
 		case Knight:
 			res = CMBTHROK;
 			switch(action) {
-			case Wait: start = 15; count = 5; break;
-			case PalmFace: start = 1; count = 5; break;
-			case Cast: start = 12; count = 2; break;
+			case Wait: start = 15; animation::count = 5; break;
+			case PalmFace: start = 1; animation::count = 5; break;
+			case Cast: start = 12; animation::count = 2; break;
 			default: break;
 			}
 			break;
 		case Necromancer:
 			res = CMBTHRON;
 			switch(action) {
-			case Wait: start = xrand(17, 19); count = 1; break;
-			case PalmFace: start = 1; count = 5; break;
-			case Cast: start = 6; count = 9; break;
+			case Wait: start = xrand(17, 19); animation::count = 1; break;
+			case PalmFace: start = 1; animation::count = 5; break;
+			case Cast: start = 6; animation::count = 9; break;
 			default: break;
 			}
 			break;
 		case Sorcerer:
 			res = CMBTHROS;
 			switch(action) {
-			case Wait: start = 13; count = 4; break;
-			case PalmFace: start = 1; count = 5; break;
-			case Cast: start = 6; count = 7; break;
+			case Wait: start = 13; animation::count = 4; break;
+			case PalmFace: start = 1; animation::count = 5; break;
+			case Cast: start = 6; animation::count = 7; break;
 			default: break;
 			}
 			break;
 		case Warlock:
 			res = CMBTHROW;
 			switch(action) {
-			case Wait: start = 14; count = 3; break;
-			case PalmFace: start = 1; count = 5; break;
-			case Cast: start = 6; count = 8; break;
+			case Wait: start = 14; animation::count = 3; break;
+			case PalmFace: start = 1; animation::count = 5; break;
+			case Cast: start = 6; animation::count = 8; break;
 			default: break;
 			}
 			break;
 		case Wizard:
 			res = CMBTHROZ;
 			switch(action) {
-			case Wait: start = 16; count = 3; break;
-			case PalmFace: start = 1; count = 5; break;
-			case Cast: start = 12; count = 7; break;
+			case Wait: start = 16; animation::count = 3; break;
+			case PalmFace: start = 1; animation::count = 5; break;
+			case Cast: start = 12; animation::count = 7; break;
 			default: break;
 			}
 			break;
-		default: res = NoRes; start = 0; count = 0; break;
+		default: res = NoRes; start = 0; animation::count = 0; break;
 		}
 		if(action==Wait)
 			wait = xrand(3, 8);
@@ -325,4 +320,10 @@ void battleimage::set(action_s action, int param) {
 void battleimage::update() {
 	if(animation::update())
 		set(Wait);
+}
+
+void battleimage::refresh() {
+	remove(Moved);
+	remove(CounterAttacked);
+	remove(TotalDefence);
 }

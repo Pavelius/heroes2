@@ -85,17 +85,16 @@ struct animation {
 	static int				getanimate(res_s id, int start, int ticket, bool quantity);
 	int						getwidth() const;
 	void					paint(int x, int y, unsigned flags = 0) const;
-	void					set(res_s id, unsigned char frame);
+	void					set(res_s id, unsigned char frame, point pos = point());
 	bool					update();
 };
-struct battleimage : animation, variant, positioni {
-	squadi					squad;
-	squadi*					squad_source;
-	heroi*					leader;
-	void					operator=(const variant& e);
+struct battleimage : animation, variant, uniti {
+	constexpr explicit operator bool() const { return squadi::count != 0; }
 	void					clear();
 	void					paint() const;
+	void					refresh();
 	void					set(action_s action, int param = 0);
+	void					setpos(short unsigned v);
 	void					stroke() const;
 	void					update();
 };
@@ -233,7 +232,7 @@ unsigned char*				ptr(int x, int y);
 void						quicktips(int x, int y, const char* format);
 void						rectb(const rect& rc, unsigned char m);
 void						rectf(const rect& rc, unsigned char m);
-void						setcursor(res_s res, unsigned char frame);
+void						setcursor(res_s res, unsigned char frame, point pos = point());
 void						setevil(bool value);
 void						shadow(int x1, int y1, int x2, int y2, int intense);
 void						splitter(int x, int y, res_s res, int& value, int from, int to);

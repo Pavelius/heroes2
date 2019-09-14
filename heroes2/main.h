@@ -237,8 +237,12 @@ enum object_use_s : unsigned char {
 	Dwelling, WeekBonus, ContentUse,
 	LearnUse, SpecialUse,
 };
+enum battle_s : unsigned char {
+	Moved, CounterAttacked, TotalDefence,
+};
 typedef cflags<player_s, unsigned char> playerf;
 typedef cflags<object_flag_s, unsigned char> objectf;
+typedef cflags<battle_s, unsigned char> battlef;
 class heroi;
 struct pvar;
 struct shapei;
@@ -857,6 +861,14 @@ public:
 };
 struct battlei {
 	bool					movement, cursor, distance, grid, index;
+};
+struct uniti : positioni, squadi, battlef {
+	heroi*					leader;
+	squadi*					source;
+	void					attack(uniti& enemy);
+	constexpr bool			is(battle_s v) { return battlef::is(v); }
+	void					setup(squadi& squad, heroi* hero);
+	void					refresh();
 };
 namespace map {
 extern point				camera;

@@ -251,5 +251,8 @@
     <ClCompile Include="battleimage.cpp">
       <Filter>Графика</Filter>
     </ClCompile>
+    <ClCompile Include="unit.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

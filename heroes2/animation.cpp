@@ -2,10 +2,10 @@
 
 using namespace draw;
 
-void animation::set(res_s res, unsigned char frame) {
+void animation::set(res_s res, unsigned char frame, point pos) {
 	this->res = res;
 	this->frame = frame;
-	pos.x = pos.y = 0;
+	this->pos = pos;
 	start = frame; count = 1;
 	wait = 0;
 	flags = 0;

@@ -5,12 +5,13 @@ using namespace draw;
 const int				awd = 11, ahd = 9;
 static heroi*			attacker;
 static heroi*			defender;
-static battleimage*		current_image;
+static battleimage*		current_unit;
+static unsigned short	hilite_index;
+static battleimage*		hilite_unit;
 battlei					battle;
 
 static unsigned char	hexagon_color;
 static res_s			back, frng;
-static unsigned short	hilite_index;
 static unsigned short	path[awd * ahd];
 static unsigned short	path_stack[256 * 256];
 static unsigned short	path_push;
@@ -19,8 +20,7 @@ static unsigned short	path_goal;
 static unsigned short	path_start;
 static const direction_s all_around[] = {Left, Right, LeftUp, LeftDown, RightUp, RightDown};
 
-static battleimage		units[32];
-static unsigned			units_count;
+static battleimage		units[20];
 static battleimage		attacker_image, defender_image;
 static short unsigned position_wide[2][5] = {{0, 22, 44, 66, 88}, {10, 32, 54, 76, 98}};
 
@@ -30,8 +30,13 @@ static point i2h(short unsigned index) {
 	return{(short)x, (short)y};
 }
 
+void battleimage::setpos(short unsigned v) {
+	positioni::setpos(v);
+	pos = i2h(v);
+}
+
 static unsigned getcost(short unsigned index) {
-	return Blocked;
+	return path[index];
 }
 
 static bool isattacker(const heroi* hero) {
@@ -43,18 +48,20 @@ static int getside(const heroi* leader) {
 }
 
 static void add_squad(short unsigned index, squadi& squad, heroi* leader) {
-	if(units_count >= sizeof(units) / sizeof(units[0]))
-		return;
-	auto& e = units[units_count++];
-	e.clear();
-	e = squad.unit;
-	e.pos = i2h(index);
-	e.flags = isattacker(leader) ? 0 : AFMirror;
-	e.squad = squad;
-	e.squad_source = &squad;
-	e.leader = leader;
-	e.setpos(index);
-	e.set(Wait);
+	for(auto& e : units) {
+		if(e)
+			continue;
+		e.clear();
+		e.setup(squad, leader);
+		e.type = Monster;
+		e.monster = e.unit;
+		e.flags = isattacker(leader) ? 0 : AFMirror;
+		e.source = &squad;
+		e.leader = leader;
+		e.setpos(index);
+		e.set(Wait);
+		break;
+	}
 }
 
 static void add_squad(armyi& army, heroi* leader) {
@@ -72,10 +79,12 @@ static void add_squad(armyi& army, heroi* leader) {
 
 static bool isend() {
 	heroi* leader = 0;
-	for(unsigned i = 0; i < units_count; i++) {
+	for(auto& e : units) {
+		if(!e)
+			continue;
 		if(!leader)
-			leader = units[i].leader;
-		else if(units[i].leader != leader)
+			leader = e.leader;
+		else if(e.leader != leader)
 			return false;
 	}
 	return true;
@@ -142,7 +151,8 @@ static void prepare_background(landscape_s area, bool trees) {
 
 static void prepare_leader(battleimage& e, heroi* hero, bool defender) {
 	e.clear();
-	e = hero->getid();
+	e.type = Hero;
+	e.hero = hero->getid();
 	e.set(Wait);
 	if(defender) {
 		e.pos.x = 606;
@@ -154,12 +164,12 @@ static void prepare_leader(battleimage& e, heroi* hero, bool defender) {
 	}
 }
 
-static void paint_grid(const battleimage* bi) {
+static void paint_grid() {
 	// Shadow movement indecies
-	if(battle.movement) {
+	if(battle.movement && current_unit) {
 		state push;
 		font = SMALFONT;
-		unsigned radius = bi->squad.get(Speed) + 2;
+		unsigned radius = current_unit->get(Speed) + 2;
 		for(auto i = 0; i < awd*ahd; i++) {
 			auto m = getcost(i);
 			if(m) {
@@ -210,8 +220,14 @@ void heroi::setup_battle(heroi* enemy) {
 	prepare_leader(defender_image, defender, true);
 }
 
-static void skip_turn() {
+static void end_turn() {
+	current_unit->add(Moved);
+	breakmodal(0);
+}
 
+static void skip_turn() {
+	current_unit->add(TotalDefence);
+	end_turn();
 }
 
 static void open_setting() {
@@ -220,6 +236,11 @@ static void open_setting() {
 
 static void start_autocombat() {
 
+}
+
+static void move_unit() {
+	current_unit->setpos(hot::param);
+	end_turn();
 }
 
 static void hittest_grid() {
@@ -274,7 +295,7 @@ static direction_s hex_direction(int x1, int y1, point pt) {
 	return Up;
 }
 
-static void paint_field(battleimage* squad) {
+static void paint_field() {
 	auto h1 = getheight(TEXTBAR, 4);
 	auto h2 = getheight(TEXTBAR, 6);
 	auto h3 = getheight(TEXTBAR, 0);
@@ -298,26 +319,30 @@ static unsigned select_drawables(battleimage** source, unsigned count) {
 	auto pe = source + count;
 	*pb++ = &attacker_image;
 	*pb++ = &defender_image;
-	for(unsigned i = 0; i < units_count; i++) {
+	for(auto& e : units) {
+		if(!e)
+			continue;
 		if(pb < pe)
-			*pb++ = &units[i];
+			*pb++ = &e;
 	}
 	return pb - source;
 }
 
 static void update_drawables() {
 	if(hot::key == InputTimer) {
-		for(unsigned i = 0; i < units_count; i++)
-			units[i].update();
+		for(auto& e : units) {
+			if(e)
+				e.update();
+		}
 		attacker_image.update();
 		defender_image.update();
 	}
 }
 
-static void paint_drawables(battleimage** source, unsigned count, const battleimage* squad) {
+static void paint_drawables(battleimage** source, unsigned count) {
 	for(unsigned i = 0; i < count; i++) {
 		source[i]->paint();
-		if(source[i]==squad)
+		if(source[i] == current_unit)
 			source[i]->stroke();
 	}
 }
@@ -326,42 +351,220 @@ static void hittest_drawable(battleimage** source, unsigned count) {
 	for(unsigned i = 0; i < count; i++) {
 		auto p = source[i];
 		if(hilite_index != Blocked && p->index == hilite_index)
-			current_image = p;
+			hilite_unit = p;
 		else if(p->type == Hero) {
-			if(mousein({p->pos.x - 32, p->pos.y - 96, p->pos.x + 32, p->pos.y+ 8}))
-				current_image = p;
+			if(mousein({p->pos.x - 32, p->pos.y - 96, p->pos.x + 32, p->pos.y + 8}))
+				hilite_unit = p;
 		}
 	}
 }
 
-static void paint_status() {
-	if(!current_image)
-		return;
-	if(current_image->type == Hero) {
-		auto p = current_image->gethero();
-		status(p->getname());
-	} else if(current_image->type == Monster) {
-		auto p = &current_image->squad;
-		status("%1i %2", p->count, bsmeta<monsteri>::elements[p->unit].multiname);
+static void paint_screen() {
+	battleimage* source[32];
+	auto count = select_drawables(source, sizeof(source) / sizeof(source[0]));
+	hilite_index = Blocked;
+	hilite_unit = 0;
+	hittest_grid();
+	hittest_drawable(source, count);
+	paint_field();
+	paint_grid();
+	paint_drawables(source, count);
+}
+
+//// res::CMSECO
+//// 0 - None
+//// 1 - Move
+//// 2 - Fly
+//// 3 - Shoot
+//// 4 - Hero (Helmet)
+//// 5 - Info
+//// 6 - Small cursor
+//// 7 - Sword (to right up)
+//// 8 - Sword (to right)
+//// 9 - Sword (to right down)
+//// 10 - Sword (to left down)
+//// 11 - Sword (to left)
+//// 12 - Sword (to left up)
+//// 13 - Sword (to up)
+//// 14 - Sword (to down)
+//// 15 - Broken arrow
+//switch(value) {
+//case HexLeft:
+//	icn = res::CMSECO;
+//	start = 8;
+//	pos.x = -25;
+//	pos.y = -7;
+//	break;
+//case HexRight:
+//	icn = res::CMSECO;
+//	start = 11;
+//	pos.x = -5;
+//	pos.y = -7;
+//	break;
+//case HexLeftUp:
+//	icn = res::CMSECO;
+//	start = 9;
+//	pos.x = -20;
+//	pos.y = -20;
+//	break;
+//case HexLeftDown:
+//	icn = res::CMSECO;
+//	start = 7;
+//	pos.x = -20;
+//	pos.y = -5;
+//	break;
+//case HexRightUp:
+//	icn = res::CMSECO;
+//	start = 10;
+//	pos.x = -5;
+//	pos.y = -20;
+//	break;
+//case HexRightDown:
+//	icn = res::CMSECO;
+//	start = 12;
+//	pos.x = -5;
+//	pos.y = -5;
+//	break;
+//case Information:
+//	icn = res::CMSECO;
+//	start = 5;
+//	pos.x = -7;
+//	pos.y = -7;
+//	break;
+//case Fly:
+//	icn = res::CMSECO;
+//	start = 2;
+//	pos.x = -7;
+//	pos.y = -14;
+//	break;
+//case Shoot:
+//	icn = res::CMSECO;
+//	start = 3;
+//	pos.x = -7;
+//	pos.y = -7;
+//	break;
+//case Empthy:
+//	icn = res::CMSECO;
+//	start = 0;
+//	pos.x = -7;
+//	pos.y = -7;
+//	break;
+//case Hero:
+//	icn = res::CMSECO;
+//	start = 4;
+//	pos.x = -7;
+//	pos.y = -7;
+//	break;
+
+static void standart_input() {
+	if(hilite_unit) {
+		if(hilite_unit->type == Hero) {
+			auto p = hilite_unit->gethero();
+			if(p)
+				status(p->getname());
+		} else if(hilite_unit->type == Monster) {
+			uniti* p = hilite_unit;
+			status("%1i %2", p->count, bsmeta<monsteri>::elements[p->unit].multiname);
+		}
+	} else if(hilite_index != Blocked && current_unit) {
+		int a = getcost(hilite_index) - 1;
+		int m = current_unit->get(Speed) + 1;
+		if(a <= m) {
+			setcursor(CMSECO, 1, {-7, -14});
+			if(hot::key == MouseLeft && hot::pressed)
+				execute(move_unit, hilite_index);
+		}
 	}
 }
 
-static void paint_screen(battleimage* squad) {
-	battleimage* source[32];
-	auto count = select_drawables(source, sizeof(source)/ sizeof(source[0]));
-	hilite_index = Blocked;
-	current_image = 0;
-	hittest_grid();
-	hittest_drawable(source, count);
-	paint_field(squad);
-	paint_grid(squad);
-	paint_status();
-	paint_drawables(source, count, squad);
+short unsigned to(short unsigned i, direction_s d) {
+	if(i == Blocked)
+		return Blocked;
+	auto x = i % awd, y = i / awd;
+	switch(d) {
+	case Left:
+		if(x == 0)
+			return Blocked;
+		return i - 1;
+	case Right:
+		if(x < awd - 1)
+			return i + 1;
+		return Blocked;
+	case LeftUp:
+		if(x <= (y & 1) && y > 0)
+			return i - 11 - (y & 1);
+		return Blocked;
+	case RightUp:
+		if(x >= awd - 1 + (y & 1))
+			return Blocked;
+		if(y == 0)
+			return Blocked;
+		return i - 10 - (y & 1);
+	case LeftDown:
+		if((x >= (y & 1)) && y < (ahd - 1))
+			return i + 11 - (y & 1);
+		return Blocked;
+	case RightDown:
+		if(x >= (awd - (y & 1)) && y < (ahd - 1))
+			return i + 12 - (y & 1);
+		return Blocked;
+	default:
+		return i;
+	}
 }
 
-static void battlemove(battleimage* squad) {
+static void snode(short unsigned from, direction_s d, short unsigned cost) {
+	auto index = to(from, d);
+	if(index == Blocked)
+		return;
+	if(path[index] >= Blocked)
+		return;
+	auto a = path[index];
+	if(a != 0 && cost >= a)
+		return;
+	path_stack[path_push++] = index;
+	path[index] = cost;
+}
+
+static void wave(short unsigned start) {
+	path_push = 0;
+	path_pop = 0;
+	if(start == Blocked)
+		return;
+	// Clear all path map
+	memset(path, 0, sizeof(path));
+	// Block units
+	for(auto& e : units) {
+		if(!e)
+			continue;
+		auto i = e.getpos();
+		if(i == Blocked)
+			continue;
+		path[i] = Blocked;
+	}
+	// Start wave
+	path_stack[path_push++] = start;
+	path[start] = 1;
+	while(path_push != path_pop) {
+		auto pos = path_stack[path_pop++];
+		auto cost = path[pos] + 1;
+		if(cost >= Blocked - 1024)
+			break;
+		for(auto d : all_around)
+			snode(pos, d, cost);
+	}
+	path_pop = 0;
+	path_push = 0;
+	path_goal = Blocked;
+	path_start = start;
+}
+
+static void battlemove(battleimage& e) {
+	current_unit = &e;
+	wave(e.getpos());
 	while(ismodal()) {
-		paint_screen(squad);
+		paint_screen();
+		standart_input();
 		domodal();
 		update_drawables();
 	}
@@ -371,15 +574,33 @@ static void makebattle() {
 	static speed_s speeds[] = {UltraFastSpeed, VeryFastSpeed, FastSpeed, AverageSpeed, SlowSpeed, VerySlowSpeed, CrawlingSpeed};
 	while(!isend()) {
 		for(auto s : speeds) {
-			for(unsigned i = 0; i < units_count; i++) {
-				if(units[i].squad.get(Speed) != s)
+			for(auto& e : units) {
+				if(!e)
 					continue;
-				battlemove(&units[i]);
+				if(e.is(Moved))
+					continue;
+				if(e.get(Speed) < s)
+					continue;
+				battlemove(e);
 			}
+		}
+		for(auto& e : units) {
+			if(!e)
+				continue;
+			e.refresh();
 		}
 	}
 }
 
+static void prepare_battle() {
+	battle.grid = true;
+	battle.cursor = true;
+	battle.movement = true;
+	battle.index = false;
+	battle.distance = true;
+}
+
 void heroi::battlestart() {
+	prepare_battle();
 	makebattle();
 }

@@ -56,6 +56,10 @@ unsigned squadi::getstrenght() const {
 	return bsmeta<monsteri>::elements[unit].rating * count;
 }
 
+bool squadi::isarcher() const {
+	return bsmeta<monsteri>::elements[unit].isarcher();
+}
+
 bool armyi::is(tag_s v) const {
 	for(auto& e : units) {
 		if(!e)

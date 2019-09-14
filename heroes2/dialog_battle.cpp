@@ -243,6 +243,15 @@ static void move_unit() {
 	end_turn();
 }
 
+static void shoot_enemy() {
+	end_turn();
+}
+
+static void show_info() {
+	auto p = (uniti*)hot::param;
+	p->show(p->leader, false, false, false);
+}
+
 static void hittest_grid() {
 	for(int i = 0; i < awd*ahd; i++) {
 		auto pt = i2h(i);
@@ -437,84 +446,51 @@ static void paint_screen() {
 //	pos.x = -7;
 //	pos.y = -14;
 //	break;
-//case Shoot:
-//	icn = res::CMSECO;
-//	start = 3;
-//	pos.x = -7;
-//	pos.y = -7;
-//	break;
-//case Hero:
-//	icn = res::CMSECO;
-//	start = 4;
-//	pos.x = -7;
-//	pos.y = -7;
-//	break;
+
+static void hero_options() {
+	auto p = (heroi*)hot::param;
+	p->battlemenu(true, false);
+}
 
 static void standart_input() {
+	auto fev = (hot::key == MouseLeft && hot::pressed);
 	if(hilite_unit) {
 		if(hilite_unit->type == Hero) {
 			auto p = hilite_unit->gethero();
 			if(p) {
 				status(p->getname());
 				setcursor(CMSECO, 4, {-7, -7});
-				if(hot::key == MouseLeft && hot::pressed) {
-
-				}
+				if(fev)
+					execute(hero_options, (int)p);
 			}
 		} else if(hilite_unit->type == Monster) {
 			uniti* p = hilite_unit;
-			status("%1i %2", p->count, bsmeta<monsteri>::elements[p->unit].multiname);
+			if(current_unit->isenemy(p) && current_unit->canshoot()) {
+				setcursor(CMSECO, 3, {-7, -7});
+				status("Стрелять в %1i %2", p->count, bsmeta<monsteri>::elements[p->unit].multiname);
+				if(fev)
+					execute(shoot_enemy, (int)p);
+			} else {
+				setcursor(CMSECO, 5, {-7, -7});
+				status("%1i %2", p->count, bsmeta<monsteri>::elements[p->unit].multiname);
+				if(fev)
+					execute(show_info, (int)p);
+			}
 		}
 	} else if(hilite_index != Blocked && current_unit) {
 		int a = getcost(hilite_index) - 1;
 		int m = current_unit->get(Speed) + 1;
 		if(a <= m) {
 			setcursor(CMSECO, 1, {-7, -14});
-			if(hot::key == MouseLeft && hot::pressed)
+			if(fev)
 				execute(move_unit, hilite_index);
 		} else
 			setcursor(CMSECO, 0, {-7, -7});
 	}
 }
 
-short unsigned to(short unsigned i, direction_s d) {
-	if(i == Blocked)
-		return Blocked;
-	auto x = i % awd, y = i / awd;
-	switch(d) {
-	case Left:
-		if(x == 0)
-			return Blocked;
-		return i - 1;
-	case Right:
-		if(x < awd - 1)
-			return i + 1;
-		return Blocked;
-	case LeftUp:
-		if(x >= (y & 1) && y > 0)
-			return i - 11 - (y & 1);
-		return Blocked;
-	case RightUp:
-		if(x >= awd - 1 + (y & 1))
-			return Blocked;
-		if(y == 0)
-			return Blocked;
-		return i - 10 - (y & 1);
-	case LeftDown:
-		if((x >= (y & 1)) && y < (ahd - 1))
-			return i + 11 - (y & 1);
-		return Blocked;
-	case RightDown:
-		if(x < (awd - 1 + (y & 1)) && y < (ahd - 1))
-			return i + 12 - (y & 1);
-		return Blocked;
-	default:
-		return i;
-	}
-}
-
 static void snode(short unsigned from, direction_s d, short unsigned cost) {
-	auto index = to(from, d);
+	auto index = uniti::to(from, d);
 	if(index == Blocked)
 		return;
 	if(path[index] >= Blocked)
@@ -603,4 +579,14 @@ static void prepare_battle() {
 void heroi::battlestart() {
 	prepare_battle();
 	makebattle();
+}
+
+uniti* uniti::find(short unsigned index) {
+	for(auto& e : units) {
+		if(!e)
+			continue;
+		if(e.getpos() == index)
+			return &e;
+	}
+	return 0;
 }

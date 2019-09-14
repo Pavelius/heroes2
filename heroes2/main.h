@@ -354,6 +354,7 @@ struct squadi {
 	unsigned				getstrenght() const;
 	monster_s				getupgrade() const;
 	bool					is(tag_s v) const;
+	bool					isarcher() const;
 	void					information(const heroi* hero) { show(hero, true, false, false); }
 	void					paint(int x, int y, const heroi* hero = 0, bool allow_change = true) const;
 	void					show(const heroi* hero, bool info_mode, bool allow_dismiss, bool allow_upgrade);
@@ -558,7 +559,7 @@ public:
 	int						ask(const char* format);
 	int						ask(const char* format, const variantcol* source);
 	bool					battle(moveablei& enemy);
-	void					battlemove(squadi* squad);
+	void					battlemenu(bool friendly, bool surrender) const;
 	void					battlestart();
 	bool					buymagicbook();
 	void					clear();
@@ -810,6 +811,7 @@ public:
 	void					addi(const costi& v);
 	void					addi(const variantcol& v);
 	void					addt(const costi& v);
+	void					addo(const heroi* p);
 	static const char*		parse(const char* p, variantcol* source, unsigned& count);
 };
 class eventi : public namei, public positioni {
@@ -865,9 +867,15 @@ struct battlei {
 struct uniti : positioni, squadi, battlef {
 	heroi*					leader;
 	squadi*					source;
+	int						shoots;
 	void					attack(uniti& enemy);
+	bool					canshoot() const;
 	constexpr bool			is(battle_s v) { return battlef::is(v); }
+	constexpr bool			isenemy(const uniti* p) { return p->leader!=leader; }
+	static uniti*			find(short unsigned index);
+	int						get(ability_s v) const;
 	void					setup(squadi& squad, heroi* hero);
+	static short unsigned	to(short unsigned i, direction_s d);
 	void					refresh();
 };
 namespace map {

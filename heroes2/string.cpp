@@ -93,3 +93,13 @@ void string::addt(const costi& v) {
 		adds("%1i %-2", v.data[i], bsmeta<resourcei>::elements[i].nameof);
 	}
 }
+
+void string::addo(const heroi* p) {
+	static ability_s abilities[] = {Attack, Defence, SpellPower, Knowledge};
+	for(auto id : abilities)
+		addn("%1: %2i", getstr(id), p->get(id));
+	addn("\n");
+	addn("Мораль: %1", getstr((morale_s)(p->get(MoraleStat)+NormalMorale)));
+	addn("Удача: %1", getstr((luck_s)(p->get(LuckStat)+NormalLuck)));
+	addn("Очки магии: %1i/%2i", p->get(SpellPoints), p->getspmax());
+}

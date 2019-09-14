@@ -142,6 +142,7 @@
     <ClCompile Include="dialog_adventure.cpp" />
     <ClCompile Include="dialog_army.cpp" />
     <ClCompile Include="dialog_battle.cpp" />
+    <ClCompile Include="dialog_battle_hero.cpp" />
     <ClCompile Include="dialog_castle.cpp" />
     <ClCompile Include="dialog_city.cpp" />
     <ClCompile Include="dialog_game.cpp" />

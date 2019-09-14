@@ -254,5 +254,8 @@
     <ClCompile Include="unit.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="dialog_battle_hero.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

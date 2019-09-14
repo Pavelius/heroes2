@@ -321,9 +321,3 @@ void battleimage::update() {
 	if(animation::update())
 		set(Wait);
 }
-
-void battleimage::refresh() {
-	remove(Moved);
-	remove(CounterAttacked);
-	remove(TotalDefence);
-}

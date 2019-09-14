@@ -443,12 +443,6 @@ static void paint_screen() {
 //	pos.x = -7;
 //	pos.y = -7;
 //	break;
-//case Empthy:
-//	icn = res::CMSECO;
-//	start = 0;
-//	pos.x = -7;
-//	pos.y = -7;
-//	break;
 //case Hero:
 //	icn = res::CMSECO;
 //	start = 4;
@@ -460,8 +454,13 @@ static void standart_input() {
 	if(hilite_unit) {
 		if(hilite_unit->type == Hero) {
 			auto p = hilite_unit->gethero();
-			if(p)
+			if(p) {
 				status(p->getname());
+				setcursor(CMSECO, 4, {-7, -7});
+				if(hot::key == MouseLeft && hot::pressed) {
+
+				}
+			}
 		} else if(hilite_unit->type == Monster) {
 			uniti* p = hilite_unit;
 			status("%1i %2", p->count, bsmeta<monsteri>::elements[p->unit].multiname);
@@ -473,7 +472,8 @@ static void standart_input() {
 			setcursor(CMSECO, 1, {-7, -14});
 			if(hot::key == MouseLeft && hot::pressed)
 				execute(move_unit, hilite_index);
-		}
+		} else
+			setcursor(CMSECO, 0, {-7, -7});
 	}
 }
 
@@ -491,7 +491,7 @@ short unsigned to(short unsigned i, direction_s d) {
 			return i + 1;
 		return Blocked;
 	case LeftUp:
-		if(x <= (y & 1) && y > 0)
+		if(x >= (y & 1) && y > 0)
 			return i - 11 - (y & 1);
 		return Blocked;
 	case RightUp:
@@ -505,7 +505,7 @@ short unsigned to(short unsigned i, direction_s d) {
 			return i + 11 - (y & 1);
 		return Blocked;
 	case RightDown:
-		if(x >= (awd - (y & 1)) && y < (ahd - 1))
+		if(x < (awd - 1 + (y & 1)) && y < (ahd - 1))
 			return i + 12 - (y & 1);
 		return Blocked;
 	default:

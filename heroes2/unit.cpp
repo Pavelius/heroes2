@@ -8,5 +8,7 @@ void uniti::setup(squadi& v, heroi* h) {
 }
 
 void uniti::refresh() {
-
+	remove(Moved);
+	remove(CounterAttacked);
+	remove(TotalDefence);
 }

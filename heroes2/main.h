@@ -518,7 +518,7 @@ public:
 	skill_s					getskill() const { return skill_s(subtype); }
 	object_s				gettype() const { return type; }
 	bool					is(player_s v) const { return player.is(v); }
-	bool					is(object_s v) const { return type==v; }
+	bool					is(object_s v) const { return type == v; }
 	bool					isplayer() const { return player.data != 0; }
 	bool					issingleuse() const;
 	void					set(artifact_s v) { subtype = v; }
@@ -595,7 +595,7 @@ public:
 	bool					interact(short unsigned index, const pvar& object);
 	bool					is(artifact_s v) const;
 	bool					is(spell_s v) const { return spellbook.is(v); }
-	bool					is(skill_s v) const { return get(v)>0; }
+	bool					is(skill_s v) const { return get(v) > 0; }
 	bool					isadventure() const { return index != Blocked; }
 	bool					isvisited(const moveablei& object) const;
 	static int				learn(const char* format, const variantcol* v1, unsigned count);
@@ -867,16 +867,30 @@ struct battlei {
 struct uniti : positioni, squadi, battlef {
 	heroi*					leader;
 	squadi*					source;
-	int						shoots;
-	void					attack(uniti& enemy);
+	short unsigned			shoots;
+	short unsigned			hits;
+	void					addspell(spell_s v, unsigned short rounds);
+	unsigned				attack(uniti& enemy);
 	bool					canshoot() const;
-	constexpr bool			is(battle_s v) { return battlef::is(v); }
-	constexpr bool			isenemy(const uniti* p) { return p->leader!=leader; }
+	void					damage(unsigned v);
+	constexpr bool			is(battle_s v) const { return battlef::is(v); }
+	bool					is(spell_s v) const { return getspell(v) > 0; }
+	constexpr bool			isenemy(const uniti* p) { return p->leader != leader; }
 	static uniti*			find(short unsigned index);
 	int						get(ability_s v) const;
+	unsigned				getdamage() const;
+	const monsteri&			getmonster() const { return bsmeta<monsteri>::elements[unit]; }
+	unsigned short			getspell(spell_s v) const;
+	void					setspell(spell_s v, unsigned short count);
 	void					setup(squadi& squad, heroi* hero);
 	static short unsigned	to(short unsigned i, direction_s d);
 	void					refresh();
+};
+struct enchantmenti {
+	uniti*					object;
+	spell_s					id;
+	unsigned short			count;
+	constexpr operator bool() const { return object != 0; }
 };
 namespace map {
 extern point				camera;

@@ -244,6 +244,10 @@ static void move_unit() {
 }
 
 static void shoot_enemy() {
+	auto& attacker = *current_unit;
+	auto& defender = *hilite_unit;
+	auto d = attacker.attack(defender);
+	defender.damage(d);
 	end_turn();
 }
 

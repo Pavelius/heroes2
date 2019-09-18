@@ -10,6 +10,8 @@ static unsigned short	hilite_index;
 static battleimage*		hilite_unit;
 battlei					battle;
 
+static unsigned short	attack_index;
+static direction_s		attack_direction;
 static unsigned char	hexagon_color;
 static res_s			back, frng;
 static unsigned short	path[awd * ahd];
@@ -36,6 +38,8 @@ void battleimage::setpos(short unsigned v) {
 }
 
 static unsigned getcost(short unsigned index) {
+	if(index == Blocked)
+		return 0;
 	return path[index];
 }
 
@@ -251,6 +255,14 @@ static void shoot_enemy() {
 	end_turn();
 }
 
+static void attack_enemy() {
+	auto& attacker = *current_unit;
+	auto& defender = *hilite_unit;
+	attacker.setpos(attack_index);
+	attacker.melee(defender);
+	end_turn();
+}
+
 static void show_info() {
 	auto p = (uniti*)hot::param;
 	p->show(p->leader, false, false, false);
@@ -281,15 +293,15 @@ static void hittest_grid() {
 	}
 }
 
-static direction_s hex_direction(int x1, int y1, point pt) {
+static direction_s hex_direction(const point hp, const point pt) {
 	const int INFL = 12;
-	point coord[7] = {{(short)x1, (short)y1},
-	{(short)x1, (short)(y1 - cell_hd * INFL / 2)}, // u
-	{(short)(x1 + cell_wd * INFL / 2), (short)(y1 - cell_hr * INFL)}, // ru
-	{(short)(x1 + cell_wd * INFL / 2), (short)(y1 + cell_hr * INFL)}, // rd
-	{(short)x1, (short)(y1 + cell_hd * INFL / 2)}, // d
-	{(short)(x1 - cell_wd * INFL / 2), (short)(y1 + cell_hr * INFL)}, // ld
-	{(short)(x1 - cell_wd * INFL / 2), (short)(y1 - cell_hr * INFL)}, // lu
+	point coord[7] = {hp,
+	{hp.x, hp.y - cell_hd * INFL / 2}, // u
+	{(short)(hp.x + cell_wd * INFL / 2), (short)(hp.y - cell_hr * INFL)}, // ru
+	{(short)(hp.x + cell_wd * INFL / 2), (short)(hp.y + cell_hr * INFL)}, // rd
+	{(short)hp.x, (short)(hp.y + cell_hd * INFL / 2)}, // d
+	{(short)(hp.x - cell_wd * INFL / 2), (short)(hp.y + cell_hr * INFL)}, // ld
+	{(short)(hp.x - cell_wd * INFL / 2), (short)(hp.y - cell_hr * INFL)}, // lu
 	};
 	if(pt == coord[0])
 		return Up;
@@ -402,42 +414,6 @@ static void paint_screen() {
 //// 14 - Sword (to down)
 //// 15 - Broken arrow
 //switch(value) {
-//case HexLeft:
-//	icn = res::CMSECO;
-//	start = 8;
-//	pos.x = -25;
-//	pos.y = -7;
-//	break;
-//case HexRight:
-//	icn = res::CMSECO;
-//	start = 11;
-//	pos.x = -5;
-//	pos.y = -7;
-//	break;
-//case HexLeftUp:
-//	icn = res::CMSECO;
-//	start = 9;
-//	pos.x = -20;
-//	pos.y = -20;
-//	break;
-//case HexLeftDown:
-//	icn = res::CMSECO;
-//	start = 7;
-//	pos.x = -20;
-//	pos.y = -5;
-//	break;
-//case HexRightUp:
-//	icn = res::CMSECO;
-//	start = 10;
-//	pos.x = -5;
-//	pos.y = -20;
-//	break;
-//case HexRightDown:
-//	icn = res::CMSECO;
-//	start = 12;
-//	pos.x = -5;
-//	pos.y = -5;
-//	break;
 //case Information:
 //	icn = res::CMSECO;
 //	start = 5;
@@ -456,8 +432,20 @@ static void hero_options() {
 	p->battlemenu(true, false);
 }
 
+static void setattack(direction_s d) {
+	switch(d) {
+	case Left: setcursor(CMSECO, 8, {-25, -7}); break;
+	case Right: setcursor(CMSECO, 11, {-5, -7}); break;
+	case LeftUp: setcursor(CMSECO, 9, {-20, -20}); break;
+	case LeftDown: setcursor(CMSECO, 7, {-20, -5}); break;
+	case RightUp: setcursor(CMSECO, 10, {-5, -20}); break;
+	case RightDown: setcursor(CMSECO, 12, {-5, -5}); break;
+	}
+}
+
 static void standart_input() {
 	auto fev = (hot::key == MouseLeft && hot::pressed);
+	int m = current_unit->get(Speed) + 1;
 	if(hilite_unit) {
 		if(hilite_unit->type == Hero) {
 			auto p = hilite_unit->gethero();
@@ -474,6 +462,21 @@ static void standart_input() {
 				status("Стрелять в %1i %2", p->count, bsmeta<monsteri>::elements[p->unit].multiname);
 				if(fev)
 					execute(shoot_enemy, (int)p);
+			} else if(current_unit->isenemy(p)) {
+				auto ad = hex_direction(i2h(hilite_index), hot::mouse);
+				auto bd = uniti::to(ad, Down);
+				auto bi = uniti::to(hilite_index, ad);
+				int a = getcost(bi) - 1;
+				if(bi != Blocked && a <= m) {
+					setattack(ad);
+					status("Атаковать %2", p->count, bsmeta<monsteri>::elements[p->unit].multiname);
+					if(fev) {
+						attack_index = bi;
+						attack_direction = ad;
+						execute(attack_enemy, (int)p);
+					}
+				} else
+					setcursor(CMSECO, 0, {-7, -7});
 			} else {
 				setcursor(CMSECO, 5, {-7, -7});
 				status("%1i %2", p->count, bsmeta<monsteri>::elements[p->unit].multiname);
@@ -483,7 +486,6 @@ static void standart_input() {
 		}
 	} else if(hilite_index != Blocked && current_unit) {
 		int a = getcost(hilite_index) - 1;
-		int m = current_unit->get(Speed) + 1;
 		if(a <= m) {
 			setcursor(CMSECO, 1, {-7, -14});
 			if(fev)
@@ -573,11 +575,11 @@ static void makebattle() {
 }
 
 static void prepare_battle() {
-	battle.grid = true;
+	battle.grid = false;
 	battle.cursor = true;
 	battle.movement = true;
 	battle.index = false;
-	battle.distance = true;
+	battle.distance = false;
 }
 
 void heroi::battlestart() {

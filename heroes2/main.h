@@ -873,10 +873,12 @@ struct uniti : positioni, squadi, battlef {
 	unsigned				attack(uniti& enemy);
 	bool					canshoot() const;
 	void					damage(unsigned v);
+	static uniti*			find(short unsigned index);
 	constexpr bool			is(battle_s v) const { return battlef::is(v); }
 	bool					is(spell_s v) const { return getspell(v) > 0; }
+	bool					is(tag_s v) const { return squadi::is(v); }
 	constexpr bool			isenemy(const uniti* p) { return p->leader != leader; }
-	static uniti*			find(short unsigned index);
+	void					melee(uniti& enemy);
 	int						get(ability_s v) const;
 	unsigned				getdamage() const;
 	const monsteri&			getmonster() const { return bsmeta<monsteri>::elements[unit]; }
@@ -884,6 +886,7 @@ struct uniti : positioni, squadi, battlef {
 	void					setspell(spell_s v, unsigned short count);
 	void					setup(squadi& squad, heroi* hero);
 	static short unsigned	to(short unsigned i, direction_s d);
+	static direction_s		to(direction_s d, direction_s d1);
 	void					refresh();
 };
 struct enchantmenti {

@@ -96,6 +96,23 @@ bool uniti::canshoot() const {
 	return true;
 }
 
+direction_s uniti::to(direction_s d, direction_s d1) {
+	switch(d1) {
+	case Down:
+		switch(d) {
+		case RightUp: return LeftDown;
+		case LeftDown: return RightUp;
+		case Left: return Right;
+		case Right: return Left;
+		case RightDown: return LeftUp;
+		case LeftUp: return RightDown;
+		default: return d;
+		}
+		break;
+	default: return d;
+	}
+}
+
 short unsigned uniti::to(short unsigned i, direction_s d) {
 	if(i == Blocked)
 		return Blocked;
@@ -147,6 +164,8 @@ unsigned uniti::getdamage() const {
 }
 
 unsigned uniti::attack(uniti& enemy) {
+	if(!count || !enemy.count)
+		return 0;
 	auto d = getdamage();
 	auto at = get(Attack);
 	auto df = enemy.get(Defence);
@@ -164,6 +183,20 @@ unsigned uniti::attack(uniti& enemy) {
 	if(d <= 0)
 		d = 1;
 	return d;
+}
+
+void uniti::melee(uniti& enemy) {
+	auto d = attack(enemy);
+	enemy.damage(d);
+	if(!is(Stealth) && !is(CounterAttacked)) {
+		d = enemy.attack(*this);
+		damage(d);
+		enemy.add(CounterAttacked);
+	}
+	if(is(Twice)) {
+		d = attack(enemy);
+		enemy.damage(d);
+	}
 }
 
 void uniti::damage(unsigned v) {

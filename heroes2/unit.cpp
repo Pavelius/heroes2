@@ -190,6 +190,8 @@ void uniti::melee(uniti& enemy) {
 	enemy.damage(d);
 	if(!is(Stealth) && !is(CounterAttacked)) {
 		d = enemy.attack(*this);
+		if(enemy.isarcher() && !enemy.is(MeleeArcher))
+			d = d / 2;
 		damage(d);
 		enemy.add(CounterAttacked);
 	}

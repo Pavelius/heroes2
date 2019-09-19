@@ -878,9 +878,10 @@ struct uniti : positioni, squadi, battlef {
 	bool					is(spell_s v) const { return getspell(v) > 0; }
 	bool					is(tag_s v) const { return squadi::is(v); }
 	constexpr bool			isenemy(const uniti* p) { return p->leader != leader; }
-	void					melee(uniti& enemy);
+	void					melee(uniti& enemy, direction_s d = Up);
 	int						get(ability_s v) const;
 	unsigned				getdamage() const;
+	static direction_s		getdirection(short unsigned from, short unsigned to);
 	const monsteri&			getmonster() const { return bsmeta<monsteri>::elements[unit]; }
 	unsigned short			getspell(spell_s v) const;
 	void					setspell(spell_s v, unsigned short count);

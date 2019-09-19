@@ -90,7 +90,7 @@ struct animation {
 };
 struct battleimage : animation, variant, uniti {
 	constexpr explicit operator bool() const { return squadi::count != 0; }
-	void					animate(unsigned speed = 100);
+	void					animate(unsigned speed = 50);
 	void					clear();
 	void					paint() const;
 	void					set(action_s action, int param = 0);

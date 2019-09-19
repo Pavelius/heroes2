@@ -266,7 +266,7 @@ static void attack_enemy() {
 	auto& attacker = *current_unit;
 	auto& defender = *hilite_unit;
 	attacker.setpos(attack_index);
-	attacker.melee(defender);
+	attacker.melee(defender, attack_direction);
 	end_turn();
 }
 
@@ -407,30 +407,6 @@ static void paint_screen() {
 	paint_screen(source, count, current_unit);
 }
 
-//// res::CMSECO
-//// 0 - None
-//// 1 - Move
-//// 2 - Fly
-//// 3 - Shoot
-//// 4 - Hero (Helmet)
-//// 5 - Info
-//// 6 - Small cursor
-//// 7 - Sword (to right up)
-//// 8 - Sword (to right)
-//// 9 - Sword (to right down)
-//// 10 - Sword (to left down)
-//// 11 - Sword (to left)
-//// 12 - Sword (to left up)
-//// 13 - Sword (to up)
-//// 14 - Sword (to down)
-//// 15 - Broken arrow
-//switch(value) {
-//case Information:
-//	icn = res::CMSECO;
-//	start = 5;
-//	pos.x = -7;
-//	pos.y = -7;
-//	break;
 //case Fly:
 //	icn = res::CMSECO;
 //	start = 2;
@@ -609,6 +585,8 @@ uniti* uniti::find(short unsigned index) {
 }
 
 void battleimage::animate(unsigned speed) {
+	if(!*this)
+		return;
 	battleimage* source[32];
 	auto count = select_drawables(source, sizeof(source) / sizeof(source[0]));
 	auto frame_stop = start + count;
@@ -651,4 +629,21 @@ void uniti::show_attack(uniti& enemy, direction_s d) const {
 		pa->set(AttackAction, 3);
 	pa->animate();
 	pa->set(Wait);
+}
+
+direction_s uniti::getdirection(short unsigned from, short unsigned to) {
+	int x1 = from % awd;
+	int y1 = from / awd;
+	int x2 = to % awd;
+	int y2 = to / awd;
+	if(y2 == y1) {
+		if(x2 == x1)
+			return Up;
+		return (x2 > x1) ? Right : Left;
+	}
+	point p1 = i2h(from);
+	point p2 = i2h(to);
+	if(y2 < y1)
+		return (p2.x < p1.x) ? LeftUp : RightUp;
+	return (p2.x < p1.x) ? LeftDown : RightDown;
 }

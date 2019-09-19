@@ -19,14 +19,24 @@ void animation::set(res_s res, unsigned char frame, point pos) {
 	}
 }
 
-bool animation::update() {
+bool animation::update(int step) {
 	if(wait) {
 		wait--;
 		return false;
 	}
-	if(++frame >= start + count)
-		frame = start;
-	return frame == start;
+	frame += step;
+	if(step > 0) {
+		if(frame >= start + count) {
+			frame = start;
+			return true;
+		}
+	} else {
+		if(frame <= start) {
+			frame = start + count - 1;
+			return true;
+		}
+	}
+	return false;
 }
 
 void animation::paint(int x, int y, unsigned flags) const {

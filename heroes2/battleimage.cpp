@@ -321,3 +321,10 @@ void battleimage::update() {
 	if(animation::update())
 		set(Wait);
 }
+
+void battleimage::set(direction_s d) {
+	if(d == Left || d == LeftDown || d == LeftUp)
+		flags = AFMirror;
+	else
+		flags = 0;
+}

@@ -24,7 +24,7 @@ static const direction_s all_around[] = {Left, Right, LeftUp, LeftDown, RightUp,
 
 static battleimage		units[20];
 static battleimage		attacker_image, defender_image;
-static short unsigned position_wide[2][5] = {{0, 22, 44, 66, 88}, {10, 32, 54, 76, 98}};
+static short unsigned	position_wide[2][5] = {{0, 22, 44, 66, 88}, {10, 32, 54, 76, 98}};
 
 static point i2h(short unsigned index) {
 	int x = 20 + 88 - ((index / awd) % 2 ? cell_wd / 2 : 0) + (cell_wd - 1) * (index % awd);
@@ -49,6 +49,14 @@ static bool isattacker(const heroi* hero) {
 
 static int getside(const heroi* leader) {
 	return (attacker == leader) ? 0 : 1;
+}
+
+static battleimage* find_image(battleimage** ps, unsigned count, const uniti* p) {
+	for(auto pe = ps + count; ps < pe; ps++) {
+		if(*ps == p)
+			return *ps;
+	}
+	return 0;
 }
 
 static void add_squad(short unsigned index, squadi& squad, heroi* leader) {
@@ -250,8 +258,7 @@ static void move_unit() {
 static void shoot_enemy() {
 	auto& attacker = *current_unit;
 	auto& defender = *hilite_unit;
-	auto d = attacker.attack(defender);
-	defender.damage(d);
+	attacker.shoot(defender);
 	end_turn();
 }
 
@@ -384,9 +391,7 @@ static void hittest_drawable(battleimage** source, unsigned count) {
 	}
 }
 
-static void paint_screen() {
-	battleimage* source[32];
-	auto count = select_drawables(source, sizeof(source) / sizeof(source[0]));
+static void paint_screen(battleimage** source, unsigned count) {
 	hilite_index = Blocked;
 	hilite_unit = 0;
 	hittest_grid();
@@ -394,6 +399,12 @@ static void paint_screen() {
 	paint_field();
 	paint_grid();
 	paint_drawables(source, count);
+}
+
+static void paint_screen() {
+	battleimage* source[32];
+	auto count = select_drawables(source, sizeof(source) / sizeof(source[0]));
+	paint_screen(source, count);
 }
 
 //// res::CMSECO
@@ -595,4 +606,48 @@ uniti* uniti::find(short unsigned index) {
 			return &e;
 	}
 	return 0;
+}
+
+void battleimage::animate(unsigned speed) {
+	battleimage* source[32];
+	auto count = select_drawables(source, sizeof(source) / sizeof(source[0]));
+	auto frame_stop = start + count;
+	while(frame<frame_stop) {
+		paint_screen(source, count);
+		updatescreen();
+		frame++;
+		sleep(speed);
+	}
+}
+
+void uniti::show_shoot(uniti& enemy) const {
+	auto pa = (battleimage*)this;
+	const auto d = Right;
+	pa->set(d);
+	pa->set(Shoot);
+	pa->animate();
+	if(d == Left || d == Right)
+		pa->set(Shoot, 2);
+	else if(d == LeftUp || d == RightUp)
+		pa->set(Shoot, 1);
+	else
+		pa->set(Shoot, 3);
+	pa->animate();
+}
+
+void uniti::show_attack(uniti& enemy, direction_s d) const {
+	if(!enemy || !*this)
+		return;
+	auto pa = (battleimage*)this;
+	pa->set(d);
+	pa->set(AttackAction);
+	pa->animate();
+	if(d == Left || d == Right)
+		pa->set(AttackAction, 2);
+	else if(d == LeftUp || d == RightUp)
+		pa->set(AttackAction, 1);
+	else
+		pa->set(AttackAction, 3);
+	pa->animate();
+	pa->set(Wait);
 }

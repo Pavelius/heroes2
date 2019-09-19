@@ -885,6 +885,9 @@ struct uniti : positioni, squadi, battlef {
 	unsigned short			getspell(spell_s v) const;
 	void					setspell(spell_s v, unsigned short count);
 	void					setup(squadi& squad, heroi* hero);
+	unsigned				shoot(uniti& enemy);
+	void					show_shoot(uniti& enemy) const;
+	void					show_attack(uniti& enemy, direction_s d) const;
 	static short unsigned	to(short unsigned i, direction_s d);
 	static direction_s		to(direction_s d, direction_s d1);
 	void					refresh();

@@ -185,11 +185,20 @@ unsigned uniti::attack(uniti& enemy) {
 	return d;
 }
 
+unsigned uniti::shoot(uniti& enemy) {
+	show_shoot(enemy);
+	auto d = attack(enemy);
+	enemy.damage(d);
+	return d;
+}
+
 void uniti::melee(uniti& enemy) {
 	auto d = attack(enemy);
+	show_attack(enemy, Left);
 	enemy.damage(d);
 	if(!is(Stealth) && !is(CounterAttacked)) {
 		d = enemy.attack(*this);
+		enemy.show_attack(*this, Right);
 		if(enemy.isarcher() && !enemy.is(MeleeArcher))
 			d = d / 2;
 		damage(d);
@@ -197,6 +206,7 @@ void uniti::melee(uniti& enemy) {
 	}
 	if(is(Twice)) {
 		d = attack(enemy);
+		show_attack(enemy, Left);
 		enemy.damage(d);
 	}
 }

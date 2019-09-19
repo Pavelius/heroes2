@@ -86,13 +86,17 @@ struct animation {
 	int						getwidth() const;
 	void					paint(int x, int y, unsigned flags = 0) const;
 	void					set(res_s id, unsigned char frame, point pos = point());
-	bool					update();
+	bool					update(int step);
+	bool					update() { return update(1); }
 };
 struct battleimage : animation, variant, uniti {
+	action_s				action;
 	constexpr explicit operator bool() const { return squadi::count != 0; }
+	void					animate(unsigned speed = 100);
 	void					clear();
 	void					paint() const;
 	void					set(action_s action, int param = 0);
+	void					set(direction_s dir);
 	void					setpos(short unsigned v);
 	void					stroke() const;
 	void					update();

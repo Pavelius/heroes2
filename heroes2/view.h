@@ -78,9 +78,8 @@ struct picture {
 struct animation {
 	point					pos;
 	res_s					res;
-	short unsigned			wait;
-	unsigned char			frame, start, count;
 	unsigned				flags;
+	unsigned char			frame, start, count, wait;
 	constexpr animation() : pos{0, 0}, res(NoRes), wait(0), frame(0), start(0), count(0), flags(0) {}
 	static int				getanimate(res_s id, int start, int ticket, bool quantity);
 	int						getwidth() const;
@@ -90,7 +89,6 @@ struct animation {
 	bool					update() { return update(1); }
 };
 struct battleimage : animation, variant, uniti {
-	action_s				action;
 	constexpr explicit operator bool() const { return squadi::count != 0; }
 	void					animate(unsigned speed = 100);
 	void					clear();

@@ -371,10 +371,10 @@ static void update_drawables() {
 	}
 }
 
-static void paint_drawables(battleimage** source, unsigned count) {
+static void paint_drawables(battleimage** source, unsigned count, const battleimage* current) {
 	for(unsigned i = 0; i < count; i++) {
 		source[i]->paint();
-		if(source[i] == current_unit)
+		if(source[i] == current)
 			source[i]->stroke();
 	}
 }
@@ -391,20 +391,20 @@ static void hittest_drawable(battleimage** source, unsigned count) {
 	}
 }
 
-static void paint_screen(battleimage** source, unsigned count) {
+static void paint_screen(battleimage** source, unsigned count, const battleimage* current) {
 	hilite_index = Blocked;
 	hilite_unit = 0;
 	hittest_grid();
 	hittest_drawable(source, count);
 	paint_field();
 	paint_grid();
-	paint_drawables(source, count);
+	paint_drawables(source, count, current);
 }
 
 static void paint_screen() {
 	battleimage* source[32];
 	auto count = select_drawables(source, sizeof(source) / sizeof(source[0]));
-	paint_screen(source, count);
+	paint_screen(source, count, current_unit);
 }
 
 //// res::CMSECO
@@ -613,7 +613,7 @@ void battleimage::animate(unsigned speed) {
 	auto count = select_drawables(source, sizeof(source) / sizeof(source[0]));
 	auto frame_stop = start + count;
 	while(frame<frame_stop) {
-		paint_screen(source, count);
+		paint_screen(source, count, 0);
 		updatescreen();
 		frame++;
 		sleep(speed);
@@ -633,6 +633,7 @@ void uniti::show_shoot(uniti& enemy) const {
 	else
 		pa->set(Shoot, 3);
 	pa->animate();
+	pa->set(Wait);
 }
 
 void uniti::show_attack(uniti& enemy, direction_s d) const {

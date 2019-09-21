@@ -8,7 +8,6 @@ static heroi*			defender;
 static battleimage*		current_unit;
 static unsigned short	hilite_index;
 static battleimage*		hilite_unit;
-static unsigned			speed = 100;
 battlei					battle;
 
 static unsigned short	attack_index;
@@ -26,6 +25,14 @@ static const direction_s all_around[] = {Left, Right, LeftUp, LeftDown, RightUp,
 static battleimage		units[20];
 static battleimage		attacker_image, defender_image;
 static short unsigned	position_wide[2][5] = {{0, 22, 44, 66, 88}, {10, 32, 54, 76, 98}};
+
+static unsigned getanimationspeed() {
+	switch(battle.speed) {
+	case 1: return 90;
+	case 2: return 50;
+	default: return 180;
+	}
+}
 
 static point i2h(short unsigned index) {
 	int x = 20 + 88 - ((index / awd) % 2 ? cell_wd / 2 : 0) + (cell_wd - 1) * (index % awd);
@@ -617,7 +624,7 @@ void battleimage::animate(int frames, const aref<battleimage*>& linked) {
 	while(frame < frames) {
 		paint_screen(source, count, 0);
 		updatescreen();
-		sleep(speed);
+		sleep(getanimationspeed());
 		for(auto pair : linked)
 			pair->increment();
 		if(increment())

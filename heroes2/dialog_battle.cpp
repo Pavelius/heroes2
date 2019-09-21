@@ -52,14 +52,6 @@ static int getside(const heroi* leader) {
 	return (attacker == leader) ? 0 : 1;
 }
 
-static battleimage* find_image(battleimage** ps, unsigned count, const uniti* p) {
-	for(auto pe = ps + count; ps < pe; ps++) {
-		if(*ps == p)
-			return *ps;
-	}
-	return 0;
-}
-
 static void add_squad(short unsigned index, squadi& squad, heroi* leader) {
 	for(auto& e : units) {
 		if(e)
@@ -93,7 +85,7 @@ static void add_squad(armyi& army, heroi* leader) {
 static bool isend() {
 	heroi* leader = 0;
 	for(auto& e : units) {
-		if(!e)
+		if(!e.isalive())
 			continue;
 		if(!leader)
 			leader = e.leader;
@@ -225,7 +217,8 @@ static void paint_grid() {
 void heroi::setup_battle(heroi* enemy) {
 	attacker = this;
 	defender = enemy;
-	auto pos = defender->getpos();
+	for(auto& e : (::units))
+		e.clear();
 	add_squad(*this, this);
 	add_squad(*enemy, enemy);
 	prepare_background(Dirt, true);
@@ -545,7 +538,7 @@ static void makebattle() {
 	while(!isend()) {
 		for(auto s : speeds) {
 			for(auto& e : units) {
-				if(!e)
+				if(!e.isalive())
 					continue;
 				if(e.is(Moved))
 					continue;
@@ -555,7 +548,7 @@ static void makebattle() {
 			}
 		}
 		for(auto& e : units) {
-			if(!e)
+			if(!e.isalive())
 				continue;
 			e.refresh();
 		}
@@ -577,7 +570,7 @@ void heroi::battlestart() {
 
 uniti* uniti::find(short unsigned index) {
 	for(auto& e : units) {
-		if(!e)
+		if(!e.isalive())
 			continue;
 		if(e.getpos() == index)
 			return &e;
@@ -585,19 +578,50 @@ uniti* uniti::find(short unsigned index) {
 	return 0;
 }
 
-void battleimage::animate(aref<battleimage*> linked) {
-	if(!*this || animation::count==0)
+static battleimage* find_image(const uniti* p) {
+	auto pe = (battleimage*)p;
+	if(pe >= units && pe < units + sizeof(units) / sizeof(units[0]))
+		return pe;
+	return 0;
+}
+
+static int find_image(battleimage** ps, unsigned count, const battleimage* p) {
+	auto pe = ps + count;
+	for(auto pb = ps; pb < pe; ps++) {
+		if(*pb == p)
+			return pb - ps;
+	}
+	return -1;
+}
+
+static void add_drawable(battleimage* source[32], unsigned& count, battleimage* p) {
+	if(count >= sizeof(source) / sizeof(source[0]))
+		return;
+	if(find_image(source, count, p) != -1)
+		return;
+	source[count++] = p;
+}
+
+void battleimage::animate(int frames, const aref<battleimage*>& linked) {
+	if(!isalive())
+		return;
+	if(frames == -1)
+		frames = animation::count;
+	frames += start;
+	if(frame>=frames)
 		return;
 	battleimage* source[32];
 	auto count = select_drawables(source, sizeof(source) / sizeof(source[0]));
-	while(true) {
+	for(auto p : linked)
+		add_drawable(source, count, p);
+	while(frame < frames) {
 		paint_screen(source, count, 0);
 		updatescreen();
 		sleep(speed);
-		if(increment())
-			break;
 		for(auto pair : linked)
 			pair->increment();
+		if(increment())
+			break;
 	}
 }
 
@@ -614,13 +638,14 @@ void uniti::show_shoot(uniti& enemy) const {
 	else
 		pa->set(Shoot, 3);
 	pa->animate();
-	pa->set(Wait);
+	pa->setdefault();
 }
 
-void uniti::show_attack(uniti& enemy, direction_s d) const {
-	if(!enemy || !*this)
+void uniti::show_attack(uniti& enemy, direction_s d, bool destroy_enemy) const {
+	if(!enemy.isalive() || !isalive())
 		return;
 	auto pa = (battleimage*)this;
+	auto pe = find_image(&enemy);
 	pa->set(d);
 	pa->set(AttackAction);
 	pa->animate();
@@ -630,8 +655,13 @@ void uniti::show_attack(uniti& enemy, direction_s d) const {
 		pa->set(AttackAction, 1);
 	else
 		pa->set(AttackAction, 3);
-	pa->animate();
-	pa->set(Wait);
+	pa->animate(pa->animation::count-2);
+	if(destroy_enemy)
+		pe->set(Killed);
+	else
+		pe->set(Damaged);
+	pa->animate(-1, pe); pa->setdefault();
+	pe->animate(-1, pa); pe->setdefault();
 }
 
 direction_s uniti::getdirection(short unsigned from, short unsigned to) {

@@ -869,26 +869,31 @@ struct uniti : positioni, squadi, battlef {
 	squadi*					source;
 	short unsigned			shoots;
 	short unsigned			hits;
+	constexpr explicit operator bool() const { return index != Blocked; }
 	void					addspell(spell_s v, unsigned short rounds);
-	unsigned				attack(uniti& enemy);
+	int						attack(uniti& enemy);
 	bool					canshoot() const;
 	void					damage(unsigned v);
 	static uniti*			find(short unsigned index);
 	constexpr bool			is(battle_s v) const { return battlef::is(v); }
 	bool					is(spell_s v) const { return getspell(v) > 0; }
 	bool					is(tag_s v) const { return squadi::is(v); }
+	bool					isalive() const { return index!=Blocked && count > 0; }
 	constexpr bool			isenemy(const uniti* p) { return p->leader != leader; }
+	bool					iskill(int d) const { return gethits() <= d; }
 	void					melee(uniti& enemy, direction_s d = Up);
 	int						get(ability_s v) const;
-	unsigned				getdamage() const;
+	int						getdamage() const;
 	static direction_s		getdirection(short unsigned from, short unsigned to);
+	int						gethits() const;
 	const monsteri&			getmonster() const { return bsmeta<monsteri>::elements[unit]; }
 	unsigned short			getspell(spell_s v) const;
+	void					sethits(int value);
 	void					setspell(spell_s v, unsigned short count);
 	void					setup(squadi& squad, heroi* hero);
 	unsigned				shoot(uniti& enemy);
 	void					show_shoot(uniti& enemy) const;
-	void					show_attack(uniti& enemy, direction_s d) const;
+	void					show_attack(uniti& enemy, direction_s d, bool destroy_enemy) const;
 	static short unsigned	to(short unsigned i, direction_s d);
 	static direction_s		to(direction_s d, direction_s d1);
 	void					refresh();

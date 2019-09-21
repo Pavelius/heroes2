@@ -149,7 +149,7 @@ short unsigned uniti::to(short unsigned i, direction_s d) {
 	}
 }
 
-unsigned uniti::getdamage() const {
+int uniti::getdamage() const {
 	unsigned min = bsmeta<monsteri>::elements[unit].damageMin;
 	unsigned max = bsmeta<monsteri>::elements[unit].damageMax;
 	if(is(Curse))
@@ -163,8 +163,8 @@ unsigned uniti::getdamage() const {
 	return min + rand() % (max - min + 1);
 }
 
-unsigned uniti::attack(uniti& enemy) {
-	if(!count || !enemy.count)
+int uniti::attack(uniti& enemy) {
+	if(!isalive() || !enemy.isalive())
 		return 0;
 	auto d = getdamage();
 	auto at = get(Attack);
@@ -196,11 +196,11 @@ void uniti::melee(uniti& enemy, direction_s dir) {
 	auto d = attack(enemy);
 	if(dir == Up)
 		dir = getdirection(getpos(), enemy.getpos());
-	show_attack(enemy, to(dir, Down));
+	show_attack(enemy, to(dir, Down), enemy.iskill(d));
 	enemy.damage(d);
 	if(!is(Stealth) && !is(CounterAttacked)) {
 		d = enemy.attack(*this);
-		enemy.show_attack(*this, dir);
+		enemy.show_attack(*this, dir, iskill(d));
 		if(enemy.isarcher() && !enemy.is(MeleeArcher))
 			d = d / 2;
 		damage(d);
@@ -208,23 +208,33 @@ void uniti::melee(uniti& enemy, direction_s dir) {
 	}
 	if(is(Twice)) {
 		d = attack(enemy);
-		show_attack(enemy, to(dir, Down));
+		show_attack(enemy, to(dir, Down), enemy.iskill(d));
 		enemy.damage(d);
 	}
 }
 
 void uniti::damage(unsigned v) {
+	sethits(gethits() - v);
+}
+
+int uniti::gethits() const {
 	if(count < 1)
-		return;
-	unsigned mhp = getmonster().hp;
+		return 0;
+	auto mhp = getmonster().hp;
+	if(!mhp)
+		return 0;
+	return (count - 1) * mhp + hits;
+}
+
+void uniti::sethits(int value) {
+	auto mhp = getmonster().hp;
 	if(!mhp)
 		return;
-	unsigned chp = (count - 1) * mhp + hits;
-	if(chp < v)
+	if(value <= 0) {
 		count = 0;
-	else {
-		chp -= v;
-		count = chp / mhp;
-		hits = (chp % mhp) + 1;
+		hits = 0;
+	} else {
+		count = value / mhp;
+		hits = value % mhp;
 	}
 }

@@ -90,12 +90,15 @@ struct animation {
 	bool					update() { return update(1); }
 };
 struct battleimage : animation, variant, uniti {
-	constexpr explicit operator bool() const { return squadi::count != 0; }
-	void					animate(aref<battleimage*> source = aref<battleimage*>());
+	constexpr explicit operator bool() const { return uniti::operator bool(); }
+	void					animate(int frames = -1, const aref<battleimage*>& linked = aref<battleimage*>());
 	void					clear();
 	void					paint() const;
+	bool					iskilled() const;
+	bool					iswait() const;
 	void					set(action_s action, int param = 0);
 	void					set(direction_s dir);
+	void					setdefault();
 	void					setpos(short unsigned v);
 	void					stroke() const;
 	void					update();

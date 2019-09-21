@@ -193,6 +193,10 @@ void battleimage::set(action_s action, int param) {
 			start = e.kill[0];
 			animation::count = e.kill[1];
 			break;
+		case Dead:
+			start = e.kill[0] + e.kill[1] - 1;
+			animation::count = 1;
+			break;
 		case AttackAction:
 			switch(param) {
 			case 0:
@@ -317,9 +321,16 @@ void battleimage::set(action_s action, int param) {
 	frame = start;
 }
 
+void battleimage::setdefault() {
+	if(iskilled())
+		set(Dead);
+	else
+		set(Wait);
+}
+
 void battleimage::update() {
 	if(animation::update())
-		set(Wait);
+		setdefault();
 }
 
 void battleimage::set(direction_s d) {
@@ -327,4 +338,14 @@ void battleimage::set(direction_s d) {
 		flags = AFMirror;
 	else
 		flags = 0;
+}
+
+bool battleimage::iskilled() const {
+	return frame >= monsters[unit].kill[0]
+		&& frame < monsters[unit].kill[0] + monsters[unit].kill[1];
+}
+
+bool battleimage::iswait() const {
+	return frame >= monsters[unit].idle[0]
+		&& frame <= monsters[unit].idle[0] + monsters[unit].idle[1];
 }

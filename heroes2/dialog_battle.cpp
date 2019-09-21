@@ -100,17 +100,8 @@ static int getside(const heroi* leader) {
 	return (attacker == leader) ? 0 : 1;
 }
 
-static battleimage* find_image(const uniti* p) {
-	auto pe = (battleimage*)p;
-	if(pe >= units && pe < units + sizeof(units) / sizeof(units[0]))
-		return pe;
-	return 0;
-}
-
 static void add_drawable(battleimage* p) {
 	if(drawables_count >= sizeof(drawables) / sizeof(drawables[0]))
-		return;
-	if(find_image(p))
 		return;
 	drawables[drawables_count++] = p;
 }
@@ -128,7 +119,6 @@ static void add_squad(short unsigned index, squadi& squad, heroi* leader) {
 		e.leader = leader;
 		e.setpos(index);
 		e.set(Wait);
-		add_drawable(&e);
 		break;
 	}
 }
@@ -707,17 +697,16 @@ int getdistance(point p1, point p2) {
 }
 
 void battleimage::animate(point goal, int velocity) {
-	if(!isalive() || iswait())
+	if(type==Monster && (!isalive() || iswait()))
 		return;
 	auto frames = start + animation::count;
 	if(frame >= frames)
 		return;
-	auto p1 = i2h(index);
+	auto p1 = pos;
 	auto distance_maximum = getdistance(p1, goal);
-	if(distance_maximum<=0)
+	if(distance_maximum <= 0)
 		return;
 	auto distance = 0;
-	add_drawable(this);
 	distance += velocity;
 	while(distance < distance_maximum) {
 		pos.x = p1.x + (goal.x - p1.x)*distance / distance_maximum;
@@ -731,10 +720,77 @@ void battleimage::animate(point goal, int velocity) {
 	}
 }
 
+static res_s getshooting(monster_s id) {
+	switch(id) {
+	case Orc:
+	case OrcChief:
+		return ORC__MSL;
+	case Druid:
+	case GreaterDruid:
+		return DRUIDMSL;
+	case Halfling:
+		return HALFLMSL;
+	case Titan:
+		return TITANMSL;
+	case Troll:
+	case WarTroll:
+		return TROLLMSL;
+	case Lich:
+	case PowerLich:
+		return LICH_MSL;
+	case Mage:
+	case ArchMage:
+	case Centaur:
+	case Archer:
+	case Ranger:
+		return ARCH_MSL;
+	case Elf:
+	case GrandElf:
+		return ELF__MSL;
+	default:
+		return NoRes;
+	}
+}
+
+static int missile9(int dx, int dy) {
+	if(0 == dx)
+		return dy > 0 ? 0 : 8;
+	int tan = iabs(1000 * dy / dx);
+	if(tan <= 60)
+		return 4;
+	else if(tan <= 577) // tan 30: 0 - 30
+		return dy > 0 ? 3 : 5;
+	else if(tan >= 1732) // tan 60: 90 - 60
+		return dy > 0 ? 1 : 7;
+	// tan 45: 30 - 60
+	return dy > 0 ? 2 : 6;
+}
+
+static int missile7(int dx, int dy) {
+	if(0 == dx)
+		return dy > 0 ? 0 : 6;
+	else if(0 == dy)
+		return 3;
+	int tan = iabs(1000 * dy / dx);
+	// tan 45: 0 - 45
+	if(1000 >= tan)
+		return dy > 0 ? 2 : 4;
+	// 45 - 90
+	return dy > 0 ? 1 : 5;
+}
+
+static int get_missile_index(res_s icn, int dx, int dy) {
+	switch(getframecount(icn)) {
+	case 9: return missile9(dx, dy);
+	case 7: return missile7(dx, dy);
+	default: return 0;
+	}
+}
+
 void uniti::show_shoot(uniti& enemy) const {
 	auto pa = (battleimage*)this;
 	auto pe = (battleimage*)&enemy;
-	const auto d = Right;
+	const auto d = getdirection(getpos(), enemy.getpos());
 	pa->set(d);
 	pa->set(Shoot);
 	pa->animate();
@@ -744,15 +800,34 @@ void uniti::show_shoot(uniti& enemy) const {
 		pa->set(Shoot, 1);
 	else
 		pa->set(Shoot, 3);
+	pa->animate(pa->animation::count - 2);
+	// Выпускание снаряда
+	const int shoot_height = 50;
+	battleimage arrow; arrow.clear();
+	point target = i2h(enemy.getpos());
+	arrow.pos = i2h(getpos());
+	arrow.pos.y -= shoot_height;
+	target.y -= shoot_height;
+	auto dx = arrow.pos.x - target.x;
+	auto dy = arrow.pos.y - target.y;
+	arrow.res = getshooting(pa->monster);
+	arrow.frame = get_missile_index(arrow.res, dx, dy);
+	arrow.start = arrow.frame;
+	arrow.flags = pa->flags;
+	arrow.animation::count = 1;
+	add_drawable(&arrow);
+	arrow.animate(target, 44);
+	// Оставшаяся анимация
 	pa->animate();
 	pa->setdefault();
+	prepare_drawables();
 }
 
 void uniti::show_attack(uniti& enemy, direction_s d, bool destroy_enemy) const {
 	if(!enemy.isalive() || !isalive())
 		return;
 	auto pa = (battleimage*)this;
-	auto pe = find_image(&enemy);
+	auto pe = (battleimage*)&enemy;
 	pa->set(d);
 	pa->set(AttackAction);
 	pa->animate();
@@ -818,7 +893,7 @@ void uniti::show_fly(short unsigned goal) const {
 	pa->set(getdirection(index, goal));
 	pa->flags |= AFMoving;
 	pa->set(FlyAction, 0);
-	pa->animate(-1, getanimationspeed()/2);
+	pa->animate(-1, getanimationspeed() / 2);
 	pa->set(FlyAction, 1);
 	pa->animate(p2, 16);
 	pa->set(FlyAction, 2);

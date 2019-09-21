@@ -209,6 +209,7 @@ const void*					get(res_s id);
 const icn::record*			get(res_s id, int n);
 rect						get(res_s id, int n, int x, int y, unsigned flags);
 res_s						getbuildings(kind_s v);
+int							getframecount(res_s id);
 int							getheight(res_s id, int n);
 const char*					getname(res_s id);
 res_s						getres(unsigned char object);

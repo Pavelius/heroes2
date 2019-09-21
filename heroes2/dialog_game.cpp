@@ -342,7 +342,7 @@ void gamei::newgame() {
 		pd->armyi::clear();
 		pd->add(Skeleton, 30);
 		pd->add(Zombie, 4);
-		ph.hero->add(Gargoyle, 3);
+		ph.hero->add(Sprite, 3);
 		ph.hero->setup_battle(pd);
 		ph.hero->battlestart();
 	}

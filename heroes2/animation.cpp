@@ -29,24 +29,9 @@ bool animation::increment() {
 	return false;
 }
 
-bool animation::update(int step) {
-	if(wait) {
-		wait--;
-		return false;
-	}
-	frame += step;
-	if(step > 0) {
-		if(frame >= start + count) {
-			frame = start;
-			return true;
-		}
-	} else {
-		if(frame <= start) {
-			frame = start + count - 1;
-			return true;
-		}
-	}
-	return false;
+void animation::update() {
+	if(increment())
+		frame = start;
 }
 
 void animation::paint(int x, int y, unsigned flags) const {

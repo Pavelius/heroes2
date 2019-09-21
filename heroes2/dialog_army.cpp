@@ -263,7 +263,7 @@ void squadi::show(const heroi* hero, bool info_mode, bool allow_dismiss, bool al
 			setcursor(NoRes, 0);
 		domodal();
 		if(hot::key == InputTimer) {
-			if(mon.animation::update()) {
+			if(mon.increment()) {
 				if(is(Fly))
 					mon.set(FlyAction, 1);
 				else

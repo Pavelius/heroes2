@@ -897,6 +897,7 @@ struct uniti : positioni, squadi, battlef {
 	void					setup(squadi& squad, heroi* hero);
 	unsigned				shoot(uniti& enemy);
 	void					show_attack(uniti& enemy, direction_s d, bool destroy_enemy) const;
+	void					show_damage(bool destroy) const;
 	void					show_fly(short unsigned index) const;
 	void					show_move(short unsigned index) const;
 	void					show_shoot(uniti& enemy) const;

@@ -23,7 +23,9 @@ static unsigned short	path_start;
 static const direction_s all_around[] = {Left, Right, LeftUp, LeftDown, RightUp, RightDown};
 
 static battleimage		units[20];
+static battleimage*		drawables[20];
 static battleimage		attacker_image, defender_image;
+static unsigned			drawables_count;
 static short unsigned	position_wide[2][5] = {{0, 22, 44, 66, 88}, {10, 32, 54, 76, 98}};
 
 static unsigned getanimationspeed() {
@@ -98,6 +100,21 @@ static int getside(const heroi* leader) {
 	return (attacker == leader) ? 0 : 1;
 }
 
+static battleimage* find_image(const uniti* p) {
+	auto pe = (battleimage*)p;
+	if(pe >= units && pe < units + sizeof(units) / sizeof(units[0]))
+		return pe;
+	return 0;
+}
+
+static void add_drawable(battleimage* p) {
+	if(drawables_count >= sizeof(drawables) / sizeof(drawables[0]))
+		return;
+	if(find_image(p))
+		return;
+	drawables[drawables_count++] = p;
+}
+
 static void add_squad(short unsigned index, squadi& squad, heroi* leader) {
 	for(auto& e : units) {
 		if(e)
@@ -111,6 +128,7 @@ static void add_squad(short unsigned index, squadi& squad, heroi* leader) {
 		e.leader = leader;
 		e.setpos(index);
 		e.set(Wait);
+		add_drawable(&e);
 		break;
 	}
 }
@@ -126,6 +144,18 @@ static void add_squad(armyi& army, heroi* leader) {
 		if(index >= 5)
 			break;
 	}
+}
+
+static void prepare_drawables() {
+	auto ps = drawables;
+	for(auto& e : units) {
+		if(!e)
+			continue;
+		*ps++ = &e;
+	}
+	*ps++ = &attacker_image;
+	*ps++ = &defender_image;
+	drawables_count = ps - drawables;
 }
 
 static bool isend() {
@@ -316,6 +346,7 @@ static void show_info() {
 }
 
 static void hittest_grid() {
+	hilite_index = Blocked;
 	for(int i = 0; i < awd*ahd; i++) {
 		auto pt = i2h(i);
 		rect rc = {pt.x - cell_wd / 2, pt.y - cell_hr, pt.x + cell_wd / 2, pt.y + cell_hr};
@@ -393,49 +424,38 @@ static int drawable_compare(const void* v1, const void* v2) {
 	auto y2 = p2->getz();
 	if(y1 != y2)
 		return y1 - y2;
-	return p1->pos.x - p2->pos.x;
+	if(p1->pos.x != p2->pos.x)
+		return p1->pos.x - p2->pos.x;
+	return (p1 < p2) ? -1 : 1;
 }
 
-static void normalize_drawables(battleimage** source, unsigned source_count) {
-	qsort(source, source_count, sizeof(source[0]), drawable_compare);
+static void normalize_drawables() {
+	qsort(drawables, drawables_count, sizeof(drawables[0]), drawable_compare);
 }
 
-static unsigned select_drawables(battleimage** source, unsigned count) {
-	auto pb = source;
-	auto pe = source + count;
-	*pb++ = &attacker_image;
-	*pb++ = &defender_image;
-	for(auto& e : units) {
-		if(!e)
+static bool update_drawables(battleimage* p) {
+	for(unsigned i = 0; i < drawables_count; i++) {
+		if(drawables[i] == p)
 			continue;
-		if(pb < pe)
-			*pb++ = &e;
+		drawables[i]->update();
 	}
-	return pb - source;
+	if(p)
+		return p->increment();
+	return false;
 }
 
-static void update_drawables() {
-	if(hot::key == InputTimer) {
-		for(auto& e : units) {
-			if(e)
-				e.update();
-		}
-		attacker_image.update();
-		defender_image.update();
+static void paint_drawables(const battleimage* current) {
+	for(unsigned i = 0; i < drawables_count; i++) {
+		drawables[i]->paint();
+		if(drawables[i] == current)
+			drawables[i]->stroke();
 	}
 }
 
-static void paint_drawables(battleimage** source, unsigned count, const battleimage* current) {
-	for(unsigned i = 0; i < count; i++) {
-		source[i]->paint();
-		if(source[i] == current)
-			source[i]->stroke();
-	}
-}
-
-static void hittest_drawable(battleimage** source, unsigned count) {
-	for(unsigned i = 0; i < count; i++) {
-		auto p = source[i];
+static void hittest_drawable() {
+	hilite_unit = 0;
+	for(unsigned i = 0; i < drawables_count; i++) {
+		auto p = drawables[i];
 		if(hilite_index != Blocked && p->index == hilite_index)
 			hilite_unit = p;
 		else if(p->type == Hero) {
@@ -445,21 +465,13 @@ static void hittest_drawable(battleimage** source, unsigned count) {
 	}
 }
 
-static void paint_screen(battleimage** source, unsigned count, const battleimage* current) {
-	hilite_index = Blocked;
-	hilite_unit = 0;
-	normalize_drawables(source, count);
+static void paint_screen(const battleimage* current) {
+	normalize_drawables();
 	hittest_grid();
-	hittest_drawable(source, count);
+	hittest_drawable();
 	paint_field();
 	paint_grid(current);
-	paint_drawables(source, count, current);
-}
-
-static void paint_screen() {
-	battleimage* source[32];
-	auto count = select_drawables(source, sizeof(source) / sizeof(source[0]));
-	paint_screen(source, count, current_unit);
+	paint_drawables(current);
 }
 
 //case Fly:
@@ -596,12 +608,14 @@ static void wave(short unsigned start, bool fly) {
 
 static void battlemove(battleimage& e) {
 	current_unit = &e;
+	prepare_drawables();
 	wave(e.getpos(), e.is(Fly));
 	while(ismodal()) {
-		paint_screen();
+		paint_screen(current_unit);
 		standart_input();
 		domodal();
-		update_drawables();
+		if(hot::key == InputTimer)
+			update_drawables(0);
 	}
 }
 
@@ -650,49 +664,21 @@ uniti* uniti::find(short unsigned index) {
 	return 0;
 }
 
-static battleimage* find_image(const uniti* p) {
-	auto pe = (battleimage*)p;
-	if(pe >= units && pe < units + sizeof(units) / sizeof(units[0]))
-		return pe;
-	return 0;
-}
-
-static int find_image(battleimage** ps, unsigned count, const battleimage* p) {
-	auto pe = ps + count;
-	for(auto pb = ps; pb < pe; ps++) {
-		if(*pb == p)
-			return pb - ps;
-	}
-	return -1;
-}
-
-static void add_drawable(battleimage* source[32], unsigned& count, battleimage* p) {
-	if(count >= sizeof(source) / sizeof(source[0]))
-		return;
-	if(find_image(source, count, p) != -1)
-		return;
-	source[count++] = p;
-}
-
-void battleimage::animate(int frames, const aref<battleimage*>& linked) {
-	if(!isalive())
+void battleimage::animate(int frames, int speed) {
+	if(!isalive() || iswait())
 		return;
 	if(frames == -1)
 		frames = animation::count;
 	frames += start;
-	if(frame>=frames)
+	if(frame >= frames)
 		return;
-	battleimage* source[32];
-	auto count = select_drawables(source, sizeof(source) / sizeof(source[0]));
-	for(auto p : linked)
-		add_drawable(source, count, p);
+	if(speed == -1)
+		speed = getanimationspeed();
 	while(frame < frames) {
-		paint_screen(source, count, 0);
+		paint_screen(0);
 		updatescreen();
-		sleep(getanimationspeed());
-		for(auto pair : linked)
-			pair->increment();
-		if(increment())
+		sleep(speed);
+		if(update_drawables(this))
 			break;
 	}
 }
@@ -721,27 +707,25 @@ int getdistance(point p1, point p2) {
 }
 
 void battleimage::animate(point goal, int velocity) {
-	if(!isalive())
+	if(!isalive() || iswait())
 		return;
 	auto frames = start + animation::count;
 	if(frame >= frames)
 		return;
 	auto p1 = i2h(index);
 	auto distance_maximum = getdistance(p1, goal);
-	if(!distance_maximum)
+	if(distance_maximum<=0)
 		return;
 	auto distance = 0;
-	battleimage* source[32];
-	auto source_count = select_drawables(source, sizeof(source) / sizeof(source[0]));
-	add_drawable(source, source_count, this);
+	add_drawable(this);
 	distance += velocity;
 	while(distance < distance_maximum) {
 		pos.x = p1.x + (goal.x - p1.x)*distance / distance_maximum;
 		pos.y = p1.y + (goal.y - p1.y)*distance / distance_maximum;
-		paint_screen(source, source_count, 0);
+		paint_screen(0);
 		updatescreen();
 		sleep(getmovespeed());
-		if(increment())
+		if(update_drawables(this))
 			frame = start;
 		distance += velocity;
 	}
@@ -749,6 +733,7 @@ void battleimage::animate(point goal, int velocity) {
 
 void uniti::show_shoot(uniti& enemy) const {
 	auto pa = (battleimage*)this;
+	auto pe = (battleimage*)&enemy;
 	const auto d = Right;
 	pa->set(d);
 	pa->set(Shoot);
@@ -777,13 +762,22 @@ void uniti::show_attack(uniti& enemy, direction_s d, bool destroy_enemy) const {
 		pa->set(AttackAction, 1);
 	else
 		pa->set(AttackAction, 3);
-	pa->animate(pa->animation::count-2);
+	pa->animate(pa->animation::count - 2);
 	if(destroy_enemy)
 		pe->set(Killed);
 	else
 		pe->set(Damaged);
-	pa->animate(-1, pe); pa->setdefault();
-	pe->animate(-1, pa); pe->setdefault();
+	pa->animate(-1); pa->setdefault();
+	pe->animate(-1); pe->setdefault();
+}
+
+void uniti::show_damage(bool destroy) const {
+	auto pa = (battleimage*)this;
+	if(destroy)
+		pa->set(Killed);
+	else
+		pa->set(Damaged);
+	pa->animate();
 }
 
 void uniti::show_move(short unsigned index) const {
@@ -792,12 +786,10 @@ void uniti::show_move(short unsigned index) const {
 		return;
 	auto pa = (battleimage*)this;
 	auto i = getpos();
-	battleimage* source[32];
-	auto source_count = select_drawables(source, sizeof(source) / sizeof(source[0]));
 	pa->set(Move);
 	path_push--;
 	int distance = 0;
-	while(path_push!=0) {
+	while(path_push != 0) {
 		path_push--;
 		auto i1 = path_stack[path_push];
 		if(i1 == Blocked)
@@ -806,7 +798,7 @@ void uniti::show_move(short unsigned index) const {
 		pa->set(d);
 		pa->flags |= AFMoving;
 		while(true) {
-			paint_screen(source, source_count, 0);
+			paint_screen(0);
 			updatescreen();
 			sleep(getmovespeed());
 			if(pa->increment()) {
@@ -826,11 +818,11 @@ void uniti::show_fly(short unsigned goal) const {
 	pa->set(getdirection(index, goal));
 	pa->flags |= AFMoving;
 	pa->set(FlyAction, 0);
-	pa->animate();
+	pa->animate(-1, getanimationspeed()/2);
 	pa->set(FlyAction, 1);
 	pa->animate(p2, 16);
 	pa->set(FlyAction, 2);
-	pa->animate();
+	pa->animate(-1, getanimationspeed() / 2);
 	pa->setdefault();
 	pa->setpos(goal);
 }

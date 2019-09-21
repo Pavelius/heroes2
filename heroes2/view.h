@@ -84,13 +84,12 @@ struct animation {
 	int						getwidth() const;
 	void					paint(int x, int y, unsigned flags = 0) const;
 	void					set(res_s id, unsigned char frame, point pos = point());
-	bool					update(int step);
-	bool					update() { return update(1); }
+	void					update();
 };
 struct battleimage : animation, variant, uniti {
 	constexpr explicit operator bool() const { return uniti::operator bool(); }
 	void					animate(point pos, int velocity);
-	void					animate(int frames = -1, const aref<battleimage*>& linked = aref<battleimage*>());
+	void					animate(int frames = -1, int speed = -1);
 	void					clear();
 	int						getz() const;
 	void					paint() const;

@@ -186,9 +186,10 @@ int uniti::attack(uniti& enemy) {
 }
 
 unsigned uniti::shoot(uniti& enemy) {
-	show_shoot(enemy);
 	auto d = attack(enemy);
+	show_shoot(enemy);
 	enemy.damage(d);
+	enemy.show_damage(!enemy.isalive());
 	return d;
 }
 

@@ -330,11 +330,6 @@ void battleimage::setdefault() {
 		flags = isattacker(leader) ? 0 : AFMirror;
 }
 
-void battleimage::update() {
-	if(animation::update())
-		setdefault();
-}
-
 void battleimage::set(direction_s d) {
 	if(d == Left || d == LeftDown || d == LeftUp)
 		flags = AFMirror;
@@ -343,18 +338,24 @@ void battleimage::set(direction_s d) {
 }
 
 bool battleimage::iskilled() const {
+	if(type != Monster)
+		return false;
 	return frame >= monsters[unit].kill[0]
 		&& frame < monsters[unit].kill[0] + monsters[unit].kill[1];
 }
 
 bool battleimage::iswait() const {
+	if(type != Monster)
+		return false;
 	return frame >= monsters[unit].idle[0]
-		&& frame <= monsters[unit].idle[0] + monsters[unit].idle[1];
+		&& frame < monsters[unit].idle[0] + monsters[unit].idle[1];
 }
 
 bool battleimage::ismoved() const {
+	if(type != Monster)
+		return false;
 	return frame >= monsters[unit].move[0]
-		&& frame <= monsters[unit].move[0] + monsters[unit].move[1];
+		&& frame < monsters[unit].move[0] + monsters[unit].move[1];
 }
 
 int	battleimage::getz() const {
@@ -363,4 +364,9 @@ int	battleimage::getz() const {
 			return pos.y - 480;
 	}
 	return pos.y;
+}
+
+void battleimage::update() {
+	if(increment())
+		setdefault();
 }

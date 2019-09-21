@@ -34,6 +34,10 @@ static unsigned getanimationspeed() {
 	}
 }
 
+static unsigned getmovespeed() {
+	return getanimationspeed() / 2;
+}
+
 static point i2h(short unsigned index) {
 	int x = 20 + 88 - ((index / awd) % 2 ? cell_wd / 2 : 0) + (cell_wd - 1) * (index % awd);
 	int y = 20 + 85 + ((cell_hd / 4) * 3 - 1) * (index / awd);
@@ -531,7 +535,7 @@ static void snode(short unsigned from, direction_s d, short unsigned cost) {
 	path[index] = cost;
 }
 
-static void wave(short unsigned start) {
+static void wave(short unsigned start, bool fly) {
 	path_push = 0;
 	path_pop = 0;
 	if(start == Blocked)
@@ -540,23 +544,31 @@ static void wave(short unsigned start) {
 	memset(path, 0, sizeof(path));
 	// Block units
 	for(auto& e : units) {
-		if(!e)
+		if(!e.isalive())
 			continue;
 		auto i = e.getpos();
 		if(i == Blocked)
 			continue;
 		path[i] = Blocked;
 	}
-	// Start wave
-	path_stack[path_push++] = start;
-	path[start] = 1;
-	while(path_push != path_pop) {
-		auto pos = path_stack[path_pop++];
-		auto cost = path[pos] + 1;
-		if(cost >= Blocked - 1024)
-			break;
-		for(auto d : all_around)
-			snode(pos, d, cost);
+	if(fly) {
+		for(auto& e : path) {
+			if(e == Blocked)
+				continue;
+			e = 1;
+		}
+	} else {
+		// Start wave
+		path_stack[path_push++] = start;
+		path[start] = 1;
+		while(path_push != path_pop) {
+			auto pos = path_stack[path_pop++];
+			auto cost = path[pos] + 1;
+			if(cost >= Blocked - 1024)
+				break;
+			for(auto d : all_around)
+				snode(pos, d, cost);
+		}
 	}
 	path_pop = 0;
 	path_push = 0;
@@ -566,7 +578,7 @@ static void wave(short unsigned start) {
 
 static void battlemove(battleimage& e) {
 	current_unit = &e;
-	wave(e.getpos());
+	wave(e.getpos(), e.is(Fly));
 	while(ismodal()) {
 		paint_screen();
 		standart_input();
@@ -709,7 +721,7 @@ void battleimage::animate(point goal, int velocity) {
 		pos.y = p1.y + (goal.y - p1.y)*distance / distance_maximum;
 		paint_screen(source, source_count, 0);
 		updatescreen();
-		sleep(getanimationspeed());
+		sleep(getmovespeed());
 		if(increment())
 			frame = start;
 		distance += velocity;
@@ -777,7 +789,7 @@ void uniti::show_move(short unsigned index) const {
 		while(true) {
 			paint_screen(source, source_count, 0);
 			updatescreen();
-			sleep(getanimationspeed());
+			sleep(getmovespeed());
 			if(pa->increment()) {
 				pa->frame = pa->start + 1;
 				break;

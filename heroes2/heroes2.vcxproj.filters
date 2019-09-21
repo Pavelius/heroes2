@@ -257,5 +257,8 @@
     <ClCompile Include="dialog_battle_hero.cpp">
       <Filter>Диалоги</Filter>
     </ClCompile>
+    <ClCompile Include="dialog_battle_options.cpp">
+      <Filter>Диалоги</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

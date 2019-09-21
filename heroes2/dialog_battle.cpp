@@ -237,7 +237,7 @@ static void skip_turn() {
 }
 
 static void open_setting() {
-
+	battle.show();
 }
 
 static void start_autocombat() {

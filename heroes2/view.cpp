@@ -1012,9 +1012,12 @@ void draw::setcursor(res_s res, unsigned char frame, point pos) {
 
 static void standart_domodal() {
 	if(status_rect && status_text[0]) {
+		auto pf = font;
+		font = FONT;
 		text(status_rect.x1 + (status_rect.width() - textw(status_text)) / 2,
 			status_rect.y1 + (status_rect.height() - texth()) / 2,
 			status_text);
+		font = pf;
 	}
 	image(hot::mouse.x + current_cursor.pos.x,
 		hot::mouse.y + current_cursor.pos.y,

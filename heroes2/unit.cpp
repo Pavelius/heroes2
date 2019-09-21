@@ -204,7 +204,7 @@ void uniti::melee(uniti& enemy, direction_s dir) {
 		if(enemy.isarcher() && !enemy.is(MeleeArcher))
 			d = d / 2;
 		damage(d);
-		enemy.add(CounterAttacked);
+		add(CounterAttacked);
 	}
 	if(is(Twice)) {
 		d = attack(enemy);

@@ -862,7 +862,9 @@ public:
 	costi & getresources() { return resources; }
 };
 struct battlei {
-	bool					movement, cursor, distance, grid, index;
+	bool					movement, cursor, distance, grid, index, usespells;
+	int						speed, info;
+	void					show();
 };
 struct uniti : positioni, squadi, battlef {
 	heroi*					leader;

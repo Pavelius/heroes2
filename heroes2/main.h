@@ -880,10 +880,12 @@ struct uniti : positioni, squadi, battlef {
 	constexpr bool			is(battle_s v) const { return battlef::is(v); }
 	bool					is(spell_s v) const { return getspell(v) > 0; }
 	bool					is(tag_s v) const { return squadi::is(v); }
+	static bool				isattacker(const heroi* leader);
 	bool					isalive() const { return index!=Blocked && count > 0; }
 	constexpr bool			isenemy(const uniti* p) { return p->leader != leader; }
 	bool					iskill(int d) const { return gethits() <= d; }
 	void					melee(uniti& enemy, direction_s d = Up);
+	void					move(short unsigned index);
 	int						get(ability_s v) const;
 	int						getdamage() const;
 	static direction_s		getdirection(short unsigned from, short unsigned to);
@@ -894,8 +896,10 @@ struct uniti : positioni, squadi, battlef {
 	void					setspell(spell_s v, unsigned short count);
 	void					setup(squadi& squad, heroi* hero);
 	unsigned				shoot(uniti& enemy);
-	void					show_shoot(uniti& enemy) const;
 	void					show_attack(uniti& enemy, direction_s d, bool destroy_enemy) const;
+	void					show_fly(short unsigned index) const;
+	void					show_move(short unsigned index) const;
+	void					show_shoot(uniti& enemy) const;
 	static short unsigned	to(short unsigned i, direction_s d);
 	static direction_s		to(direction_s d, direction_s d1);
 	void					refresh();

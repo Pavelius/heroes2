@@ -35,10 +35,8 @@ enum event_s {
 	FirstInput = InputSymbol,
 };
 enum image_flags {
-	AFMirror = 1,
-	AFNoOffset = 2,
-	AFCenter = 4,
-	AFCenterV = 8,
+	AFMirror = 1, AFNoOffset = 2, AFCenter = 4, AFCenterV = 8,
+	AFMoving = 16,
 };
 enum align_s : unsigned char {
 	AlignLeft, AlignCenter, AlignRight,
@@ -91,16 +89,19 @@ struct animation {
 };
 struct battleimage : animation, variant, uniti {
 	constexpr explicit operator bool() const { return uniti::operator bool(); }
+	void					animate(point pos, int velocity = 16);
 	void					animate(int frames = -1, const aref<battleimage*>& linked = aref<battleimage*>());
 	void					clear();
 	void					paint() const;
 	bool					iskilled() const;
+	bool					ismoved() const;
 	bool					iswait() const;
 	void					set(action_s action, int param = 0);
 	void					set(direction_s dir);
 	void					setdefault();
 	void					setpos(short unsigned v);
 	void					stroke() const;
+	void					show_fly(short unsigned index);
 	void					update();
 };
 struct screenshoot {

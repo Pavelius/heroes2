@@ -63,6 +63,7 @@ static void full_castle(const playeri* player, kind_s type) {
 
 static void load_game() {}
 void dialog_palette();
+void animation_view();
 
 static void main_menu() {
 	animation latern;
@@ -71,7 +72,7 @@ static void main_menu() {
 		button(0, 0, BTNSHNGL, gamei::newgame, {1, 2, 3}, 0, "Начать новую одиночную или мультиплеер игру.");
 		button(0, 0, BTNSHNGL, dialog_palette, {5, 6, 7}, Ctrl + Alpha + 'L', "Загрузить ранее сохраненную игру.");
 		button(0, 0, BTNSHNGL, hightscore::show, {9, 10, 11});
-		button(0, 0, BTNSHNGL, object_view, {13, 14, 15});
+		button(0, 0, BTNSHNGL, animation_view, {13, 14, 15});
 		button(0, 0, BTNSHNGL, buttoncancel, {17, 18, 19});
 		//latern.painting({0, 0});
 		domodal();
@@ -96,6 +97,7 @@ int main() {
 		return -1;
 	srand(21837);
 	util_main();
+	//animation_view();
 	main_menu();
 	return 0;
 }

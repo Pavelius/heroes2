@@ -51,7 +51,42 @@ static unsigned getcost(short unsigned index) {
 	return path[index];
 }
 
-static bool isattacker(const heroi* hero) {
+static void gnext(short unsigned index, unsigned& level, short unsigned& pos) {
+	if(index == Blocked)
+		return;
+	auto nlevel = path[index];
+	if(!nlevel)
+		return;
+	if(nlevel < level) {
+		level = nlevel;
+		pos = index;
+	}
+}
+
+static void route_path(short unsigned goal) {
+	path_push = 0;
+	path_goal = Blocked;
+	auto pos = goal;
+	unsigned level = BlockedPath;
+	path_stack[path_push++] = goal;
+	while(pos != path_start) {
+		auto n = pos;
+		gnext(uniti::to(pos, Left), level, n);
+		gnext(uniti::to(pos, Right), level, n);
+		gnext(uniti::to(pos, LeftDown), level, n);
+		gnext(uniti::to(pos, LeftUp), level, n);
+		gnext(uniti::to(pos, RightDown), level, n);
+		gnext(uniti::to(pos, RightUp), level, n);
+		if(pos == n)
+			return;
+		pos = n;
+		path_stack[path_push++] = n;
+		level = path[pos];
+	}
+	path_goal = goal;
+}
+
+bool uniti::isattacker(const heroi* hero) {
 	return hero == attacker;
 }
 
@@ -67,7 +102,7 @@ static void add_squad(short unsigned index, squadi& squad, heroi* leader) {
 		e.setup(squad, leader);
 		e.type = Monster;
 		e.monster = e.unit;
-		e.flags = isattacker(leader) ? 0 : AFMirror;
+		e.flags = uniti::isattacker(leader) ? 0 : AFMirror;
 		e.source = &squad;
 		e.leader = leader;
 		e.setpos(index);
@@ -176,7 +211,7 @@ static void prepare_leader(battleimage& e, heroi* hero, bool defender) {
 	}
 }
 
-static void paint_grid() {
+static void paint_grid(const battleimage* current_unit) {
 	// Shadow movement indecies
 	if(battle.movement && current_unit) {
 		state push;
@@ -196,7 +231,7 @@ static void paint_grid() {
 		}
 	}
 	// Shadow cursor index
-	if(battle.cursor) {
+	if(battle.cursor && current_unit) {
 		if(hilite_index != Blocked) {
 			auto pt = i2h(hilite_index);
 			hexagonf(pt.x, pt.y, 0);
@@ -252,7 +287,7 @@ static void start_autocombat() {
 }
 
 static void move_unit() {
-	current_unit->setpos(hot::param);
+	current_unit->move(hot::param);
 	end_turn();
 }
 
@@ -266,7 +301,7 @@ static void shoot_enemy() {
 static void attack_enemy() {
 	auto& attacker = *current_unit;
 	auto& defender = *hilite_unit;
-	attacker.setpos(attack_index);
+	attacker.move(attack_index);
 	attacker.melee(defender, attack_direction);
 	end_turn();
 }
@@ -398,7 +433,7 @@ static void paint_screen(battleimage** source, unsigned count, const battleimage
 	hittest_grid();
 	hittest_drawable(source, count);
 	paint_field();
-	paint_grid();
+	paint_grid(current);
 	paint_drawables(source, count, current);
 }
 
@@ -632,6 +667,55 @@ void battleimage::animate(int frames, const aref<battleimage*>& linked) {
 	}
 }
 
+static int isqrt(int num) {
+	int res = 0;
+	int bit = 1 << 30;
+	// "bit" starts at the highest power of four <= the argument.
+	while(bit > num)
+		bit >>= 2;
+	while(bit != 0) {
+		if(num >= res + bit) {
+			num -= res + bit;
+			res = (res >> 1) + bit;
+		} else
+			res >>= 1;
+		bit >>= 2;
+	}
+	return res;
+}
+
+int getdistance(point p1, point p2) {
+	auto dx = p1.x - p2.x;
+	auto dy = p1.y - p2.y;
+	return isqrt(dx*dx + dy * dy);
+}
+
+void battleimage::animate(point goal, int velocity) {
+	if(!isalive())
+		return;
+	auto frames = start + animation::count;
+	if(frame >= frames)
+		return;
+	auto p1 = i2h(index);
+	auto distance_maximum = getdistance(p1, goal);
+	if(!distance_maximum)
+		return;
+	auto distance = 0;
+	battleimage* source[32];
+	auto source_count = select_drawables(source, sizeof(source) / sizeof(source[0]));
+	add_drawable(source, source_count, this);
+	while(distance < distance_maximum) {
+		pos.x = p1.x + (goal.x - p1.x)*distance / distance_maximum;
+		pos.y = p1.y + (goal.y - p1.y)*distance / distance_maximum;
+		paint_screen(source, source_count, 0);
+		updatescreen();
+		sleep(getanimationspeed());
+		if(increment())
+			frame = start;
+		distance += velocity;
+	}
+}
+
 void uniti::show_shoot(uniti& enemy) const {
 	auto pa = (battleimage*)this;
 	const auto d = Right;
@@ -669,6 +753,54 @@ void uniti::show_attack(uniti& enemy, direction_s d, bool destroy_enemy) const {
 		pe->set(Damaged);
 	pa->animate(-1, pe); pa->setdefault();
 	pe->animate(-1, pa); pe->setdefault();
+}
+
+void uniti::show_move(short unsigned index) const {
+	route_path(index);
+	if(!path_push)
+		return;
+	auto pa = (battleimage*)this;
+	auto i = getpos();
+	battleimage* source[32];
+	auto source_count = select_drawables(source, sizeof(source) / sizeof(source[0]));
+	pa->set(Move);
+	path_push--;
+	int distance = 0;
+	while(path_push!=0) {
+		path_push--;
+		auto i1 = path_stack[path_push];
+		if(i1 == Blocked)
+			break;
+		auto d = uniti::getdirection(i, i1);
+		pa->set(d);
+		pa->flags |= AFMoving;
+		while(true) {
+			paint_screen(source, source_count, 0);
+			updatescreen();
+			sleep(getanimationspeed());
+			if(pa->increment()) {
+				pa->frame = pa->start + 1;
+				break;
+			}
+		}
+		pa->pos = i2h(i1);
+		i = i1;
+	}
+	pa->setdefault();
+}
+
+void uniti::show_fly(short unsigned goal) const {
+	auto pa = (battleimage*)this;
+	auto p2 = i2h(goal);
+	pa->set(getdirection(index, goal));
+	pa->flags |= AFMoving;
+	pa->set(FlyAction, 0);
+	pa->animate();
+	pa->set(FlyAction, 1);
+	pa->animate(p2, 11);
+	pa->set(FlyAction, 2);
+	pa->animate();
+	pa->setdefault();
 }
 
 direction_s uniti::getdirection(short unsigned from, short unsigned to) {

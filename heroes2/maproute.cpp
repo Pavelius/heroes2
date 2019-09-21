@@ -11,7 +11,7 @@ static const direction_s all_around[] = {
 	LeftUp, LeftDown, RightUp, RightDown
 };
 
-static void gnext(int index, unsigned& level, short unsigned& pos) {
+static void gnext(short unsigned index, unsigned& level, short unsigned& pos) {
 	if(index == Blocked)
 		return;
 	auto nlevel = path[index];

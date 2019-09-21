@@ -77,3 +77,54 @@ void object_view() {
 		}
 	}
 }
+
+void animation_view() {
+	auto speed = 6;
+	int x = 0;
+	battleimage pic;
+	pic.type = Monster;
+	pic.monster = Peasant;
+	pic.unit = pic.monster;
+	pic.uniti::count = 13;
+	pic.set(Move);
+	pic.set(Right);
+	pic.flags |= AFMoving;
+	while(ismodal()) {
+		pic.pos.x = 640 / 2 - 16;
+		pic.pos.y = 480 / 2 - 16;
+		rectf({0, 0, draw::width - 1, draw::height - 1}, 0x12);
+		auto step = pic.frame - pic.start;
+		line(pic.pos.x + step * speed, pic.pos.y, pic.pos.x + step * speed, pic.pos.y - 100, 0x30);
+		hexagon(pic.pos.x, pic.pos.y, 0x50);
+		hexagon(pic.pos.x + cell_wr*2, pic.pos.y, 0x50);
+		pic.paint();
+		char temp[260];
+		zprint(temp, "frames: %1i-%2i, count = %3i\nSpeed: %4i", pic.start, pic.start + pic.animation::count, pic.animation::count, speed);
+		textm(10, 10, 600, AlignLeft, temp);
+		domodal();
+		switch(hot::key) {
+		case KeyEscape:
+		case KeySpace:
+			buttoncancel();
+			break;
+		case KeyRight:
+			if(pic.monster < WaterElement)
+				pic.value++;
+			pic.unit = pic.monster;
+			pic.set(Move);
+			break;
+		case KeyLeft:
+			if(pic.value)
+				pic.value--;
+			pic.unit = pic.monster;
+			pic.set(Move);
+			break;
+		case KeyUp: speed++; break;
+		case KeyDown: speed--; break;
+		case InputTimer:
+			if(pic.increment())
+				pic.frame = pic.start;
+			break;
+		}
+	}
+}

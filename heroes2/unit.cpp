@@ -192,6 +192,14 @@ unsigned uniti::shoot(uniti& enemy) {
 	return d;
 }
 
+void uniti::move(short unsigned index) {
+	if(is(Fly))
+		show_fly(index);
+	else
+		show_move(index);
+	setpos(index);
+}
+
 void uniti::melee(uniti& enemy, direction_s dir) {
 	auto d = attack(enemy);
 	if(dir == Up)

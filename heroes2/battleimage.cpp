@@ -133,7 +133,7 @@ void battleimage::paint() const {
 		draw::image(pos.x, pos.y, icn, draw::counter % 5, flags);
 	} else if(type == Monster) {
 		auto count = this->uniti::count;
-		if(count) {
+		if(count && (flags&AFMoving)==0) {
 			state push;
 			font = SMALFONT;
 			char temp[32]; zprint(temp, "%1i", count);
@@ -326,6 +326,8 @@ void battleimage::setdefault() {
 		set(Dead);
 	else
 		set(Wait);
+	if(type==Monster)
+		flags = isattacker(leader) ? 0 : AFMirror;
 }
 
 void battleimage::update() {
@@ -348,4 +350,9 @@ bool battleimage::iskilled() const {
 bool battleimage::iswait() const {
 	return frame >= monsters[unit].idle[0]
 		&& frame <= monsters[unit].idle[0] + monsters[unit].idle[1];
+}
+
+bool battleimage::ismoved() const {
+	return frame >= monsters[unit].move[0]
+		&& frame <= monsters[unit].move[0] + monsters[unit].move[1];
 }

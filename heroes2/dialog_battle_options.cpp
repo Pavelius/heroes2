@@ -62,4 +62,5 @@ void battlei::show() {
 		button(x1 + 113, y1 + 252, isevil(CSPANBTE, CSPANBTN), buttonok, {0, 0, 1}, KeyEnter);
 		domodal();
 	}
+	saveb("boptions.dat", this, sizeof(*this));
 }

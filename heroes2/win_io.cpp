@@ -147,3 +147,19 @@ const char* szfnamewe(char* result, const char* name) {
 		p[-1] = 0;
 	return result;
 }
+
+bool saveb(const char* url, const void* p, unsigned size) {
+	io::file file(url, StreamWrite);
+	if(!file)
+		return false;
+	file.write(p, size);
+	return true;
+}
+
+bool loadb(const char* url, void* p, unsigned size) {
+	io::file file(url, StreamRead);
+	if(!file)
+		return false;
+	file.read(p, size);
+	return true;
+}

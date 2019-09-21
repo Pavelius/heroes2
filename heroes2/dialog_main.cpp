@@ -80,6 +80,10 @@ static void main_menu() {
 	}
 }
 
+static void before_open() {
+	loadb("boptions.dat", &battle, sizeof(battle));
+}
+
 void util_main();
 
 int main() {
@@ -87,6 +91,7 @@ int main() {
 	setevil(true);
 	draw::initialize();
 	drawobji::initialize();
+	before_open();
 	if(!draw::create("test", 190, false))
 		return -1;
 	srand(21837);

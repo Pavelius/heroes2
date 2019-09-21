@@ -234,7 +234,7 @@ void uniti::sethits(int value) {
 		count = 0;
 		hits = 0;
 	} else {
-		count = value / mhp;
+		count = value / mhp + 1;
 		hits = value % mhp;
 	}
 }

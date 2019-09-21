@@ -5,6 +5,8 @@ template<class T> inline T			imin(T a, T b) { return a < b ? a : b; }
 template<class T> inline T			iabs(T a) { return a > 0 ? a : -a; }
 template<class T> inline void		iswap(T& a, T& b) { T i = a; a = b; b = i; }
 //
+bool								loadb(const char* url, void* p, unsigned size);
+bool								saveb(const char* url, const void* p, unsigned size);
 const char*							szdup(const char* text);
 char*								szprint(char* result, const char* result_maximum, const char* format, ...);
 char*								szprintv(char* result, const char* result_maximum, const char* format, const char* format_param);

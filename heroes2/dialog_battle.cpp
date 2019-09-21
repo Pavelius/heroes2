@@ -386,6 +386,20 @@ static void paint_field() {
 		image(0, 0, frng, 0);
 }
 
+static int drawable_compare(const void* v1, const void* v2) {
+	auto p1 = *((battleimage**)v1);
+	auto p2 = *((battleimage**)v2);
+	auto y1 = p1->getz();
+	auto y2 = p2->getz();
+	if(y1 != y2)
+		return y1 - y2;
+	return p1->pos.x - p2->pos.x;
+}
+
+static void normalize_drawables(battleimage** source, unsigned source_count) {
+	qsort(source, source_count, sizeof(source[0]), drawable_compare);
+}
+
 static unsigned select_drawables(battleimage** source, unsigned count) {
 	auto pb = source;
 	auto pe = source + count;
@@ -434,6 +448,7 @@ static void hittest_drawable(battleimage** source, unsigned count) {
 static void paint_screen(battleimage** source, unsigned count, const battleimage* current) {
 	hilite_index = Blocked;
 	hilite_unit = 0;
+	normalize_drawables(source, count);
 	hittest_grid();
 	hittest_drawable(source, count);
 	paint_field();
@@ -473,17 +488,20 @@ static void setattack(direction_s d) {
 static void standart_input() {
 	auto fev = (hot::key == MouseLeft && hot::pressed);
 	int m = current_unit->get(Speed) + 1;
-	if(hilite_unit) {
-		if(hilite_unit->type == Hero) {
-			auto p = hilite_unit->gethero();
+	auto pu = hilite_unit;
+	if(pu && pu->type == Monster && !pu->isalive())
+		pu = 0;
+	if(pu) {
+		if(pu->type == Hero) {
+			auto p = pu->gethero();
 			if(p) {
 				status(p->getname());
 				setcursor(CMSECO, 4, {-7, -7});
 				if(fev)
 					execute(hero_options, (int)p);
 			}
-		} else if(hilite_unit->type == Monster) {
-			uniti* p = hilite_unit;
+		} else if(pu->type == Monster) {
+			uniti* p = pu;
 			if(current_unit->isenemy(p) && current_unit->canshoot()) {
 				setcursor(CMSECO, 3, {-7, -7});
 				status("Стрелять в %1i %2", p->count, bsmeta<monsteri>::elements[p->unit].multiname);
@@ -716,6 +734,7 @@ void battleimage::animate(point goal, int velocity) {
 	battleimage* source[32];
 	auto source_count = select_drawables(source, sizeof(source) / sizeof(source[0]));
 	add_drawable(source, source_count, this);
+	distance += velocity;
 	while(distance < distance_maximum) {
 		pos.x = p1.x + (goal.x - p1.x)*distance / distance_maximum;
 		pos.y = p1.y + (goal.y - p1.y)*distance / distance_maximum;
@@ -809,10 +828,11 @@ void uniti::show_fly(short unsigned goal) const {
 	pa->set(FlyAction, 0);
 	pa->animate();
 	pa->set(FlyAction, 1);
-	pa->animate(p2, 11);
+	pa->animate(p2, 16);
 	pa->set(FlyAction, 2);
 	pa->animate();
 	pa->setdefault();
+	pa->setpos(goal);
 }
 
 direction_s uniti::getdirection(short unsigned from, short unsigned to) {

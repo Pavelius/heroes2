@@ -89,9 +89,10 @@ struct animation {
 };
 struct battleimage : animation, variant, uniti {
 	constexpr explicit operator bool() const { return uniti::operator bool(); }
-	void					animate(point pos, int velocity = 16);
+	void					animate(point pos, int velocity);
 	void					animate(int frames = -1, const aref<battleimage*>& linked = aref<battleimage*>());
 	void					clear();
+	int						getz() const;
 	void					paint() const;
 	bool					iskilled() const;
 	bool					ismoved() const;
@@ -101,7 +102,6 @@ struct battleimage : animation, variant, uniti {
 	void					setdefault();
 	void					setpos(short unsigned v);
 	void					stroke() const;
-	void					show_fly(short unsigned index);
 	void					update();
 };
 struct screenshoot {

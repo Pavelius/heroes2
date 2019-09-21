@@ -356,3 +356,11 @@ bool battleimage::ismoved() const {
 	return frame >= monsters[unit].move[0]
 		&& frame <= monsters[unit].move[0] + monsters[unit].move[1];
 }
+
+int	battleimage::getz() const {
+	if(type == Monster) {
+		if(frame == (monsters[unit].kill[0] + monsters[unit].kill[1] - 1))
+			return pos.y - 480;
+	}
+	return pos.y;
+}

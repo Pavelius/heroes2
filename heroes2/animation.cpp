@@ -19,6 +19,16 @@ void animation::set(res_s res, unsigned char frame, point pos) {
 	}
 }
 
+bool animation::increment() {
+	if(wait)
+		wait--;
+	else if(frame < start + count - 1)
+		frame++;
+	else
+		return true;
+	return false;
+}
+
 bool animation::update(int step) {
 	if(wait) {
 		wait--;

@@ -81,6 +81,7 @@ struct animation {
 	unsigned				flags;
 	unsigned char			frame, start, count, wait;
 	constexpr animation() : pos{0, 0}, res(NoRes), wait(0), frame(0), start(0), count(0), flags(0) {}
+	bool					increment();
 	static int				getanimate(res_s id, int start, int ticket, bool quantity);
 	int						getwidth() const;
 	void					paint(int x, int y, unsigned flags = 0) const;
@@ -90,7 +91,7 @@ struct animation {
 };
 struct battleimage : animation, variant, uniti {
 	constexpr explicit operator bool() const { return squadi::count != 0; }
-	void					animate(unsigned speed = 50);
+	void					animate(aref<battleimage*> source = aref<battleimage*>());
 	void					clear();
 	void					paint() const;
 	void					set(action_s action, int param = 0);

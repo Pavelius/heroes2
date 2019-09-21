@@ -8,6 +8,7 @@ static heroi*			defender;
 static battleimage*		current_unit;
 static unsigned short	hilite_index;
 static battleimage*		hilite_unit;
+static unsigned			speed = 100;
 battlei					battle;
 
 static unsigned short	attack_index;
@@ -584,17 +585,19 @@ uniti* uniti::find(short unsigned index) {
 	return 0;
 }
 
-void battleimage::animate(unsigned speed) {
-	if(!*this)
+void battleimage::animate(aref<battleimage*> linked) {
+	if(!*this || animation::count==0)
 		return;
 	battleimage* source[32];
 	auto count = select_drawables(source, sizeof(source) / sizeof(source[0]));
-	auto frame_stop = start + count;
-	while(frame<frame_stop) {
+	while(true) {
 		paint_screen(source, count, 0);
 		updatescreen();
-		frame++;
 		sleep(speed);
+		if(increment())
+			break;
+		for(auto pair : linked)
+			pair->increment();
 	}
 }
 

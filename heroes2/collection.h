@@ -34,6 +34,7 @@ template<typename T> struct aref {
 	unsigned				count;
 	T*						data;
 	constexpr aref() :count(0), data(0) {}
+	constexpr aref(T& data) : data(&data), count(1) {}
 	template<unsigned N> constexpr aref(T(&data)[N]) : data(data), count(N) {}
 	constexpr T& operator[](unsigned index) { return data[index]; }
 	constexpr const T& operator[](unsigned index) const { return data[index]; }

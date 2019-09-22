@@ -220,7 +220,7 @@ void list::box(int x, int y, res_s icn, int n1, int dx, int sbu, int sbd, int sb
 			break;
 		row(x1, y1, origin + i);
 		if(id == current)
-			shadow(x1, y1, x1 + rc.width() - 4, y1 + n1 - 1, 1);
+			shadow({x1, y1, x1 + rc.width() - 4, y1 + n1 - 1}, 1);
 		y1 += n1;
 	}
 }

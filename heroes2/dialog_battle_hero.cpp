@@ -34,7 +34,7 @@ void heroi::battlemenu(bool can_escape) const {
 		sb.clear();
 		sb.addo(this);
 		textf(x + 148, y1, 110, sb);
-		if(button(x + 30, y + 148, VIEWGEN, {9, 9, 10}, 0))
+		if(button(x + 30, y + 148, VIEWGEN, disable({9, 9, 10}, !is(MagicBook)), 0))
 			execute(use_spells, (int)this);
 		button(x + 89, y + 148, VIEWGEN, run_away, {11, 11, 12}, 0);
 		button(x + 148, y + 148, VIEWGEN, make_offer, {13, 13, 14}, 0);

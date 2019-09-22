@@ -526,23 +526,23 @@ void draw::hexagon(int x, int y, unsigned char m) {
 
 void draw::hexagonf(int x, int y, unsigned char intense) {
 	static int points[] = {1, 2, 2, 1, 2, 2, 2, 1, 2, 2, 1, 2, 2};
-	shadow(x - cell_wr, y - cell_hr, x + cell_wr - 1, y + cell_hr - 1, intense);
+	shadow({x - cell_wr, y - cell_hr, x + cell_wr - 1, y + cell_hr - 1}, intense);
 	int j = 0;
-	for(unsigned i = 0; i < sizeof(points) / sizeof(points[0]); i++) {
+	for(int i = 0; i < int(sizeof(points) / sizeof(points[0])); i++) {
 		j += points[i];
-		shadow(x - cell_wr + j,
+		shadow({x - cell_wr + j,
 			y - cell_hr - 1 - i,
 			x + cell_wr - j,
-			y - cell_hr - 1 - i,
+			y - cell_hr - 1 - i},
 			intense);
 	}
 	j = 0;
-	for(unsigned i = 1; i < sizeof(points) / sizeof(points[0]); i++) {
+	for(int i = 1; i < int(sizeof(points) / sizeof(points[0])); i++) {
 		j += points[i];
-		shadow(x - cell_wr + j,
+		shadow({x - cell_wr + j,
 			y + cell_hr - 1 + i,
 			x + cell_wr - j,
-			y + cell_hr - 1 + i,
+			y + cell_hr - 1 + i},
 			intense);
 	}
 }
@@ -728,11 +728,11 @@ void draw::line(int x1, int y1, int x2, int y2, unsigned char m) {
 	}
 }
 
-void draw::shadow(int x1, int y1, int x2, int y2, int intense) {
-	int w1 = iabs(x1 - x2);
-	unsigned char* p = ptr(imin(x1, x2), imin(y1, y2));
+void draw::shadow(const rect& rc, int intense) {
+	int w1 = iabs(rc.x1 - rc.x2);
+	unsigned char* p = ptr(imin(rc.x1, rc.x2), imin(rc.y1, rc.y2));
 	int scan_line = width - w1 - 1;
-	for(int h = iabs(y1 - y2); h >= 0; h--) {
+	for(int h = iabs(rc.y1 - rc.y2); h >= 0; h--) {
 		unsigned char* p1 = p + w1;
 		switch(intense) {
 		case 1:
@@ -975,6 +975,10 @@ bool draw::button(int x, int y, res_s res, const buttoni& decor, int key, const 
 		}
 	}
 	image(x, y, res, i, 0);
+	if(decor.hilite == decor.pressed && decor.hilite == decor.normal) {
+		auto rc = draw::get(res, i, x, y, 0);
+		shadow(rc, 2);
+	}
 	if(key && hot::key == key)
 		need_execute = true;
 	return need_execute;
@@ -1673,4 +1677,10 @@ void draw::initialize() {
 
 void draw::updatescreen() {
 	sys_input(false);
+}
+
+buttoni draw::disable(const buttoni& e, bool v) {
+	if(!v)
+		return e;
+	return {e.pressed, e.pressed, e.pressed};
 }

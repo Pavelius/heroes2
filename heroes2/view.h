@@ -81,7 +81,12 @@ struct animation {
 	constexpr animation() : pos{0, 0}, res(NoRes), wait(0), frame(0), start(0), count(0), flags(0) {}
 	bool					increment();
 	static int				getanimate(res_s id, int start, int ticket, bool quantity);
+	point					getbreast() const;
+	point					getcenter() const;
+	point					getlaunch(monster_s id, direction_s d) const;
+	static res_s			getmissile(monster_s id);
 	static int				getmissiledy(monster_s id, int param);
+	static int				getparam(direction_s d);
 	int						getwidth() const;
 	void					paint(int x, int y, unsigned flags = 0) const;
 	void					set(res_s id, unsigned char frame, point pos = point());

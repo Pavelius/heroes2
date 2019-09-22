@@ -720,38 +720,6 @@ void battleimage::animate(point goal, int velocity) {
 	}
 }
 
-static res_s getshooting(monster_s id) {
-	switch(id) {
-	case Orc:
-	case OrcChief:
-		return ORC__MSL;
-	case Druid:
-	case GreaterDruid:
-		return DRUIDMSL;
-	case Halfling:
-		return HALFLMSL;
-	case Titan:
-		return TITANMSL;
-	case Troll:
-	case WarTroll:
-		return TROLLMSL;
-	case Lich:
-	case PowerLich:
-		return LICH_MSL;
-	case Mage:
-	case ArchMage:
-	case Centaur:
-	case Archer:
-	case Ranger:
-		return ARCH_MSL;
-	case Elf:
-	case GrandElf:
-		return ELF__MSL;
-	default:
-		return NoRes;
-	}
-}
-
 static int missile9(int dx, int dy) {
 	if(0 == dx)
 		return dy > 0 ? 0 : 8;
@@ -794,24 +762,15 @@ void uniti::show_shoot(uniti& enemy) const {
 	pa->set(d);
 	pa->set(Shoot);
 	pa->animate();
-	if(d == Left || d == Right)
-		pa->set(Shoot, 2);
-	else if(d == LeftUp || d == RightUp)
-		pa->set(Shoot, 1);
-	else
-		pa->set(Shoot, 3);
+	pa->set(Shoot, pa->getparam(d));
 	pa->animate(pa->animation::count - 2);
 	// Выпускание снаряда
 	const int shoot_height = 50;
 	battleimage arrow; arrow.clear();
-	point target = i2h(enemy.getpos());
-	arrow.pos = i2h(getpos());
-	arrow.pos.y -= shoot_height;
-	target.y -= shoot_height;
-	auto dx = arrow.pos.x - target.x;
-	auto dy = arrow.pos.y - target.y;
-	arrow.res = getshooting(pa->monster);
-	arrow.frame = get_missile_index(arrow.res, dx, dy);
+	arrow.pos = pa->getlaunch(pa->monster, d);
+	point target = pe->getbreast();
+	arrow.res = pa->getmissile(pa->monster);
+	arrow.frame = get_missile_index(arrow.res, arrow.pos.x - target.x, arrow.pos.y - target.y);
 	arrow.start = arrow.frame;
 	arrow.flags = pa->flags;
 	arrow.animation::count = 1;

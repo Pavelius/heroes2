@@ -125,9 +125,18 @@ void battleimage::clear() {
 	index = Blocked;
 }
 
-static int getbarframe() {
-	bool isboosted = false;
-	bool ispenalized = false;
+int battleimage::getbarframe() const {
+	auto isboosted = false;
+	auto ispenalized = false;
+	for(unsigned i = 0; i < bsmeta<enchantmenti>::count; i++) {
+		auto& e = bsmeta<enchantmenti>::elements[i];
+		if(e.object == this) {
+			if(bsmeta<spelli>::elements[e.id].tags.is(Hostile))
+				ispenalized = true;
+			if(bsmeta<spelli>::elements[e.id].tags.is(Friendly))
+				isboosted = true;
+		}
+	}
 	if(isboosted && ispenalized)
 		return 13;
 	else if(isboosted)

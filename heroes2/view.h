@@ -96,6 +96,7 @@ struct battleimage : animation, variant, uniti {
 	void					animate(point pos, int velocity);
 	void					animate(int frames = -1, int speed = -1);
 	void					clear();
+	int						getbarframe() const;
 	int						getz() const;
 	void					paint() const;
 	bool					iskilled() const;

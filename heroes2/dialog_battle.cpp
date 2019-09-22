@@ -625,6 +625,8 @@ static void makebattle() {
 			e.refresh();
 		}
 		uniti::exhausespells();
+		attacker->remove(Moved);
+		defender->remove(Moved);
 	}
 }
 
@@ -899,19 +901,19 @@ static int getframe(spell_s id) {
 	case FireBall: return 8;
 	case FireBlast: return 9;
 	case Teleport: return 10;
+	case ElementalStorm: return 0x0B;
+	case RessurectTrue: return 0x0C;
+	case Ressurect: return 0x0D;
+	case Haste: return 0x0E;
+	case Shield: return 0x0F;
+	case Armagedon: return 0x10;
+	case Antimagic: return 0x11;
+	case Dispel: return 0x12;
+	case Berserker: return 0x13;
+	case Paralyze: return 0x14;
+	case Blind: return 0x15;
 	default: return 0;
 	}
-	//	SP_ELEMENTALSTORM = 0x300B,
-	//	SP_RESURRECTTRUE = 0x300C,
-	//	SP_RESURRECT = 0x300D,
-	//	SP_HASTE = 0x300E,
-	//	SP_SHIELD = 0x300F,
-	//	SP_ARMAGEDDON = 0x3010,
-	//	SP_ANTIMAGIC = 0x3011,
-	//	SP_DISPEL = 0x3012,
-	//	SP_BERSERKER = 0x3013,
-	//	SP_PARALYZE = 0x3014,
-	//	SP_BLIND = 0x3015,
 	//	SP_HOLYWORD = 0x3016,
 	//	SP_HOLYSHOUT = 0x3017,
 	//	SP_METEORSHOWER = 0x3018,
@@ -929,23 +931,20 @@ static int getframe(spell_s id) {
 	//	SP_COLDRAY = 0x3024,
 	//	SP_HYPNOTIZE = 0x3025,
 	//	SP_ARROW = 0x3026
-
 }
 
-static bool choose_target(spell_s id, int spell_level, pvar& result) {
+bool heroi::choose(spell_s id, pvar& result) const {
 	result.clear();
 	prepare_drawables();
 	while(ismodal()) {
 		paint_screen(current_unit);
 		setcursor(SPELLS, 0);
 		result.clear();
-		if(hilite_unit) {
-			auto resist = hilite_unit->getresist(id, spell_level);
-			if(resist < 100) {
-				result = static_cast<uniti*>(hilite_unit);
-				auto fr = getframe(id);
-				setcursor(SPELLS, getframe(id));
-			}
+		if(hilite_unit)
+			result = static_cast<uniti*>(hilite_unit);
+		if(result &&  cast(id, result, false)) {
+			auto fr = getframe(id);
+			setcursor(SPELLS, getframe(id));
 		}
 		domodal();
 		switch(hot::key) {
@@ -967,7 +966,9 @@ void heroi::castcombatspell() {
 	spell_s spell;
 	if(showbook(CombatSpell, &spell)) {
 		pvar target;
-		if(choose_target(spell, get(SpellPower), target))
-			cast(spell, target);
+		if(choose(spell, target)) {
+			cast(spell, target, true);
+			set(Moved);
+		}
 	}
 }

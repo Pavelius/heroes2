@@ -954,6 +954,7 @@ bool draw::button(int x, int y, res_s res, const buttoni& decor, int key, const 
 	int i = decor.normal;
 	rect rc = get(res, i, x, y, 0);
 	auto need_execute = false;
+	auto disabled = (decor.hilite == decor.pressed && decor.hilite == decor.normal);
 	if(mousein(rc)) {
 		i = decor.hilite;
 		if(hot::pressed)
@@ -964,7 +965,7 @@ bool draw::button(int x, int y, res_s res, const buttoni& decor, int key, const 
 			else if(hot::key == MouseRight && hot::pressed)
 				tooltips("Информация", tips);
 		}
-		if(hot::key == MouseLeft) {
+		if(!disabled && hot::key == MouseLeft) {
 			if(!hot::pressed) {
 				if(point_cashe.x == rc.x1 && point_cashe.y == rc.y1)
 					need_execute = true;
@@ -975,11 +976,11 @@ bool draw::button(int x, int y, res_s res, const buttoni& decor, int key, const 
 		}
 	}
 	image(x, y, res, i, 0);
-	if(decor.hilite == decor.pressed && decor.hilite == decor.normal) {
+	if(disabled) {
 		auto rc = draw::get(res, i, x, y, 0);
 		shadow(rc, 2);
 	}
-	if(key && hot::key == key)
+	if(!disabled && key && hot::key == key)
 		need_execute = true;
 	return need_execute;
 }

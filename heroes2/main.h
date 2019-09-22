@@ -31,7 +31,7 @@ enum skill_s : unsigned char {
 };
 enum spell_s : unsigned char {
 	FireBall, FireBlast, LightingBolt, ChainLighting, Teleport,
-	Cure, MassCure, Ressurrect, RessurectTrue, Haste, MassHaste, Slow, MassSlow,
+	Cure, MassCure, Ressurect, RessurectTrue, Haste, MassHaste, Slow, MassSlow,
 	Blind, Bless, MassBless, StoneSkin, SteelSkin, Curse, MassCurse,
 	HolyWord, HolyShout, Antimagic, Dispel, MassDispel, MagicArrow, Berserker,
 	Armagedon, ElementalStorm, MeteorShower, Paralyze, Hypnotize, ColdRay, ColdRing,
@@ -562,7 +562,7 @@ public:
 	void					setowner(player_s v) { player.clear(); player.add(v); }
 	void					setup(generator& generate);
 };
-class heroi : public namei, public armyi, public positioni {
+class heroi : public namei, public armyi, public positioni, battlef {
 	kind_s					kind;
 	unsigned char			level;
 	short unsigned			index_move;
@@ -575,6 +575,7 @@ class heroi : public namei, public armyi, public positioni {
 	unsigned char			visited[64];
 	spellbooki				spellbook;
 	direction_s				direction;
+	//
 	static void				open_artifact();
 	int						getbonus(ability_s v) const;
 public:
@@ -589,10 +590,11 @@ public:
 	void					battlemenu(bool can_escape);
 	void					battlestart();
 	bool					buymagicbook();
-	void					cast(spell_s id, const pvar& target);
+	bool					cast(spell_s id, const pvar& target, bool run) const;
 	void					castcombatspell();
 	void					clear();
 	void					choose();
+	bool					choose(spell_s id, pvar& result) const;
 	static const costi		cost;
 	void					disappear() const;
 	static heroi*			find(short unsigned index);
@@ -601,7 +603,6 @@ public:
 	void					gainmine(const char* text, resource_s mine);
 	playeri*				getplayer() const;
 	int						get(ability_s v) const;
-	int						get(artifact_s v) const;
 	int						get(skill_s v) const { return skills[v]; }
 	unsigned				get(artifact_s* source, unsigned count_maximum);
 	int						getcost(spell_s v) const;
@@ -627,14 +628,17 @@ public:
 	bool					is(artifact_s v) const;
 	bool					is(spell_s v) const { return spellbook.is(v); }
 	bool					is(skill_s v) const { return get(v) > 0; }
+	bool					is(battle_s v) const { return battlef::is(v); }
 	bool					isadventure() const { return index != Blocked; }
 	bool					isvisited(const moveablei& object) const;
 	static int				learn(const char* format, const variantcol* v1, unsigned count);
 	void					levelup(bool interactive);
 	void					message(const char* format);
 	void					refresh();
+	void					remove(battle_s v) { battlef::remove(v); }
 	static unsigned			select(heroi** result, heroi** result_maximum, const playeri* player, kind_s kind, kind_s kind_exclude, bool include_special = false);
 	void					set(ability_s id, int v);
+	void					set(battle_s v) { battlef::add(v); }
 	void					set(direction_s v) { direction = v; }
 	void					set(skill_s id, int v) { skills[id] = v; }
 	void					set(spell_s id) { spellbook.set(id); }
@@ -883,7 +887,7 @@ struct uniti : positioni, squadi, battlef {
 	constexpr explicit operator bool() const { return index != Blocked; }
 	bool					canshoot() const;
 	void					damage(unsigned v);
-	void					enchant(spell_s id, unsigned duration, const heroi* caster);
+	void					dispell();
 	static void				exhausespells();
 	static uniti*			find(short unsigned index);
 	int						get(ability_s v) const;
@@ -906,6 +910,7 @@ struct uniti : positioni, squadi, battlef {
 	bool					isattacker() const { return isattacker(leader); }
 	bool					isdamaged() const;
 	constexpr bool			isenemy(const uniti* p) { return p->leader != leader; }
+	constexpr bool			isenemy(const heroi* p) { return p != leader; }
 	bool					iskill(int d) const { return gethits() <= d; }
 	void					melee(uniti& enemy, direction_s d = Up);
 	void					move(short unsigned index);

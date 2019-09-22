@@ -280,8 +280,10 @@ void uniti::sethits(int value) {
 		count = 0;
 		hits = 0;
 	} else {
-		count = value / mhp + 1;
+		count = (value + mhp - 1) / mhp;
 		hits = value % mhp;
+		if(hits == 0)
+			hits = 4;
 	}
 }
 
@@ -422,7 +424,7 @@ int	uniti::getresist(spell_s id, int spell_power) const {
 		if(!isdamaged())
 			return 100;
 		break;
-	case Ressurrect:
+	case Ressurect:
 	case RessurectTrue:
 	case AnimateDead:
 		if(source && count >= source->count)
@@ -463,33 +465,12 @@ spell_s uniti::getbattlemagic(int chance) const {
 	return ViewMines;
 }
 
-void uniti::enchant(spell_s id, unsigned duration, const heroi* caster) {
-	if(caster) {
-		if(caster->is(WizardHat))
-			duration += getpower(WizardHat);
-		if(caster->is(EnchantedHourglass))
-			duration += getpower(EnchantedHourglass);
-	}
-	setspell(id, duration);
-	switch(id) {
-	case Bless: setspell(Curse, 0); break;
-	case Curse: setspell(Bless, 0); break;
-	case Haste: setspell(Slow, 0); break;
-	case Slow: setspell(Haste, 0); break;
-	case StoneSkin: setspell(SteelSkin, 0); break;
-	case SteelSkin: setspell(StoneSkin, 0); break;
-	case Dispel:
-		for(unsigned i = 0; i < bsmeta<enchantmenti>::count; i++) {
-			auto& e = bsmeta<enchantmenti>::elements[i];
-			if(!e)
-				continue;
-			if(e.object == this)
-				e.count = 0;
-		}
-		break;
-	case Hypnotize:
-		if(caster->is(GoldenWatch))
-			duration += getpower(GoldenWatch);
-		break;
+void uniti::dispell() {
+	for(unsigned i = 0; i < bsmeta<enchantmenti>::count; i++) {
+		auto& e = bsmeta<enchantmenti>::elements[i];
+		if(!e)
+			continue;
+		if(e.object == this)
+			e.count = 0;
 	}
 }

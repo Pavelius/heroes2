@@ -482,11 +482,48 @@ unsigned heroi::getdamage(spell_s id, uniti& enemy) const {
 	return value;
 }
 
-void heroi::cast(spell_s id, const pvar& target) {
+bool heroi::cast(spell_s id, const pvar& target, bool run) const {
 	auto& spell = bsmeta<spelli>::elements[id];
 	auto power = get(SpellPower);
-	if(spell.tags.is(Enchantment)) {
-		if(target.type == Unit)
-			target.unit->enchant(id, power, this);
+	auto cost = getcost(id);
+	if(cost > get(SpellPoints))
+		return false;
+	if(spell.tags.is(Summon)) {
+		if(is(BookElements))
+			power *= 2;
 	}
+	if(target.type == Unit) {
+		if(spell.tags.is(Friendly) && target.unit->isenemy(this))
+			return false;
+		if(spell.tags.is(Hostile) && !target.unit->isenemy(this))
+			return false;
+		if(spell.tags.is(Enchantment)) {
+			if(is(WizardHat))
+				power += getpower(WizardHat);
+			if(is(EnchantedHourglass))
+				power += getpower(EnchantedHourglass);
+			if(is(GoldenWatch) && id == Hypnotize)
+				power += getpower(EnchantedHourglass);
+		}
+		auto resist = target.unit->getresist(id, power);
+		if(resist >= 100)
+			return false;
+		if(run) {
+			target.unit->setspell(id, power);
+			switch(id) {
+			case Bless: target.unit->setspell(Curse, 0); break;
+			case Curse: target.unit->setspell(Bless, 0); break;
+			case Haste: target.unit->setspell(Slow, 0); break;
+			case Slow: target.unit->setspell(Haste, 0); break;
+			case StoneSkin: target.unit->setspell(SteelSkin, 0); break;
+			case SteelSkin: target.unit->setspell(StoneSkin, 0); break;
+			case Dispel: target.unit->dispell(); break;
+			case Antimagic:
+				target.unit->dispell();
+				target.unit->setspell(id, power);
+				break;
+			}
+		}
+	}
+	return true;
 }

@@ -3,16 +3,18 @@
 using namespace draw;
 
 static void use_spells() {
+
 }
 
 static void run_away() {}
 
 static void make_offer() {}
 
-void heroi::battlemenu(bool friendly, bool surrender) const {
+void heroi::battlemenu(bool can_escape) const {
 	state push;
 	screenshoot surface;
 	font = SMALFONT;
+	auto player = getplayer();
 	auto back = isevil(VGENBKGE, VGENBKG);
 	auto w1 = getwidth(back, 0);
 	auto h1 = getheight(back, 0);
@@ -32,7 +34,8 @@ void heroi::battlemenu(bool friendly, bool surrender) const {
 		sb.clear();
 		sb.addo(this);
 		textf(x + 148, y1, 110, sb);
-		button(x + 30, y + 148, VIEWGEN, use_spells, {9, 9, 10}, 0);
+		if(button(x + 30, y + 148, VIEWGEN, {9, 9, 10}, 0))
+			execute(use_spells, (int)this);
 		button(x + 89, y + 148, VIEWGEN, run_away, {11, 11, 12}, 0);
 		button(x + 148, y + 148, VIEWGEN, make_offer, {13, 13, 14}, 0);
 		button(x + 207, y + 148, VIEWGEN, buttoncancel, {15, 15, 16}, KeyEscape);

@@ -5,6 +5,7 @@ using namespace draw;
 const int				awd = 11, ahd = 9;
 static heroi*			attacker;
 static heroi*			defender;
+static bool				defender_can_escape;
 static battleimage*		current_unit;
 static unsigned short	hilite_index;
 static battleimage*		hilite_unit;
@@ -22,17 +23,16 @@ static unsigned short	path_goal;
 static unsigned short	path_start;
 static const direction_s all_around[] = {Left, Right, LeftUp, LeftDown, RightUp, RightDown};
 
-static battleimage		units[20];
-static battleimage*		drawables[20];
+static adat<battleimage, 20>	units;
+static adat<battleimage*, 32>	drawables;
 static battleimage		attacker_image, defender_image;
-static unsigned			drawables_count;
 static short unsigned	position_wide[2][5] = {{0, 22, 44, 66, 88}, {10, 32, 54, 76, 98}};
 
 static unsigned getanimationspeed() {
 	switch(battle.speed) {
 	case 1: return 90;
 	case 2: return 50;
-	default: return 2000;
+	default: return 180;
 	}
 }
 
@@ -61,8 +61,6 @@ static void gnext(short unsigned index, unsigned& level, short unsigned& pos) {
 	if(index == Blocked)
 		return;
 	auto nlevel = path[index];
-	if(!nlevel)
-		return;
 	if(nlevel < level) {
 		level = nlevel;
 		pos = index;
@@ -100,27 +98,27 @@ static int getside(const heroi* leader) {
 	return (attacker == leader) ? 0 : 1;
 }
 
-static void add_drawable(battleimage* p) {
-	if(drawables_count >= sizeof(drawables) / sizeof(drawables[0]))
-		return;
-	drawables[drawables_count++] = p;
-}
-
 static void add_squad(short unsigned index, squadi& squad, heroi* leader) {
+	battleimage* p = 0;
 	for(auto& e : units) {
 		if(e)
 			continue;
-		e.clear();
-		e.setup(squad, leader);
-		e.type = Monster;
-		e.monster = e.unit;
-		e.flags = uniti::isattacker(leader) ? 0 : AFMirror;
-		e.source = &squad;
-		e.leader = leader;
-		e.setpos(index);
-		e.set(Wait);
+		p = &e;
 		break;
 	}
+	if(!p)
+		p = units.add();
+	if(!p)
+		return;
+	p->clear();
+	p->setup(squad, leader);
+	p->type = Monster;
+	p->monster = p->unit;
+	p->flags = uniti::isattacker(leader) ? 0 : AFMirror;
+	p->source = &squad;
+	p->leader = leader;
+	p->setpos(index);
+	p->set(Wait);
 }
 
 static void add_squad(armyi& army, heroi* leader) {
@@ -137,15 +135,14 @@ static void add_squad(armyi& army, heroi* leader) {
 }
 
 static void prepare_drawables() {
-	auto ps = drawables;
+	drawables.clear();
 	for(auto& e : units) {
 		if(!e)
 			continue;
-		*ps++ = &e;
+		drawables.add(&e);
 	}
-	*ps++ = &attacker_image;
-	*ps++ = &defender_image;
-	drawables_count = ps - drawables;
+	drawables.add(&attacker_image);
+	drawables.add(&defender_image);
 }
 
 static bool isend() {
@@ -280,11 +277,15 @@ static void paint_grid(const battleimage* current_unit) {
 	}
 }
 
+static void clear_board() {
+	units.clear();
+	drawables.clear();
+}
+
 void heroi::setup_battle(heroi* enemy) {
+	clear_board();
 	attacker = this;
 	defender = enemy;
-	for(auto& e : (::units))
-		e.clear();
 	add_squad(*this, this);
 	add_squad(*enemy, enemy);
 	prepare_background(Dirt, true);
@@ -310,19 +311,19 @@ static void start_autocombat() {
 
 }
 
-static void move_unit() {
+static void command_move() {
 	current_unit->move(hot::param);
 	end_turn();
 }
 
-static void shoot_enemy() {
+static void command_shoot() {
 	auto& attacker = *current_unit;
 	auto& defender = *hilite_unit;
 	attacker.shoot(defender);
 	end_turn();
 }
 
-static void attack_enemy() {
+static void command_attack() {
 	auto& attacker = *current_unit;
 	auto& defender = *hilite_unit;
 	attacker.move(attack_index);
@@ -420,14 +421,16 @@ static int drawable_compare(const void* v1, const void* v2) {
 }
 
 static void normalize_drawables() {
-	qsort(drawables, drawables_count, sizeof(drawables[0]), drawable_compare);
+	qsort(drawables.data, drawables.count, sizeof(drawables.data[0]), drawable_compare);
 }
 
-static bool update_drawables(battleimage* p) {
-	for(unsigned i = 0; i < drawables_count; i++) {
-		if(drawables[i] == p)
-			continue;
-		drawables[i]->update();
+static bool update_drawables(battleimage* p, bool update_wait) {
+	for(auto pe : drawables) {
+		if(pe != p) {
+			if(!update_wait && pe->iswait())
+				continue;
+			pe->update();
+		}
 	}
 	if(p)
 		return p->increment();
@@ -435,17 +438,16 @@ static bool update_drawables(battleimage* p) {
 }
 
 static void paint_drawables(const battleimage* current) {
-	for(unsigned i = 0; i < drawables_count; i++) {
-		drawables[i]->paint();
-		if(drawables[i] == current)
-			drawables[i]->stroke();
+	for(auto pe : drawables) {
+		pe->paint();
+		if(pe == current)
+			pe->stroke();
 	}
 }
 
 static void hittest_drawable() {
 	hilite_unit = 0;
-	for(unsigned i = 0; i < drawables_count; i++) {
-		auto p = drawables[i];
+	for(auto p : drawables) {
 		if(hilite_index != Blocked && p->index == hilite_index)
 			hilite_unit = p;
 		else if(p->type == Hero) {
@@ -464,16 +466,9 @@ static void paint_screen(const battleimage* current) {
 	paint_drawables(current);
 }
 
-//case Fly:
-//	icn = res::CMSECO;
-//	start = 2;
-//	pos.x = -7;
-//	pos.y = -14;
-//	break;
-
 static void hero_options() {
 	auto p = (heroi*)hot::param;
-	p->battlemenu(true, false);
+	p->battlemenu((p==attacker) || defender_can_escape);
 }
 
 static void setattack(direction_s d) {
@@ -508,7 +503,7 @@ static void standart_input() {
 				setcursor(CMSECO, 3, {-7, -7});
 				status("Стрелять в %1i %2", p->count, bsmeta<monsteri>::elements[p->unit].multiname);
 				if(fev)
-					execute(shoot_enemy, (int)p);
+					execute(command_shoot, (int)p);
 			} else if(current_unit->isenemy(p)) {
 				auto ad = hex_direction(i2h(hilite_index), hot::mouse);
 				auto bd = uniti::to(ad, Down);
@@ -520,7 +515,7 @@ static void standart_input() {
 					if(fev) {
 						attack_index = bi;
 						attack_direction = ad;
-						execute(attack_enemy, (int)p);
+						execute(command_attack, (int)p);
 					}
 				} else
 					setcursor(CMSECO, 0, {-7, -7});
@@ -534,9 +529,12 @@ static void standart_input() {
 	} else if(hilite_index != Blocked && current_unit) {
 		int a = getcost(hilite_index) - 1;
 		if(a <= m) {
-			setcursor(CMSECO, 1, {-7, -14});
+			if(current_unit->is(Fly))
+				setcursor(CMSECO, 2, {-7, -14});
+			else
+				setcursor(CMSECO, 1, {-7, -14});
 			if(fev)
-				execute(move_unit, hilite_index);
+				execute(command_move, hilite_index);
 		} else
 			setcursor(CMSECO, 0, {-7, -7});
 	}
@@ -605,7 +603,7 @@ static void battlemove(battleimage& e) {
 		standart_input();
 		domodal();
 		if(hot::key == InputTimer)
-			update_drawables(0);
+			update_drawables(0, true);
 	}
 }
 
@@ -621,6 +619,8 @@ static void makebattle() {
 				if(e.get(Speed) < s)
 					continue;
 				battlemove(e);
+				if(isend())
+					return;
 			}
 		}
 		for(auto& e : units) {
@@ -628,6 +628,7 @@ static void makebattle() {
 				continue;
 			e.refresh();
 		}
+		uniti::exhausespells();
 	}
 }
 
@@ -668,7 +669,7 @@ void battleimage::animate(int frames, int speed) {
 		paint_screen(0);
 		updatescreen();
 		sleep(speed);
-		if(update_drawables(this))
+		if(update_drawables(this, false))
 			break;
 	}
 }
@@ -690,7 +691,7 @@ static int isqrt(int num) {
 	return res;
 }
 
-int getdistance(point p1, point p2) {
+static int getdistance(point p1, point p2) {
 	auto dx = p1.x - p2.x;
 	auto dy = p1.y - p2.y;
 	return isqrt(dx*dx + dy * dy);
@@ -714,7 +715,7 @@ void battleimage::animate(point goal, int velocity) {
 		paint_screen(0);
 		updatescreen();
 		sleep(getmovespeed());
-		if(update_drawables(this))
+		if(update_drawables(this, false))
 			frame = start;
 		distance += velocity;
 	}
@@ -774,11 +775,10 @@ void uniti::show_shoot(uniti& enemy) const {
 	arrow.start = arrow.frame;
 	arrow.flags = pa->flags;
 	arrow.animation::count = 1;
-	add_drawable(&arrow);
+	drawables.add(&arrow);
 	arrow.animate(target, 44);
 	// Оставшаяся анимация
 	pa->animate();
-	pa->setdefault();
 	prepare_drawables();
 }
 
@@ -790,19 +790,14 @@ void uniti::show_attack(uniti& enemy, direction_s d, bool destroy_enemy) const {
 	pa->set(d);
 	pa->set(AttackAction);
 	pa->animate();
-	if(d == Left || d == Right)
-		pa->set(AttackAction, 2);
-	else if(d == LeftUp || d == RightUp)
-		pa->set(AttackAction, 1);
-	else
-		pa->set(AttackAction, 3);
+	pa->set(AttackAction, pa->getparam(d));
 	pa->animate(pa->animation::count - 2);
 	if(destroy_enemy)
 		pe->set(Killed);
 	else
 		pe->set(Damaged);
-	pa->animate(-1); pa->setdefault();
-	pe->animate(-1); pe->setdefault();
+	pa->animate(); 
+	pe->animate();
 }
 
 void uniti::show_damage(bool destroy) const {

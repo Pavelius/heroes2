@@ -30,6 +30,26 @@ struct cflags {
 	constexpr bool			is(const T id) const { return (data & (1 << id)) != 0; }
 	constexpr void			remove(T id) { data &= ~(1 << id); }
 };
+template<typename T, unsigned N> struct adat {
+	static constexpr unsigned maximum = N;
+	unsigned				count;
+	T						data[N];
+	constexpr adat() :count(0), data() {}
+	constexpr T& operator[](unsigned index) { return data[index]; }
+	constexpr const T& operator[](unsigned index) const { return data[index]; }
+	explicit operator bool() const { return count != 0; }
+	T*						add() { return (count < N) ? (data + (count++)) : 0; }
+	void					add(const T& e) { if(count<N) data[count++] = e; }
+	constexpr T*			begin() { return data; }
+	constexpr const T*		begin() const { return data; }
+	constexpr bool			cangrow() const { return ; }
+	void					clear() { count = 0; }
+	constexpr const T*		end() const { return data + count; }
+	int						getcount() const { return count; }
+	int						indexof(const T* t) const { if(t<data || t>data + count) return -1; return t - data; }
+	int						indexof(const T t) const { for(unsigned i = 0; i < count; i++) if(data[i] == t) return i; return -1; }
+	bool					is(const T t) const { return indexof(t) != -1; }
+};
 template<typename T> struct aref {
 	unsigned				count;
 	T*						data;

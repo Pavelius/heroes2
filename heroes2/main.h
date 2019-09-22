@@ -559,7 +559,7 @@ public:
 	int						ask(const char* format);
 	int						ask(const char* format, const variantcol* source);
 	bool					battle(moveablei& enemy);
-	void					battlemenu(bool friendly, bool surrender) const;
+	void					battlemenu(bool can_escape) const;
 	void					battlestart();
 	bool					buymagicbook();
 	void					clear();
@@ -876,6 +876,7 @@ struct uniti : positioni, squadi, battlef {
 	int						attack(uniti& enemy);
 	bool					canshoot() const;
 	void					damage(unsigned v);
+	static void				exhausespells();
 	static uniti*			find(short unsigned index);
 	constexpr bool			is(battle_s v) const { return battlef::is(v); }
 	bool					is(spell_s v) const { return getspell(v) > 0; }

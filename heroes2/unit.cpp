@@ -14,7 +14,7 @@ static enchantmenti* find_enchantment(const uniti* object, spell_s id) {
 	return 0;
 }
 
-static enchantmenti* add_enchantment() {
+enchantmenti* bsmeta<enchantmenti>::add() {
 	for(unsigned i = 0; i < bsmeta<enchantmenti>::count; i++) {
 		auto& e = bsmeta<enchantmenti>::elements[i];
 		if(!e)
@@ -25,10 +25,22 @@ static enchantmenti* add_enchantment() {
 	return &bsmeta<enchantmenti>::elements[0];
 }
 
+void uniti::exhausespells() {
+	for(unsigned i = 0; i < bsmeta<enchantmenti>::count; i++) {
+		auto& e = bsmeta<enchantmenti>::elements[i];
+		if(!e)
+			continue;
+		if(e.count > 0)
+			e.count--;
+		if(!e.count)
+			e.object = 0;
+	}
+}
+
 void uniti::addspell(spell_s v, unsigned short rounds) {
 	auto p = find_enchantment(this, v);
 	if(!p)
-		p = add_enchantment();
+		p = bsmeta<enchantmenti>::add();
 	p->object = this;
 	p->count = rounds;
 	p->id = v;

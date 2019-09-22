@@ -103,6 +103,22 @@ static monsterai monsters[] = {{PEASANT, {1, 4}, {5, 8}, /*Fly*/{0, 0}, {0, 0}, 
 {NoRes, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, NoRes, NoRes, NoRes, NoRes},
 {NoRes, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, NoRes, NoRes, NoRes, NoRes},
 };
+struct heroai {
+	res_s			icn;
+	unsigned char	lose[2];
+	unsigned char	win[2];
+	unsigned char	castmass[2];
+	unsigned char	cast[2];
+	unsigned char	idle[2];
+};
+static heroai heroes[] = {{CMBTHROB, {1, 5}, {6, 4}, {10, 2}, {12, 3}, {15, 4}},
+{CMBTHROK, {1, 5}, {6, 4}, {10, 2}, {12, 3}, {15, 5}},
+{CMBTHRON, {17, 3}, {1, 5}, {6, 9}},
+{CMBTHROS, {13, 4}, {1, 5}, {6, 7}},
+{CMBTHROW, {14, 3}, {1, 5}, {6, 8}},
+{CMBTHROZ, {16, 3}, {1, 5}, {6, 7}},
+{NoRes},
+};
 
 void battleimage::clear() {
 	memset(this, 0, sizeof(*this));
@@ -133,7 +149,7 @@ void battleimage::paint() const {
 		draw::image(pos.x, pos.y, icn, draw::counter % 5, flags);
 	} else if(type == Monster) {
 		auto count = this->uniti::count;
-		if(count && (flags&AFMoving)==0) {
+		if(count && (flags&AFMoving) == 0) {
 			state push;
 			font = SMALFONT;
 			char temp[32]; zprint(temp, "%1i", count);
@@ -142,7 +158,7 @@ void battleimage::paint() const {
 			auto frame = getbarframe();
 			auto x1 = x;
 			auto y1 = y;
-			if((flags&AFMirror)==0) {
+			if((flags&AFMirror) == 0) {
 				x1 += 12;
 				y1 -= draw::getheight(TEXTBAR, frame);
 			} else {
@@ -257,65 +273,32 @@ void battleimage::set(action_s action, int param) {
 			break;
 		}
 	} else if(type == Hero) {
-		auto kind = bsmeta<heroi>::elements[hero].getkind();
-		switch(kind) {
-		case Barbarian:
-			res = CMBTHROB;
-			switch(value) {
-			case Wait: start = xrand(15, 18); animation::count = 1; break;
-			case PalmFace: start = 1; animation::count = 5; break;
-			case Cast: start = 6; animation::count = 9; break;
-			default: break;
+		auto& ed = heroes[bsmeta<heroi>::elements[hero].getkind()];
+		res = ed.icn;
+		switch(action) {
+		case Wait:
+			if(ed.idle[1]) {
+				if(d100() < 60) {
+					start = ed.idle[0];
+					animation::count = 1 + rand() % ed.idle[1];
+				} else {
+					animation::count = 1 + rand() % ed.idle[1];
+					start = ed.idle[0] + ed.idle[1] - animation::count;
+				}
 			}
 			break;
-		case Knight:
-			res = CMBTHROK;
-			switch(action) {
-			case Wait: start = 15; animation::count = 5; break;
-			case PalmFace: start = 1; animation::count = 5; break;
-			case Cast: start = 12; animation::count = 2; break;
-			default: break;
-			}
+		case PalmFace:
+			start = ed.lose[0];
+			animation::count = ed.lose[1];
 			break;
-		case Necromancer:
-			res = CMBTHRON;
-			switch(action) {
-			case Wait: start = xrand(17, 19); animation::count = 1; break;
-			case PalmFace: start = 1; animation::count = 5; break;
-			case Cast: start = 6; animation::count = 9; break;
-			default: break;
-			}
+		case Cast:
+			start = ed.cast[0];
+			animation::count = ed.cast[1];
 			break;
-		case Sorcerer:
-			res = CMBTHROS;
-			switch(action) {
-			case Wait: start = 13; animation::count = 4; break;
-			case PalmFace: start = 1; animation::count = 5; break;
-			case Cast: start = 6; animation::count = 7; break;
-			default: break;
-			}
+		default:
 			break;
-		case Warlock:
-			res = CMBTHROW;
-			switch(action) {
-			case Wait: start = 14; animation::count = 3; break;
-			case PalmFace: start = 1; animation::count = 5; break;
-			case Cast: start = 6; animation::count = 8; break;
-			default: break;
-			}
-			break;
-		case Wizard:
-			res = CMBTHROZ;
-			switch(action) {
-			case Wait: start = 16; animation::count = 3; break;
-			case PalmFace: start = 1; animation::count = 5; break;
-			case Cast: start = 12; animation::count = 7; break;
-			default: break;
-			}
-			break;
-		default: res = NoRes; start = 0; animation::count = 0; break;
 		}
-		if(action==Wait)
+		if(action == Wait)
 			wait = xrand(3, 8);
 	}
 	frame = start;
@@ -326,7 +309,7 @@ void battleimage::setdefault() {
 		set(Dead);
 	else
 		set(Wait);
-	if(type==Monster)
+	if(type == Monster)
 		flags = isattacker(leader) ? 0 : AFMirror;
 }
 

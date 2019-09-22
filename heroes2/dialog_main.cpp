@@ -32,7 +32,7 @@ static void test_battle() {
 	pd->add(Zombie, 4);
 	ph->set(MagicArrow);
 	ph->set(PlayerBlue);
-	ph->add(Elf, 4);
+	ph->add(WarTroll, 4);
 	ph->setup_battle(pd);
 	ph->battlestart();
 }

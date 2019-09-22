@@ -773,14 +773,20 @@ void uniti::show_shoot(uniti& enemy) const {
 	pa->set(d);
 	pa->set(Shoot, pa->getparam(d));
 	auto long_animation = (pa->start != 0);
+	auto shoot_finish = -2;
+	switch(unit) {
+	case WarTroll: case Troll:
+		shoot_finish = -1;
+		break;
+	}
 	if(long_animation) {
 		pa->set(Shoot);
 		pa->animate();
 		pa->set(Shoot, pa->getparam(d));
-		pa->animate(pa->animation::count - 2);
+		pa->animate(pa->animation::count - shoot_finish);
 	} else {
 		pa->set(Shoot);
-		pa->animate(pa->animation::count - 2);
+		pa->animate(pa->animation::count - shoot_finish);
 	}
 	// Выпускание снаряда
 	const int shoot_height = 50;

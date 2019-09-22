@@ -32,7 +32,7 @@ static unsigned getanimationspeed() {
 	switch(battle.speed) {
 	case 1: return 90;
 	case 2: return 50;
-	default: return 180;
+	default: return 2000;
 	}
 }
 
@@ -697,7 +697,7 @@ int getdistance(point p1, point p2) {
 }
 
 void battleimage::animate(point goal, int velocity) {
-	if(type==Monster && (!isalive() || iswait()))
+	if(type == Monster && (!isalive() || iswait()))
 		return;
 	auto frames = start + animation::count;
 	if(frame >= frames)
@@ -872,7 +872,26 @@ void uniti::show_move(short unsigned index) const {
 		auto d = uniti::getdirection(i, i1);
 		pa->set(d);
 		pa->flags |= AFMoving;
+		auto p0 = i2h(i);
+		auto p1 = i2h(i1);
+		auto md = 0;
+		auto sf = 0;
+		if(d != Left && d != Right) {
+			auto pf = draw::get(pa->res, pa->frame);
+			pa->flags |= AFNoOffset;
+			md = pa->start + pa->animation::count - pa->frame;
+			sf = pa->frame;
+		}
 		while(true) {
+			if(md) {
+				auto pf = draw::get(pa->res, pa->frame);
+				pa->pos.x = p0.x + (pa->frame - sf) * (p1.x - p0.x) / md;
+				if(pa->flags&AFMirror)
+					pa->pos.x += pf->width / 2;
+				else
+					pa->pos.x -= pf->width / 2;
+				pa->pos.y = p0.y + (pa->frame - sf) * (p1.y - p0.y) / md + pf->y;
+			}
 			paint_screen(0);
 			updatescreen();
 			sleep(getmovespeed());

@@ -81,6 +81,7 @@ struct animation {
 	constexpr animation() : pos{0, 0}, res(NoRes), wait(0), frame(0), start(0), count(0), flags(0) {}
 	bool					increment();
 	static int				getanimate(res_s id, int start, int ticket, bool quantity);
+	static int				getmissiledy(monster_s id, int param);
 	int						getwidth() const;
 	void					paint(int x, int y, unsigned flags = 0) const;
 	void					set(res_s id, unsigned char frame, point pos = point());

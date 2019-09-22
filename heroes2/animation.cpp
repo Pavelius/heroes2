@@ -12,9 +12,13 @@ void animation::set(res_s res, unsigned char frame, point pos) {
 	switch(this->res) {
 	case ADVMCO:
 		if(frame != 0) {
-			pos.x = -draw::getwidth(res, frame) / 2;
-			pos.y = -draw::getheight(res, frame) / 2;
+			this->pos.x = -draw::getwidth(res, frame) / 2;
+			this->pos.y = -draw::getheight(res, frame) / 2;
 		}
+		break;
+	case SPELLS:
+		this->pos.x = -draw::getwidth(res, frame) / 2;
+		this->pos.y = -draw::getheight(res, frame) / 2;
 		break;
 	}
 }

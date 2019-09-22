@@ -208,7 +208,33 @@ void heroi::add(artifact_s id) {
 }
 
 int	heroi::getcost(spell_s v) const {
-	return bsmeta<spelli>::elements[v].points;
+	auto r = bsmeta<spelli>::elements[v].points;
+	switch(v) {
+	case Bless:
+	case MassBless:
+		if(is(SnakeRing))
+			r /= 2;
+		break;
+	case SummonAirElemental:
+	case SummonEarthElemental:
+	case SummonFireElemental:
+	case SummonWaterElemental:
+	case SetAirGuadrdian:
+	case SetEartGuadrdian:
+	case SetFireGuadrdian:
+	case SetWaterGuadrdian:
+		if(is(ElementalRing))
+			r /= 2;
+		break;
+	case Curse:
+	case MassCurse:
+		if(is(EvilEye))
+			r /= 2;
+		break;
+	}
+	if(r < 1)
+		r = 1;
+	return r;
 }
 
 kind_s heroi::getkind() const {
@@ -454,4 +480,13 @@ unsigned heroi::getdamage(spell_s id, uniti& enemy) const {
 		break;
 	}
 	return value;
+}
+
+void heroi::cast(spell_s id, const pvar& target) {
+	auto& spell = bsmeta<spelli>::elements[id];
+	auto power = get(SpellPower);
+	if(spell.tags.is(Enchantment)) {
+		if(target.type == Unit)
+			target.unit->enchant(id, power, this);
+	}
 }

@@ -190,7 +190,7 @@ enum spell_type_s : unsigned char {
 enum variant_s : unsigned char {
 	NoVariant,
 	Ability, Artifact, Building, CastleVar, Hero, Index, Landscape, Object, Monster, Moveable,
-	Player, Resource, Skill, Spell, Stat, Tag, Variant,
+	Player, Resource, Skill, Spell, Stat, Tag, Unit, Variant,
 };
 enum activity_s : unsigned char {
 	NotAllowed,
@@ -589,6 +589,7 @@ public:
 	void					battlemenu(bool can_escape);
 	void					battlestart();
 	bool					buymagicbook();
+	void					cast(spell_s id, const pvar& target);
 	void					castcombatspell();
 	void					clear();
 	void					choose();
@@ -776,7 +777,7 @@ struct pvar : variant {
 		castlei*			castle;
 		heroi*				hero;
 		playeri*			player;
-		squadi*				squad;
+		uniti*				unit;
 		moveablei*			moveable;
 		int					value;
 	};
@@ -784,6 +785,7 @@ struct pvar : variant {
 	template<class T> constexpr pvar(const T v) : variant(v) {}
 	constexpr pvar(castlei* v) : variant(CastleVar, 0), castle(v) {}
 	constexpr pvar(heroi* v) : variant(Hero, 0), hero(v) {}
+	constexpr pvar(uniti* v) : variant(Unit, 0), unit(v) {}
 	constexpr pvar(moveablei* v) : variant(Moveable, 0), moveable(v) {}
 	constexpr bool operator==(const pvar& e) const { return type == e.type && value == e.value; }
 	constexpr explicit operator bool() const { return type != NoVariant; }
@@ -879,7 +881,6 @@ struct uniti : positioni, squadi, battlef {
 	short unsigned			shoots;
 	short unsigned			hits;
 	constexpr explicit operator bool() const { return index != Blocked; }
-	void					addspell(spell_s v, unsigned short rounds);
 	bool					canshoot() const;
 	void					damage(unsigned v);
 	void					enchant(spell_s id, unsigned duration, const heroi* caster);
@@ -895,21 +896,21 @@ struct uniti : positioni, squadi, battlef {
 	int						getkilled(int d) const;
 	int						getresist(spell_s id, int spell_power) const;
 	unsigned				getscore(const uniti& defender) const;
-	unsigned short			getspell(spell_s v) const;
+	int						getspell(spell_s v) const;
 	constexpr bool			is(battle_s v) const { return battlef::is(v); }
 	bool					is(spell_s v) const { return getspell(v) > 0; }
 	bool					is(tag_s v) const { return squadi::is(v); }
+	bool					isalive() const { return index != Blocked && count > 0; }
 	bool					isarcher() const { return getmonster().shoots!=0; }
 	static bool				isattacker(const heroi* leader);
 	bool					isattacker() const { return isattacker(leader); }
-	bool					isalive() const { return index!=Blocked && count > 0; }
 	bool					isdamaged() const;
 	constexpr bool			isenemy(const uniti* p) { return p->leader != leader; }
 	bool					iskill(int d) const { return gethits() <= d; }
 	void					melee(uniti& enemy, direction_s d = Up);
 	void					move(short unsigned index);
 	void					sethits(int value);
-	void					setspell(spell_s v, unsigned short count);
+	void					setspell(spell_s v, int count);
 	void					setup(squadi& squad, heroi* hero);
 	unsigned				shoot(uniti& enemy);
 	void					show_attack(uniti& enemy, direction_s d, bool destroy_enemy) const;
@@ -967,7 +968,6 @@ direction_s					to(direction_s f, direction_s d);
 void						wave(short unsigned start, int skill, int ship_master);
 }
 extern battlei				battle;
-template<class T> inline bool ist(T id, tag_s v) { return bsmeta<T>::elements[id].tags.is(v); }
 template<class T> inline int getpower(T id) { return bsmeta<T>::elements[id].power; }
 const char*					getstr(building_s id, kind_s kind);
 DECLENUM(ability);

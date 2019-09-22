@@ -37,31 +37,24 @@ void uniti::exhausespells() {
 	}
 }
 
-void uniti::addspell(spell_s v, unsigned short rounds) {
+void uniti::setspell(spell_s v, int count) {
 	auto p = find_enchantment(this, v);
-	if(!p)
+	if(!p && count > 0)
 		p = bsmeta<enchantmenti>::add();
-	p->object = this;
-	p->count = rounds;
-	p->id = v;
-}
-
-void uniti::setspell(spell_s v, unsigned short count) {
-	auto p = find_enchantment(this, v);
 	if(p) {
-		p->count = count;
-		if(!count)
-			p->object = 0;
+		if(count <= 0)
+			memset(p, 0, sizeof(enchantmenti));
+		else {
+			p->id = v;
+			p->object = this;
+			p->count = count;
+		}
 	}
 }
 
-unsigned short uniti::getspell(spell_s v) const {
-	for(unsigned i = 0; i < bsmeta<enchantmenti>::count; i++) {
-		auto& e = bsmeta<enchantmenti>::elements[i];
-		if(e.object == this && e.id == v)
-			return e.count;
-	}
-	return 0;
+int uniti::getspell(spell_s v) const {
+	auto p = find_enchantment(this, v);
+	return p ? p->count : 0;
 }
 
 void uniti::setup(squadi& v, heroi* h) {
@@ -209,7 +202,7 @@ unsigned uniti::getdamage(const uniti& enemy) {
 	}
 	if(enemy.is(Stone))
 		d /= 2;
-	if(unit==Crusader && enemy.is(Undead))
+	if(unit == Crusader && enemy.is(Undead))
 		d *= 2;
 	if(d <= 0)
 		d = 1;
@@ -355,18 +348,19 @@ int	uniti::getresist(spell_s id, int spell_power) const {
 	//if(spell.isMindInfluence() &&
 	//	(isUndead() || isElemental() ||
 	//		GetID() == Monster::GIANT || GetID() == Monster::TITAN)) return 100;
-	if(ist(id, Alive) && is(Undead))
+	auto& spell = bsmeta<spelli>::elements[id].tags;
+	if(spell.is(Alive) && is(Undead))
 		return 100;
-	if(ist(id, Undead) && !is(Undead))
+	if(spell.is(Undead) && !is(Undead))
 		return 100;
 	switch(unit) {
 	case ArchMage:
-		if(ist(id, Damage) || (ist(id, Enchantment) && ist(id, Hostile)))
+		if(spell.is(Damage) || (spell.is(Enchantment) && spell.is(Hostile)))
 			return 20;
 		break;
 	case Dwarf:
 	case BattleDwarf:
-		if(ist(id, Damage) || (ist(id, Enchantment) && ist(id, Hostile)))
+		if(spell.is(Damage) || (spell.is(Enchantment) && spell.is(Hostile)))
 			return 25;
 		break;
 	case GreenDragon:

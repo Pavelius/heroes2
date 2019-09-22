@@ -464,7 +464,7 @@ static void paint_screen(const battleimage* current) {
 
 static void hero_options() {
 	auto p = (heroi*)hot::param;
-	p->battlemenu((p==attacker) || defender_can_escape);
+	p->battlemenu((p == attacker) || defender_can_escape);
 }
 
 static void setattack(direction_s d) {
@@ -792,7 +792,7 @@ void uniti::show_attack(uniti& enemy, direction_s d, bool destroy_enemy) const {
 		pe->set(Killed);
 	else
 		pe->set(Damaged);
-	pa->animate(); 
+	pa->animate();
 	pe->animate();
 }
 
@@ -888,8 +888,86 @@ direction_s uniti::getdirection(short unsigned from, short unsigned to) {
 	return (p2.x < p1.x) ? LeftDown : RightDown;
 }
 
+static int getframe(spell_s id) {
+	switch(id) {
+	case Slow: return 1;
+	case Curse: return 3;
+	case LightingBolt: return 4;
+	case ChainLighting: return 5;
+	case Cure: return 6;
+	case Bless: return 7;
+	case FireBall: return 8;
+	case FireBlast: return 9;
+	case Teleport: return 10;
+	default: return 0;
+	}
+	//	SP_ELEMENTALSTORM = 0x300B,
+	//	SP_RESURRECTTRUE = 0x300C,
+	//	SP_RESURRECT = 0x300D,
+	//	SP_HASTE = 0x300E,
+	//	SP_SHIELD = 0x300F,
+	//	SP_ARMAGEDDON = 0x3010,
+	//	SP_ANTIMAGIC = 0x3011,
+	//	SP_DISPEL = 0x3012,
+	//	SP_BERSERKER = 0x3013,
+	//	SP_PARALYZE = 0x3014,
+	//	SP_BLIND = 0x3015,
+	//	SP_HOLYWORD = 0x3016,
+	//	SP_HOLYSHOUT = 0x3017,
+	//	SP_METEORSHOWER = 0x3018,
+	//	SP_ANIMATEDEAD = 0x3019,
+	//	SP_MIRRORIMAGE = 0x301A,
+	//	SP_BLOODLUST = 0x301B,
+	//	SP_DEATHRIPPLE = 0x301C,
+	//	SP_DEATHWAVE = 0x301D,
+	//	SP_STEELSKIN = 0x301E,
+	//	SP_STONESKIN = 0x301F,
+	//	SP_DRAGONSLAYER = 0x3020,
+	//	SP_EARTHQUAKE = 0x3021,
+	//	SP_DISRUPTINGRAY = 0x3022,
+	//	SP_COLDRING = 0x3023,
+	//	SP_COLDRAY = 0x3024,
+	//	SP_HYPNOTIZE = 0x3025,
+	//	SP_ARROW = 0x3026
+
+}
+
+static bool choose_target(spell_s id, int spell_level, pvar& result) {
+	result.clear();
+	prepare_drawables();
+	while(ismodal()) {
+		paint_screen(current_unit);
+		setcursor(SPELLS, 0);
+		result.clear();
+		if(hilite_unit) {
+			auto resist = hilite_unit->getresist(id, spell_level);
+			if(resist < 100) {
+				result = static_cast<uniti*>(hilite_unit);
+				auto fr = getframe(id);
+				setcursor(SPELLS, getframe(id));
+			}
+		}
+		domodal();
+		switch(hot::key) {
+		case InputTimer:
+			update_drawables(0, true);
+			break;
+		case MouseLeft:
+			if(hot::pressed)
+				breakmodal((result.type != NoVariant) ? 1 : 0);
+			break;
+		}
+	}
+	hot::key = 0;
+	hot::param = 0;
+	return getresult() != 0;
+}
+
 void heroi::castcombatspell() {
-	spell_s result;
-	if(showbook(CombatSpell, &result)) {
+	spell_s spell;
+	if(showbook(CombatSpell, &spell)) {
+		pvar target;
+		if(choose_target(spell, get(SpellPower), target))
+			cast(spell, target);
 	}
 }

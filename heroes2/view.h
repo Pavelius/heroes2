@@ -45,7 +45,6 @@ enum button_s : unsigned char {
 	NoButtons, ButtonOK, ButtonYesNo, ButtonLearn,
 };
 namespace hot {
-void						clear();
 extern int					key; // [in] if pressed key or mouse this field has key
 extern point				mouse; // current mouse coordinates
 extern bool					pressed; // flag if any of mouse keys is pressed
@@ -246,7 +245,7 @@ unsigned char*				ptr(int x, int y);
 void						quicktips(int x, int y, const char* format);
 void						rectb(const rect& rc, unsigned char m);
 void						rectf(const rect& rc, unsigned char m);
-void						setcursor(res_s res, unsigned char frame, point pos = point());
+void						setcursor(res_s res, unsigned char frame, point pos = point(), unsigned flags = 0);
 void						setevil(bool value);
 void						shadow(const rect& rc, int intense);
 void						splitter(int x, int y, res_s res, int& value, int from, int to);

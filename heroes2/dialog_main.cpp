@@ -21,44 +21,27 @@ static void test_message() {
 	heroi::learn(str, source, 1);
 }
 
+static void test_battle() {
+	heroi::initialize();
+	auto ph = bsmeta<heroi>::elements + Natasha;
+	auto pd = bsmeta<heroi>::elements + RandomHero;
+	pd->clear();
+	pd->setpos(4640);
+	pd->armyi::clear();
+	pd->add(Skeleton, 30);
+	pd->add(Zombie, 4);
+	ph->set(PlayerBlue);
+	ph->add(Sprite, 3);
+	ph->setup_battle(pd);
+	ph->battlestart();
+}
+
 static void test_experience() {
 	heroi::initialize();
 	setevil(true);
 	auto& e = bsmeta<heroi>::elements[Jezebel];
 	e.addexperience(5000);
 	e.show(true);
-}
-
-static void show_test() {
-	test_experience();
-}
-
-static void full_castle(const playeri* player, kind_s type) {
-	//heroi::initialize();
-	//bsmeta<heroi>::elements[Dimitry].show();
-	auto p = bsmeta<castlei>::add();
-	p->clear();
-	p->setname("Гринвейл");
-	p->set(player);
-	p->set(type);
-	p->set(Tent);
-	p->set(Castle);
-	p->set(Dwelving1);
-	p->set(Dwelving2);
-	p->set(MageGuild);
-	p->set(MageGuild2);
-	p->set(MageGuild3);
-	p->set(Shipyard);
-	p->set(ThievesGuild);
-	p->set(Well);
-	p->set(Well2);
-	//p->set(SpecialBuilding);
-	//p->set(RightTurret);
-	//p->set(LeftTurret);
-	p->set(Moat);
-	p->add(Swordsman, 4);
-	p->growth();
-	p->show();
 }
 
 static void load_game() {}
@@ -72,7 +55,7 @@ static void main_menu() {
 		button(0, 0, BTNSHNGL, gamei::newgame, {1, 2, 3}, 0, "Начать новую одиночную или мультиплеер игру.");
 		button(0, 0, BTNSHNGL, dialog_palette, {5, 6, 7}, Ctrl + Alpha + 'L', "Загрузить ранее сохраненную игру.");
 		button(0, 0, BTNSHNGL, hightscore::show, {9, 10, 11});
-		button(0, 0, BTNSHNGL, animation_view, {13, 14, 15});
+		button(0, 0, BTNSHNGL, test_battle, {13, 14, 15});
 		button(0, 0, BTNSHNGL, buttoncancel, {17, 18, 19});
 		//latern.painting({0, 0});
 		domodal();

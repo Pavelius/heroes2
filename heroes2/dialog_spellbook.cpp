@@ -14,12 +14,14 @@ static int compare(const void* p1, const void* p2) {
 	return strcmp(bsmeta<spelli>::elements[s1].name, bsmeta<spelli>::elements[s2].name);
 }
 
-static int select_spells(spell_s* result, heroi& sb, spell_type_s mode) {
+static int select_spells(spell_s* result, spellbooki& sb, spell_type_s mode) {
 	auto p = result;
 	for(auto i = FirstSpell; i <= LastSpell; i = (spell_s)(i+1)) {
 		if(i == Stone)
 			continue;
 		if(mode && bsmeta<spelli>::elements[i].type!=mode)
+			continue;
+		if(!sb.is(i))
 			continue;
 		*p++ = i;
 	}
@@ -34,7 +36,12 @@ static void combat_page() {
 	mode = CombatSpell;
 }
 
-static void cast_spell() {}
+static spell_s* current_value;
+static void cast_spell() {
+	if(current_value)
+		*current_value = spell_s(hot::param);
+	breakmodal(1);
+}
 
 static void next_page() {
 	*((int*)hot::param) = *((int*)hot::param) + 1;
@@ -44,7 +51,7 @@ static void prev_page() {
 	*((int*)hot::param) = *((int*)hot::param) - 1;
 }
 
-void heroi::showbook(spell_type_s original_mode) {
+bool heroi::showbook(spell_type_s original_mode, spell_s* result) {
 	char temp[32];
 	const int cw1 = 82;
 	const int cw2 = 42;
@@ -67,7 +74,7 @@ void heroi::showbook(spell_type_s original_mode) {
 		mode = CombatSpell;
 	while(ismodal()) {
 		// fill knowing spells
-		names_count = select_spells(names, *this, mode);
+		names_count = select_spells(names, spellbook, mode);
 		qsort(names, names_count, sizeof(names[0]), compare);
 		int x1 = x - w1 - 1;
 		int y1 = y;
@@ -128,20 +135,16 @@ void heroi::showbook(spell_type_s original_mode) {
 			draw::image(rc.x1 + (cw1 - getwidth(SPELLS, spr)) / 2, rc.y1 + (cw2 - getheight(SPELLS, spr)) / 2, SPELLS, spr, AFNoOffset);
 			zprint(temp, "%1 (%2i)", getstr(sid), cost);
 			textm(rc.x1, rc.y1 + cw2 + 1, cw1, AlignCenter, temp);
-			if(get(SpellPoints) >= cost) {
-				if(draw::mousein(rc)) {
-					if(hot::key == MouseLeft && hot::pressed)
-						execute(cast_spell);
-					//else if(hot::key == MouseRight && hot::pressed)
-					//	execute(Information, names[i]);
-				}
-			} else {
-				if(draw::mousein(rc)) {
-					//if(hot::key == MouseRight && hot::pressed)
-					//	draw::execute(Information, names[i]);
+			if(mousein(rc)) {
+				if(hot::key == MouseLeft && hot::pressed) {
+					if(get(SpellPoints) >= cost) {
+						current_value = result;
+						execute(cast_spell, sid);
+					}
 				}
 			}
 		}
 		domodal();
 	}
+	return getresult() != 0;
 }

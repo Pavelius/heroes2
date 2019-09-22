@@ -52,14 +52,6 @@ monster_s squadi::getupgrade() const {
 	return bsmeta<monsteri>::elements[unit].upgrade;
 }
 
-unsigned squadi::getstrenght() const {
-	return bsmeta<monsteri>::elements[unit].rating * count;
-}
-
-bool squadi::isarcher() const {
-	return bsmeta<monsteri>::elements[unit].isarcher();
-}
-
 bool armyi::is(tag_s v) const {
 	for(auto& e : units) {
 		if(!e)
@@ -131,4 +123,52 @@ squadi* armyi::getsquad(monster_s v) const {
 
 void armyi::clear() {
 	memset(this, 0, sizeof(*this));
+}
+
+bool squadi::isdrainlife() const {
+	switch(unit) {
+	case Vampire:
+	case VampireLord:
+		return true;
+	default:
+		return false;
+	}
+}
+
+bool squadi::isdragon() const {
+	switch(unit) {
+	case GreenDragon:
+	case RedDragon:
+	case BlackDragon:
+	case BoneDragon:
+	case Phoenix:
+		return true;
+	default:
+		return false;
+	}
+}
+
+//unsigned squadi::getstrenght() const {
+//	unsigned res = ((getmonster().damageMin + getmonster().damageMax) >> 1)*count;
+//	// increase strength
+//	if(is(Fly))
+//		res += res / 2;
+//	if(getmonster().isarcher())
+//		res += res / 2;
+//	if(is(Twice))
+//		res += res / 2;
+//	if(is(Stealth))
+//		res += res / 2;
+//	// slowly: decrease strength
+//	if((!is(Fly) && !getmonster().isarcher()) && getmonster().speed<AverageSpeed)
+//		res -= res * 0.5;
+//	switch(unit) {
+//	case Ghost: res *= 2; break;
+//	default: break;
+//	}
+//	return res;
+//}
+
+unsigned squadi::getstrenght() const {
+	return bsmeta<monsteri>::elements[unit].rating * count;
 }

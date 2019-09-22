@@ -2,15 +2,7 @@
 
 using namespace draw;
 
-static void use_spells() {
-
-}
-
-static void run_away() {}
-
-static void make_offer() {}
-
-void heroi::battlemenu(bool can_escape) const {
+void heroi::battlemenu(bool can_escape) {
 	state push;
 	screenshoot surface;
 	font = SMALFONT;
@@ -35,10 +27,17 @@ void heroi::battlemenu(bool can_escape) const {
 		sb.addo(this);
 		textf(x + 148, y1, 110, sb);
 		if(button(x + 30, y + 148, VIEWGEN, disable({9, 9, 10}, !is(MagicBook)), 0))
-			execute(use_spells, (int)this);
-		button(x + 89, y + 148, VIEWGEN, run_away, {11, 11, 12}, 0);
-		button(x + 148, y + 148, VIEWGEN, make_offer, {13, 13, 14}, 0);
+			execute(buttonparam, 1);
+		if(button(x + 89, y + 148, VIEWGEN, disable({11, 11, 12}, !can_escape), 0))
+			execute(buttonparam, 2);
+		if(button(x + 148, y + 148, VIEWGEN, disable({13, 13, 14},!can_escape), 0))
+			execute(buttonparam, 3);
 		button(x + 207, y + 148, VIEWGEN, buttoncancel, {15, 15, 16}, KeyEscape);
 		domodal();
+	}
+	switch(getresult()) {
+	case 1: castcombatspell(); break;
+	case 2: break;
+	case 3: break;
 	}
 }

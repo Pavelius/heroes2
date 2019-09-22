@@ -292,7 +292,7 @@ costi playeri::getprofit() const {
 		for(auto a : artifacts) {
 			auto& ae = bsmeta<artifacti>::elements[a];
 			if(ae.type.type == Resource)
-				result.add(ae.type.resource, ae.effect);
+				result.add(ae.type.resource, ae.power);
 		}
 		// Прибыль с навыков
 		result.add(Gold, estates_income[e.get(Estates)]);

@@ -36,10 +36,6 @@ static unsigned getanimationspeed() {
 	}
 }
 
-static unsigned getmovespeed() {
-	return getanimationspeed() / 2;
-}
-
 static point i2h(short unsigned index) {
 	int x = 20 + 88 - ((index / awd) % 2 ? cell_wd / 2 : 0) + (cell_wd - 1) * (index % awd);
 	int y = 20 + 85 + ((cell_hd / 4) * 3 - 1) * (index / awd);
@@ -714,7 +710,7 @@ void battleimage::animate(point goal, int velocity) {
 		pos.y = p1.y + (goal.y - p1.y)*distance / distance_maximum;
 		paint_screen(0);
 		updatescreen();
-		sleep(getmovespeed());
+		sleep(getanimationspeed());
 		if(update_drawables(this, false))
 			frame = start;
 		distance += velocity;
@@ -848,7 +844,7 @@ void uniti::show_move(short unsigned index) const {
 			}
 			paint_screen(0);
 			updatescreen();
-			sleep(getmovespeed());
+			sleep(getanimationspeed());
 			if(pa->increment()) {
 				pa->frame = pa->start + 1;
 				break;
@@ -866,11 +862,11 @@ void uniti::show_fly(short unsigned goal) const {
 	pa->set(getdirection(index, goal));
 	pa->flags |= AFMoving;
 	pa->set(FlyAction, 0);
-	pa->animate(-1, getanimationspeed() / 2);
+	pa->animate();
 	pa->set(FlyAction, 1);
 	pa->animate(p2, 16);
 	pa->set(FlyAction, 2);
-	pa->animate(-1, getanimationspeed() / 2);
+	pa->animate();
 	pa->setdefault();
 	pa->setpos(goal);
 }
@@ -890,4 +886,10 @@ direction_s uniti::getdirection(short unsigned from, short unsigned to) {
 	if(y2 < y1)
 		return (p2.x < p1.x) ? LeftUp : RightUp;
 	return (p2.x < p1.x) ? LeftDown : RightDown;
+}
+
+void heroi::castcombatspell() {
+	spell_s result;
+	if(showbook(CombatSpell, &result)) {
+	}
 }

@@ -1068,6 +1068,10 @@ void draw::buttonok() {
 	breakmodal(1);
 }
 
+void draw::buttonparam() {
+	breakmodal(hot::param);
+}
+
 int draw::getresult() {
 	return break_result;
 }

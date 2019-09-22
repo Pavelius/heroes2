@@ -31,7 +31,7 @@ enum skill_s : unsigned char {
 };
 enum spell_s : unsigned char {
 	FireBall, FireBlast, LightingBolt, ChainLighting, Teleport,
-	Cure, MassCure, Resurrect, RessurectTrue, Haste, MassHaste, Slow, MassSlow,
+	Cure, MassCure, Ressurrect, RessurectTrue, Haste, MassHaste, Slow, MassSlow,
 	Blind, Bless, MassBless, StoneSkin, SteelSkin, Curse, MassCurse,
 	HolyWord, HolyShout, Antimagic, Dispel, MassDispel, MagicArrow, Berserker,
 	Armagedon, ElementalStorm, MeteorShower, Paralyze, Hypnotize, ColdRay, ColdRing,
@@ -171,11 +171,11 @@ enum object_s : unsigned char {
 	EmpthyObject,
 };
 enum tag_s : unsigned char {
-	Air, Cold, Dragon, Earth, Fire, Lighting, Water, Undead,
+	Cold, Fire, Lighting, Elemental, Undead, Alive, MindInfluence,
 	Friendly, Hostile,
 	Area, LargeArea, Mass, SafeCenter,
 	Damage, Enchantment, Summon,
-	Fly, Twice, Stealth, MeleeArcher, Wide,
+	Fly, Twice, Stealth, MeleeArcher, Wide, AlwaysResponse,
 };
 enum action_s : unsigned char {
 	Wait, Move, PalmFace, AttackAction, FlyAction, Shoot, Damaged, Dead, Killed, Cast,
@@ -247,6 +247,7 @@ class heroi;
 struct pvar;
 struct shapei;
 struct variantcol;
+struct uniti;
 struct variant {
 	variant_s				type;
 	union {
@@ -343,6 +344,29 @@ struct difficulti {
 	costi					resources;
 	int						rating;
 };
+struct monsteri {
+	kind_s					type;
+	unsigned char			level;
+	unsigned char			animtype;
+	unsigned char			attack;
+	unsigned char			defence;
+	unsigned char			damageMin;
+	unsigned char			damageMax;
+	unsigned short			hp;
+	unsigned char			speed;
+	unsigned char			grown;
+	unsigned char			shoots;
+	cflags<tag_s>			tags;
+	const char*				name;
+	const char*				multiname;
+	costi					cost;
+	building_s				building;
+	monster_s				upgrade;
+	unsigned				rating;
+	//
+	constexpr bool			isarcher() const { return shoots != 0; }
+	monster_s				getid() const;
+};
 struct squadi {
 	monster_s				unit;
 	unsigned short			count;
@@ -351,10 +375,12 @@ struct squadi {
 	void					clear();
 	int						get(ability_s v) const;
 	int						get(ability_s v, const heroi* hero) const;
+	const monsteri&			getmonster() const { return bsmeta<monsteri>::elements[unit]; }
 	unsigned				getstrenght() const;
 	monster_s				getupgrade() const;
 	bool					is(tag_s v) const;
-	bool					isarcher() const;
+	bool					isdrainlife() const;
+	bool					isdragon() const;
 	void					information(const heroi* hero) { show(hero, true, false, false); }
 	void					paint(int x, int y, const heroi* hero = 0, bool allow_change = true) const;
 	void					show(const heroi* hero, bool info_mode, bool allow_dismiss, bool allow_upgrade);
@@ -445,7 +471,7 @@ struct skilli {
 	const char*				name;
 };
 struct artifacti {
-	int						effect;
+	int						power;
 	variant					type;
 	int						level;
 	const char*				name;
@@ -453,12 +479,13 @@ struct artifacti {
 	const char*				text;
 };
 class spellbooki {
-	static constexpr unsigned size = sizeof(unsigned);
-	unsigned				data[3];
+	typedef unsigned type;
+	static constexpr unsigned size = sizeof(type)*8;
+	type					data[3];
 public:
-	constexpr bool			is(spell_s v) const { return (data[v / size] & (1 << (v % 32))) != 0; }
-	void					remove(spell_s v) { data[v / size] &= ~(1 << (v % 32)); }
-	void					set(spell_s v) { data[v / size] |= (1 << (v % 32)); }
+	constexpr bool			is(spell_s v) const { return (data[v / size] & (1 << (v % size))) != 0; }
+	void					remove(spell_s v) { data[v / size] &= ~(1 << (v % size)); }
+	void					set(spell_s v) { data[v / size] |= (1 << (v % size)); }
 };
 struct shapei {
 	unsigned char			count;
@@ -559,9 +586,10 @@ public:
 	int						ask(const char* format);
 	int						ask(const char* format, const variantcol* source);
 	bool					battle(moveablei& enemy);
-	void					battlemenu(bool can_escape) const;
+	void					battlemenu(bool can_escape);
 	void					battlestart();
 	bool					buymagicbook();
+	void					castcombatspell();
 	void					clear();
 	void					choose();
 	static const costi		cost;
@@ -572,10 +600,12 @@ public:
 	void					gainmine(const char* text, resource_s mine);
 	playeri*				getplayer() const;
 	int						get(ability_s v) const;
+	int						get(artifact_s v) const;
 	int						get(skill_s v) const { return skills[v]; }
 	unsigned				get(artifact_s* source, unsigned count_maximum);
 	int						getcost(spell_s v) const;
 	unsigned				getcost(short unsigned from, short unsigned to) const;
+	unsigned				getdamage(spell_s id, uniti& enemy) const;
 	direction_s				getdirection() const { return direction; }
 	hero_s					getid() const { return hero_s(this - bsmeta<heroi>::elements); }
 	short unsigned			getmove() const { return index_move; }
@@ -614,7 +644,7 @@ public:
 	void					setup_battle(heroi* defender);
 	void					setvisit(unsigned short index);
 	void					show(bool allow_change = true) const;
-	void					showbook(spell_type_s mode);
+	bool					showbook(spell_type_s mode, spell_s* result);
 };
 class castlei : public namei, public armyi, public positioni {
 	cflags<building_s>		buildings;
@@ -685,29 +715,6 @@ struct spelli {
 	cflags<tag_s>			tags;
 	spell_type_s			type;
 	const char*				description;
-};
-struct monsteri {
-	kind_s					type;
-	unsigned char			level;
-	unsigned char			animtype;
-	unsigned char			attack;
-	unsigned char			defence;
-	unsigned char			damageMin;
-	unsigned char			damageMax;
-	unsigned short			hp;
-	unsigned char			speed;
-	unsigned char			grown;
-	unsigned char			shoots;
-	cflags<tag_s>			tags;
-	const char*				name;
-	const char*				multiname;
-	costi					cost;
-	building_s				building;
-	monster_s				upgrade;
-	unsigned				rating;
-	//
-	constexpr bool			isarcher() const { return shoots != 0; }
-	monster_s				getid() const;
 };
 struct gamei {
 	char					file[32];
@@ -873,26 +880,34 @@ struct uniti : positioni, squadi, battlef {
 	short unsigned			hits;
 	constexpr explicit operator bool() const { return index != Blocked; }
 	void					addspell(spell_s v, unsigned short rounds);
-	int						attack(uniti& enemy);
 	bool					canshoot() const;
 	void					damage(unsigned v);
+	void					enchant(spell_s id, unsigned duration, const heroi* caster);
 	static void				exhausespells();
 	static uniti*			find(short unsigned index);
+	int						get(ability_s v) const;
+	spell_s					getbattlemagic(int chance) const;
+	int						getcount(int hits) const;
+	unsigned				getdamage() const;
+	unsigned				getdamage(const uniti& enemy);
+	static direction_s		getdirection(short unsigned from, short unsigned to);
+	int						gethits() const;
+	int						getkilled(int d) const;
+	int						getresist(spell_s id, int spell_power) const;
+	unsigned				getscore(const uniti& defender) const;
+	unsigned short			getspell(spell_s v) const;
 	constexpr bool			is(battle_s v) const { return battlef::is(v); }
 	bool					is(spell_s v) const { return getspell(v) > 0; }
 	bool					is(tag_s v) const { return squadi::is(v); }
+	bool					isarcher() const { return getmonster().shoots!=0; }
 	static bool				isattacker(const heroi* leader);
+	bool					isattacker() const { return isattacker(leader); }
 	bool					isalive() const { return index!=Blocked && count > 0; }
+	bool					isdamaged() const;
 	constexpr bool			isenemy(const uniti* p) { return p->leader != leader; }
 	bool					iskill(int d) const { return gethits() <= d; }
 	void					melee(uniti& enemy, direction_s d = Up);
 	void					move(short unsigned index);
-	int						get(ability_s v) const;
-	int						getdamage() const;
-	static direction_s		getdirection(short unsigned from, short unsigned to);
-	int						gethits() const;
-	const monsteri&			getmonster() const { return bsmeta<monsteri>::elements[unit]; }
-	unsigned short			getspell(spell_s v) const;
 	void					sethits(int value);
 	void					setspell(spell_s v, unsigned short count);
 	void					setup(squadi& squad, heroi* hero);
@@ -952,6 +967,8 @@ direction_s					to(direction_s f, direction_s d);
 void						wave(short unsigned start, int skill, int ship_master);
 }
 extern battlei				battle;
+template<class T> inline bool ist(T id, tag_s v) { return bsmeta<T>::elements[id].tags.is(v); }
+template<class T> inline int getpower(T id) { return bsmeta<T>::elements[id].power; }
 const char*					getstr(building_s id, kind_s kind);
 DECLENUM(ability);
 DECLENUM(artifact);

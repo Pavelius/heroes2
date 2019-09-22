@@ -205,6 +205,7 @@ void						button(int x, int y, res_s res, eventproc proc, const buttoni& decor, 
 bool						button(int x, int y, res_s res, const buttoni& decor, int key = 0, const char* tips = 0);
 void						buttoncancel();
 void						buttonok();
+void						buttonparam();
 bool						create(const char* title, unsigned milliseconds, bool fullscreen);
 int							dialog(int height, int* xpos = 0);
 buttoni						disable(const buttoni& e, bool v);

@@ -79,20 +79,20 @@ static struct heroin {
 //
 {"Случайные", RandomKind},
 };
-heroi bsmeta<heroi>::elements[CaptainWizard + 1];
+heroi bsmeta<heroi>::elements[RandomHero + 1];
 const char*	skill_level_name[] = {"нет", "Базово", "Продвинуто", "Эксперт"};
 const costi	heroi::cost = {{2500}};
 
 static unsigned level_experience[41] = {0,
 0, 1000, 2000, 3200, 4500, 6000, 7700, 9000, 11000, 13200,
 15500, 18500, 22100, 26420, 31604, 37824, 45288, 54244, 64991, 77887,
-93362, 111932, 134216,160956,193044,231549, 277755,333202, 399738, 479581,
+93362, 111932, 134216, 160956, 193044, 231549, 277755, 333202, 399738, 479581,
 575392, 690365, 828332, 993892, 1192564, 1430970, 1717057, 2060361, 2472325, 2966681
 };
 
 void heroi::initialize() {
-	for(auto i = 0; i <= RandomKind; i++)
-		bsmeta<heroi>::elements[i].clear();
+	for(auto& e : bsmeta<heroi>::elements)
+		e.clear();
 }
 
 void heroi::clear() {
@@ -135,16 +135,16 @@ int heroi::getbonus(ability_s v) const {
 	for(auto e : artifacts) {
 		if(e == NoArtifact)
 			continue;
-		auto i = bsmeta<artifacti>::elements[e].effect;
+		auto i = getpower(e);
 		auto t = bsmeta<artifacti>::elements[e].type;
 		if(t.type == Ability) {
 			if(t.ability == v)
 				r += i;
-			else if(t.ability==SpellPowerKnowledge && (v==SpellPower || v==Knowledge))
+			else if(t.ability == SpellPowerKnowledge && (v == SpellPower || v == Knowledge))
 				r += i;
 			else if(t.ability == AttackDefence && (v == Attack || v == Defence))
 				r += i;
-			else if(t.ability == AllAbilities && (v == Attack || v == Defence || v==SpellPower || v==Knowledge))
+			else if(t.ability == AllAbilities && (v == Attack || v == Defence || v == SpellPower || v == Knowledge))
 				r += i;
 		}
 	}
@@ -194,13 +194,13 @@ int	heroi::getmpmax() const {
 	auto s = get(Logistics);
 	if(s)
 		r = (r * (100 + s * 10)) / 100;
-	s += getbonus(MovePoints)*100;
+	s += getbonus(MovePoints) * 100;
 	return r;
 }
 
 void heroi::add(artifact_s id) {
 	for(auto& e : artifacts) {
-		if(e!=NoArtifact)
+		if(e != NoArtifact)
 			continue;
 		e = id;
 		break;
@@ -229,7 +229,7 @@ unsigned heroi::select(heroi** result, heroi** result_maximum, const playeri* pl
 	auto p = result;
 	for(auto i = FirstHero; i <= LastGameHero; i = (hero_s)(i + 1)) {
 		auto& e = bsmeta<heroi>::elements[i];
-		if(e.getplayer()!=player)
+		if(e.getplayer() != player)
 			continue;
 		if(kind != RandomKind && e.getkind() != kind)
 			continue;
@@ -283,7 +283,7 @@ unsigned heroi::getlearn(variantcol* result, unsigned count) const {
 		auto v = bsmeta<kindi>::elements[kind].getrandomskill(exclude);
 		if(!v)
 			break;
-		*((variant*)(result+n)) = v;
+		*((variant*)(result + n)) = v;
 		result[n].count = skills[v.skill] + 1;
 		exclude.add(v.skill);
 		n++;
@@ -331,7 +331,7 @@ void heroi::addexperience(unsigned count, bool interactive) {
 int	heroi::getskillscount() const {
 	auto n = 0;
 	for(auto i = FirstSkill; i <= LastSkill; i = skill_s(i + 1)) {
-		if(skills[i]>0)
+		if(skills[i] > 0)
 			n++;
 	}
 	return n;
@@ -372,4 +372,86 @@ void heroi::setvisit(unsigned short index) {
 	if(i == Blocked)
 		return;
 	visited[i / 8] |= (1 << (i & 7));
+}
+
+unsigned heroi::getdamage(spell_s id, uniti& enemy) const {
+	auto value = bsmeta<spelli>::elements[id].power * get(SpellPower);
+	auto leader = enemy.leader;
+	switch(enemy.unit) {
+	case IronGolem:
+	case SteelGolem:
+		switch(id) {
+			// 50% damage
+		case ColdRay:
+		case ColdRing:
+		case FireBall:
+		case FireBlast:
+		case LightingBolt:
+		case ChainLighting:
+		case ElementalStorm:
+		case Armagedon:
+			value /= 2;
+			break;
+		}
+		break;
+	case WaterElement:
+		switch(id) {
+			// 200% damage
+		case FireBall:
+		case FireBlast:
+			value *= 2;
+			break;
+		}
+		break;
+	case AirElement:
+		switch(id) {
+			// 200% damage
+		case ElementalStorm:
+		case LightingBolt:
+		case ChainLighting:
+			value *= 2;
+			break;
+		}
+		break;
+	case FireElement:
+		switch(id) {
+			// 200% damage
+		case ColdRay:
+		case ColdRing:
+			value *= 2;
+			break;
+		}
+		break;
+	default: break;
+	}
+
+	// check artifact
+	switch(id) {
+	case ColdRay:
+	case ColdRing:
+		// +50%
+		if(is(EvercoldIcicle))
+			value += value * getpower(EvercoldIcicle) / 100;
+		// -50%
+		if(leader && leader->is(IceCloack))
+			value -= value * getpower(IceCloack) / 100;
+		break;
+	case FireBall:
+	case FireBlast:
+		if(is(EvercoldIcicle))
+			value += value * getpower(EverhotLavaRock) / 100;
+		if(leader && leader->is(FireCloack))
+			value -= value * getpower(IceCloack) / 100;
+		break;
+	case LightingBolt:
+		if(is(LightingRod))
+			value += value * getpower(LightingRod) / 100;
+		if(is(LightingHelm))
+			value -= value * getpower(LightingHelm) / 100;
+		break;
+	case ElementalStorm:
+	case Armagedon:
+		break;
+	}
+	return value;
 }

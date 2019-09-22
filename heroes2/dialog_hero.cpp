@@ -18,7 +18,7 @@ static void dismiss_hero() {
 
 void heroi::open_artifact() {
 	if(current_hero->artifacts[hot::param] == MagicBook)
-		current_hero->showbook(AnySpell);
+		current_hero->showbook(AnySpell, 0);
 }
 
 void heroi::show(bool allow_change) const {

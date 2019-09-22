@@ -334,16 +334,6 @@ void gamei::newgame() {
 		//	return;
 		game.prepare();
 		playeri::prepare(game.difficult);
-		//bsmeta<playeri>::elements[PlayerRed].adventure();
-		auto ph = map::find(6435);
-		auto pd = bsmeta<heroi>::elements + RandomHero;
-		pd->clear();
-		pd->setpos(4640);
-		pd->armyi::clear();
-		pd->add(Skeleton, 30);
-		pd->add(Zombie, 4);
-		ph.hero->add(Sprite, 3);
-		ph.hero->setup_battle(pd);
-		ph.hero->battlestart();
+		bsmeta<playeri>::elements[PlayerRed].adventure();
 	}
 }

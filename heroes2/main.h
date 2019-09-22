@@ -918,8 +918,8 @@ struct uniti : positioni, squadi, battlef {
 	void					setspell(spell_s v, int count);
 	void					setup(squadi& squad, heroi* hero);
 	unsigned				shoot(uniti& enemy);
-	void					show_attack(uniti& enemy, direction_s d, bool destroy_enemy) const;
-	void					show_damage(bool destroy) const;
+	void					show_attack(const uniti& enemy, direction_s d) const;
+	void					show_damage() const;
 	void					show_fly(short unsigned index) const;
 	void					show_move(short unsigned index) const;
 	void					show_shoot(uniti& enemy) const;

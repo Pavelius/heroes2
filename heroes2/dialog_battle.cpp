@@ -30,9 +30,9 @@ static short unsigned	position_wide[2][5] = {{0, 22, 44, 66, 88}, {10, 32, 54, 7
 
 static unsigned getanimationspeed() {
 	switch(battle.speed) {
-	case 1: return 90;
-	case 2: return 50;
-	default: return 180;
+	case 1: return 70;
+	case 2: return 30;
+	default: return 160;
 	}
 }
 
@@ -478,6 +478,11 @@ static void setattack(direction_s d) {
 	}
 }
 
+static void cast_spells() {
+	auto p = (heroi*)hot::param;
+	p->castcombatspell();
+}
+
 static void standart_input() {
 	auto fev = (hot::key == MouseLeft && hot::pressed);
 	int m = current_unit->get(Speed) + 1;
@@ -533,6 +538,9 @@ static void standart_input() {
 				execute(command_move, hilite_index);
 		} else
 			setcursor(CMSECO, 0, {-7, -7});
+	}
+	switch(hot::key) {
+	case Alpha + 'C': execute(cast_spells, (int)current_unit->leader); break;
 	}
 }
 
@@ -654,6 +662,8 @@ uniti* uniti::find(short unsigned index) {
 }
 
 void battleimage::animate(int frames, int speed) {
+	if(start == 0 && animation::count == 0)
+		return;
 	if(!isalive() || iswait())
 		return;
 	if(frames == -1)
@@ -755,18 +765,27 @@ static int get_missile_index(res_s icn, int dx, int dy) {
 }
 
 void uniti::show_shoot(uniti& enemy) const {
+	if(!enemy.isalive() || !isalive())
+		return;
 	auto pa = (battleimage*)this;
 	auto pe = (battleimage*)&enemy;
 	const auto d = getdirection(getpos(), enemy.getpos());
 	pa->set(d);
-	pa->set(Shoot);
-	pa->animate();
 	pa->set(Shoot, pa->getparam(d));
-	pa->animate(pa->animation::count - 2);
+	auto long_animation = (pa->start != 0);
+	if(long_animation) {
+		pa->set(Shoot);
+		pa->animate();
+		pa->set(Shoot, pa->getparam(d));
+		pa->animate(pa->animation::count - 2);
+	} else {
+		pa->set(Shoot);
+		pa->animate(pa->animation::count - 2);
+	}
 	// Выпускание снаряда
 	const int shoot_height = 50;
 	battleimage arrow; arrow.clear();
-	arrow.pos = pa->getlaunch(pa->monster, d);
+	arrow.pos = pa->getbreast();//pa->getlaunch(pa->monster, d);
 	point target = pe->getbreast();
 	arrow.res = pa->getmissile(pa->monster);
 	arrow.frame = get_missile_index(arrow.res, arrow.pos.x - target.x, arrow.pos.y - target.y);
@@ -780,27 +799,20 @@ void uniti::show_shoot(uniti& enemy) const {
 	prepare_drawables();
 }
 
-void uniti::show_attack(uniti& enemy, direction_s d, bool destroy_enemy) const {
+void uniti::show_attack(const uniti& enemy, direction_s d) const {
 	if(!enemy.isalive() || !isalive())
 		return;
 	auto pa = (battleimage*)this;
-	auto pe = (battleimage*)&enemy;
 	pa->set(d);
 	pa->set(AttackAction);
 	pa->animate();
 	pa->set(AttackAction, pa->getparam(d));
 	pa->animate(pa->animation::count - 2);
-	if(destroy_enemy)
-		pe->set(Killed);
-	else
-		pe->set(Damaged);
-	pa->animate();
-	pe->animate();
 }
 
-void uniti::show_damage(bool destroy) const {
+void uniti::show_damage() const {
 	auto pa = (battleimage*)this;
-	if(destroy)
+	if(count<=0)
 		pa->set(Killed);
 	else
 		pa->set(Damaged);
@@ -912,25 +924,25 @@ static int getframe(spell_s id) {
 	case Berserker: return 0x13;
 	case Paralyze: return 0x14;
 	case Blind: return 0x15;
+	case HolyWord: return 0x16;
+	case HolyShout: return 0x17;
+	case MeteorShower: return 0x18;
+	case AnimateDead: return 0x19;
+	case MirrorImage: return 0x1A;
+	case BloodLust: return 0x1B;
+	case DeathRipple: return 0x1C;
+	case DeathWave: return 0x1D;
+	case SteelSkin: return 0x1E;
+	case StoneSkin: return 0x1F;
+	case DragonSlayer: return 0x20;
+	case Earthquake: return 0x21;
+	case DisruptingRay: return 0x22;
+	case ColdRing: return 0x23;
+	case ColdRay: return 0x24;
+	case Hypnotize: return 0x25;
+	case MagicArrow: return 0x26;
 	default: return 0;
 	}
-	//	SP_HOLYWORD = 0x3016,
-	//	SP_HOLYSHOUT = 0x3017,
-	//	SP_METEORSHOWER = 0x3018,
-	//	SP_ANIMATEDEAD = 0x3019,
-	//	SP_MIRRORIMAGE = 0x301A,
-	//	SP_BLOODLUST = 0x301B,
-	//	SP_DEATHRIPPLE = 0x301C,
-	//	SP_DEATHWAVE = 0x301D,
-	//	SP_STEELSKIN = 0x301E,
-	//	SP_STONESKIN = 0x301F,
-	//	SP_DRAGONSLAYER = 0x3020,
-	//	SP_EARTHQUAKE = 0x3021,
-	//	SP_DISRUPTINGRAY = 0x3022,
-	//	SP_COLDRING = 0x3023,
-	//	SP_COLDRAY = 0x3024,
-	//	SP_HYPNOTIZE = 0x3025,
-	//	SP_ARROW = 0x3026
 }
 
 bool heroi::choose(spell_s id, pvar& result) const {
@@ -963,6 +975,10 @@ bool heroi::choose(spell_s id, pvar& result) const {
 }
 
 void heroi::castcombatspell() {
+	if(is(Moved)) {
+		message("Заклинания можно использовать только один раз за ход.");
+		return;
+	}
 	spell_s spell;
 	if(showbook(CombatSpell, &spell)) {
 		pvar target;

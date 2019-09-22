@@ -178,7 +178,7 @@ enum tag_s : unsigned char {
 	Fly, Twice, Stealth, MeleeArcher, Wide, AlwaysResponse,
 };
 enum action_s : unsigned char {
-	Wait, Move, PalmFace, AttackAction, FlyAction, Shoot, Damaged, Dead, Killed, Cast,
+	Wait, Move, PalmFace, AttackAction, FlyAction, Shoot, Damaged, Dead, Killed, Throw, Cast,
 };
 enum map_flag_s : unsigned char {
 	AttackTile, BlockedTile, ActionTile,
@@ -650,6 +650,8 @@ public:
 	void					setvisit(unsigned short index);
 	void					show(bool allow_change = true) const;
 	bool					showbook(spell_type_s mode, spell_s* result);
+	void					show_cast(bool mass) const;
+	void					show_throw(spell_s id) const;
 };
 class castlei : public namei, public armyi, public positioni {
 	cflags<building_s>		buildings;
@@ -920,6 +922,7 @@ struct uniti : positioni, squadi, battlef {
 	unsigned				shoot(uniti& enemy);
 	void					show_attack(const uniti& enemy, direction_s d) const;
 	void					show_damage() const;
+	void					show_effect(variant v) const;
 	void					show_fly(short unsigned index) const;
 	void					show_move(short unsigned index) const;
 	void					show_shoot(uniti& enemy) const;

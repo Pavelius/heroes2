@@ -509,6 +509,8 @@ bool heroi::cast(spell_s id, const pvar& target, bool run) const {
 		if(resist >= 100)
 			return false;
 		if(run) {
+			show_cast(true);
+			target.unit->show_effect(id);
 			target.unit->setspell(id, power);
 			switch(id) {
 			case Bless: target.unit->setspell(Curse, 0); break;

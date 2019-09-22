@@ -79,13 +79,16 @@ struct animation {
 	unsigned char			frame, start, count, wait;
 	constexpr animation() : pos{0, 0}, res(NoRes), wait(0), frame(0), start(0), count(0), flags(0) {}
 	bool					increment();
+	void					freezy(int duration);
 	static int				getanimate(res_s id, int start, int ticket, bool quantity);
 	point					getbreast() const;
 	point					getcenter() const;
+	point					gethead() const;
 	point					getlaunch(monster_s id, direction_s d) const;
 	static res_s			getmissile(monster_s id);
 	static int				getmissiledy(monster_s id, int param);
 	static int				getparam(direction_s d);
+	static res_s			getspell(spell_s id);
 	int						getwidth() const;
 	void					paint(int x, int y, unsigned flags = 0) const;
 	void					set(res_s id, unsigned char frame, point pos = point());
@@ -94,7 +97,8 @@ struct animation {
 struct battleimage : animation, variant, uniti {
 	constexpr explicit operator bool() const { return uniti::operator bool(); }
 	void					animate(point pos, int velocity);
-	void					animate(int frames = -1, int speed = -1);
+	void					animate(int frames = -1);
+	void					animatex();
 	void					clear();
 	int						getbarframe() const;
 	int						getz() const;

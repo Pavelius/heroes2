@@ -173,6 +173,12 @@ point animation::getbreast() const {
 	return pt;
 }
 
+point animation::gethead() const {
+	point pt = pos;
+	pt.y -= 70;
+	return pt;
+}
+
 int animation::getparam(direction_s d) {
 	switch(d) {
 	case Left: case Right: return 2;
@@ -185,4 +191,17 @@ point animation::getlaunch(monster_s id, direction_s d) const {
 	auto pt = getcenter();
 	pt.y += getmissiledy(id, getparam(d));
 	return pt;
+}
+
+void animation::freezy(int duration) {
+	frame = start + count - 1;
+	wait = duration;
+}
+
+res_s animation::getspell(spell_s id) {
+	switch(id) {
+	case Bless: return BLESS;
+	case Curse: return CURSE;
+	default: return NoRes;
+	}
 }

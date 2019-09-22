@@ -300,6 +300,10 @@ void battleimage::set(action_s action, int param) {
 			start = ed.lose[0];
 			animation::count = ed.lose[1];
 			break;
+		case Throw:
+			start = ed.castmass[0];
+			animation::count = ed.castmass[1];
+			break;
 		case Cast:
 			start = ed.cast[0];
 			animation::count = ed.cast[1];

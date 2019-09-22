@@ -661,7 +661,7 @@ uniti* uniti::find(short unsigned index) {
 	return 0;
 }
 
-void battleimage::animate(int frames, int speed) {
+void battleimage::animate(int frames) {
 	if(start == 0 && animation::count == 0)
 		return;
 	if(!isalive() || iswait())
@@ -671,8 +671,24 @@ void battleimage::animate(int frames, int speed) {
 	frames += start;
 	if(frame >= frames)
 		return;
-	if(speed == -1)
-		speed = getanimationspeed();
+	auto speed = getanimationspeed();
+	while(frame < frames) {
+		paint_screen(0);
+		updatescreen();
+		sleep(speed);
+		if(update_drawables(this, false))
+			break;
+	}
+}
+
+void battleimage::animatex() {
+	if(start == 0 && animation::count == 0)
+		return;
+	auto frames = animation::count;
+	frames += start;
+	if(frame >= frames)
+		return;
+	auto speed = getanimationspeed();
 	while(frame < frames) {
 		paint_screen(0);
 		updatescreen();
@@ -802,6 +818,28 @@ void uniti::show_shoot(uniti& enemy) const {
 	arrow.animate(target, 44);
 	// Оставшаяся анимация
 	pa->animate();
+	prepare_drawables();
+}
+
+void heroi::show_cast(bool mass) const {
+	auto pa = (attacker == this) ? &attacker_image : &defender_image;
+	pa->set(mass ? Throw : Cast);
+	pa->animate();
+	pa->freezy(4);
+}
+
+void uniti::show_effect(variant v) const {
+	auto pa = (battleimage*)this;
+	battleimage e; e.clear();
+	switch(v.type) {
+	case Spell:
+		e.animation::set(animation::getspell(v.spell), 0, pa->gethead());
+		e.animation::count = getframecount(e.res);
+		break;
+	}
+	if(e.res!=NoRes)
+		drawables.add(&e);
+	e.animatex();
 	prepare_drawables();
 }
 

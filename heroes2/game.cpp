@@ -439,8 +439,7 @@ void gamei::update_monsters() {
 	moveablei* source[1024];
 	auto pb = source;
 	auto pe = pb + sizeof(source)/ sizeof(source[0]);
-	for(unsigned i = 0; i<bsmeta<moveablei>::count; i++) {
-		auto& e = bsmeta<moveablei>::elements[i];
+	for(auto& e : bsmeta<moveablei>()) {
 		if(!e)
 			continue;
 		if(e.gettype() == MonsterObject) {

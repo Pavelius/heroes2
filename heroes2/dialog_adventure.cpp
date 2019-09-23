@@ -240,8 +240,7 @@ struct drawable : point, pvar {
 		rect rc = {rcmap.x1 - 32, rcmap.y1 - 32, rcmap.x2 + 64, rcmap.y2 + 64};
 		auto p = source;
 		auto pe = p + count;
-		for(unsigned i = 0; i < bsmeta<moveablei>::count; i++) {
-			auto& e = bsmeta<moveablei>::elements[i];
+		for(auto& e : bsmeta<moveablei>()) {
 			*(static_cast<pvar*>(p)) = &e;
 			p->x = map::i2x(e.index) * 32 - camera.x + rcmap.x1;
 			p->y = map::i2y(e.index) * 32 - camera.y + rcmap.y1;

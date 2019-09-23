@@ -247,8 +247,7 @@ void playeri::hire(heroi* hero) {
 int	playeri::getmines(resource_s id) const {
 	auto result = 0;
 	auto player = getid();
-	for(unsigned i = 0; i < bsmeta<moveablei>::count; i++) {
-		auto& e = bsmeta<moveablei>::elements[i];
+	for(auto& e : bsmeta<moveablei>()) {
 		if(!e)
 			continue;
 		if(!e.is(player))
@@ -299,8 +298,7 @@ costi playeri::getprofit() const {
 	}
 	// Прибыль с шахт
 	auto player_id = getid();
-	for(unsigned i = 0; i < bsmeta<moveablei>::count; i++) {
-		auto& e = bsmeta<moveablei>::elements[i];
+	for(auto& e : bsmeta<moveablei>()) {
 		if(!e)
 			continue;
 		if(!e.is(player_id))

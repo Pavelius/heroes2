@@ -201,18 +201,17 @@ player_s moveablei::getplayer() const {
 }
 
 moveablei* moveablei::find(short unsigned index) {
-	for(unsigned i = 0; i < bsmeta<moveablei>::count; i++) {
-		if(bsmeta<moveablei>::elements[i].index == index)
-			return &bsmeta<moveablei>::elements[i];
+	for(auto& e : bsmeta<moveablei>()) {
+		if(e.index == index)
+			return &e;
 	}
 	return 0;
 }
 
 moveablei* moveablei::find(short unsigned index, object_s type) {
-	for(unsigned i = 0; i < bsmeta<moveablei>::count; i++) {
-		if(bsmeta<moveablei>::elements[i].index == index
-			&& bsmeta<moveablei>::elements[i].type==type)
-			return &bsmeta<moveablei>::elements[i];
+	for(auto& e : bsmeta<moveablei>()) {
+		if(e.index == index && e.type==type)
+			return &e;
 	}
 	return 0;
 }

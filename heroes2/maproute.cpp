@@ -180,8 +180,7 @@ static void update_map_flags(bool ship_master) {
 			map::set(index, BlockedTile);
 		}
 		// Block overland part
-		for(unsigned i = 0; i < bsmeta<moveablei>::count; i++) {
-			auto& e = bsmeta<moveablei>::elements[i];
+		for(auto& e : bsmeta<moveablei>()) {
 			if(!e)
 				continue;
 			switch(e.gettype()) {

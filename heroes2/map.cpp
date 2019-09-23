@@ -150,8 +150,7 @@ pvar map::find(short unsigned index, bool rich_find) {
 	}
 	// Moveables
 	moveablei* pf = 0;
-	for(unsigned i = 0; i <= bsmeta<moveablei>::count; i++) {
-		auto& e = bsmeta<moveablei>::elements[i];
+	for(auto& e : bsmeta<moveablei>()) {
 		if(e.index == index)
 			pf = &e;
 		else if(rich_find) {

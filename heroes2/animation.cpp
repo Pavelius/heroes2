@@ -38,7 +38,7 @@ void animation::update() {
 		frame = start;
 }
 
-void animation::paint(int x, int y, unsigned flags) const {
+void animation::paint(int x, int y) const {
 	image(x + pos.x, y + pos.y, res, frame, flags);
 }
 

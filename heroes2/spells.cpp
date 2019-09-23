@@ -69,27 +69,3 @@ spelli bsmeta<spelli>::elements[] = {{"Огненный шар", 9, 3, 8, 1, {Hostile, Area
 {"Стражи воды", 15, 4, 55, 4, {Cold}, AdventureSpell, "Устанавливает стражу и водяных элементалей для охраны шахты."},
 {"Окаменение", 0, 0, 0, 0, {Hostile}, AdventureSpell, "Stone spell from Medusa."},
 };
-
-//int game::getframe(int rec) {
-//	if(rec >= FirstSpell && rec <= LastSpell) {
-//		switch(rec) {
-//		case SpellBloodLust: return 9;
-//		case SpellBless: return 3;
-//		case SpellHaste: return 0;
-//		case SpellShield: return 10;
-//		case SpellStoneSkin: return 13;
-//		case SpellDragonSlayer: return 8;
-//		case SpellSteelSkin: return 14;
-//		case SpellAntimagic: return 12;
-//		case SpellCurse: return 4;
-//		case SpellSlow: return 1;
-//		case SpellBerserker: return 5;
-//		case SpellHypnotize: return 7;
-//		case SpellBlind: return 2;
-//		case SpellParalyze: return 6;
-//		case SpellStone: return 11;
-//		default: return 100;
-//		}
-//	}
-//	return 0;
-//}

@@ -73,7 +73,10 @@ template<typename T> struct bsmeta {
 	static T				elements[];
 	static unsigned			count;
 	static const unsigned	count_maximum;
+	//
 	static T*				add() { return (count >= count_maximum) ? 0 : &elements[count++]; }
+	static T*				begin() { return elements; }
+	static T*				end() { return elements + count; }
 };
 template<typename T> const char* getstr(const T v) { return bsmeta<T>::elements[v].name; }
 #define DECLENUM(e) template<> struct bsmeta<e##_s> : bsmeta<e##i> {}

@@ -58,7 +58,7 @@ static void main_menu() {
 		button(0, 0, BTNSHNGL, hightscore::show, {9, 10, 11});
 		button(0, 0, BTNSHNGL, test_battle, {13, 14, 15});
 		button(0, 0, BTNSHNGL, buttoncancel, {17, 18, 19});
-		//latern.painting({0, 0});
+		latern.paint(0, 0);
 		domodal();
 		if(hot::key == InputTimer)
 			latern.update();

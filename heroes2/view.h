@@ -90,7 +90,7 @@ struct animation {
 	static int				getparam(direction_s d);
 	static res_s			getspell(spell_s id);
 	int						getwidth() const;
-	void					paint(int x, int y, unsigned flags = 0) const;
+	void					paint(int x, int y) const;
 	void					set(res_s id, unsigned char frame, point pos = point());
 	void					update();
 };

@@ -210,6 +210,7 @@ void playeri::sethire(int index) {
 }
 
 void playeri::prepare(difficult_s difficult) {
+	generator gen;
 	// ¬ зависимости от сложности создадим начальные услови€
 	auto difficult_computer = bsmeta<difficulti>::elements[difficult].opposition;
 	for(auto& e : bsmeta<playeri>::elements) {
@@ -223,8 +224,7 @@ void playeri::prepare(difficult_s difficult) {
 		}
 	}
 	// ѕервоначальный прирост
-	for(unsigned i = 0; i < bsmeta<castlei>::count; i++) {
-		auto& e = bsmeta<castlei>::elements[i];
+	for(auto& e : bsmeta<castlei>()) {
 		if(!e)
 			continue;
 		e.growth();

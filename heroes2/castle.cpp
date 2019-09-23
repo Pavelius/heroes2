@@ -308,7 +308,7 @@ const costi& castlei::getcost(building_s v, kind_s k) {
 	}
 }
 
-cflags<building_s> castlei::getprereqisit(building_s v, kind_s k) {
+buildingf castlei::getprereqisit(building_s v, kind_s k) {
 	switch(v) {
 	case Moat:
 	case Captain:
@@ -616,3 +616,11 @@ void castlei::information(building_s v, kind_s k) {
 void castlei::refresh() {
 	remove(Used);
 }
+
+void castlei::genspells(generator& gen) {
+	static int count_by_level[5] = {3, 3, 2, 2, 1};
+	for(auto level = 1; level <= 5; level++) {
+		for(auto i = 0; i<count_by_level[level]; i++)
+			set(gen.spell(level));
+	}
+} 

@@ -19,7 +19,7 @@ static void statelack(const costi& c1, const costi& c2) {
 	status(temp);
 }
 
-static void statereq(castlei& castle, cflags<building_s>& req) {
+static void statereq(castlei& castle, buildingf& req) {
 	char temp[260]; stringbuilder sb(temp);
 	auto kind = castle.getkind();
 	for(auto i = FirstBuilding; i <= LastBuilding; i = (building_s)(i + 1)) {
@@ -36,7 +36,7 @@ static void statereq(castlei& castle, cflags<building_s>& req) {
 	status(temp);
 }
 
-static bool isallow(castlei& castle, cflags<building_s>& req) {
+static bool isallow(castlei& castle, buildingf& req) {
 	auto kind = castle.getkind();
 	auto errors = 0;
 	for(auto i = FirstBuilding; i <= LastBuilding; i = (building_s)(i + 1)) {

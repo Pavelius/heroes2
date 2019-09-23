@@ -243,6 +243,7 @@ enum battle_s : unsigned char {
 typedef cflags<player_s, unsigned char> playerf;
 typedef cflags<object_flag_s, unsigned char> objectf;
 typedef cflags<battle_s, unsigned char> battlef;
+typedef cflags<building_s, unsigned char> buildingf;
 class heroi;
 struct pvar;
 struct shapei;
@@ -653,9 +654,7 @@ public:
 	void					show_cast(bool mass) const;
 	void					show_throw(spell_s id) const;
 };
-class castlei : public namei, public armyi, public positioni {
-	cflags<building_s>		buildings;
-	spellbooki				mageguild;
+class castlei : public namei, public armyi, public positioni, spellbooki, buildingf {
 	kind_s					kind;
 	player_s				player;
 	short unsigned			population[6];
@@ -671,6 +670,7 @@ public:
 	bool					build(building_s building, bool confirm);
 	void					clear();
 	static castlei*			find(const playeri* player, castlei* first = 0);
+	void					genspells(generator& gen);
 	static building_s		getbase(building_s v);
 	static const costi&		getcost(building_s v, kind_s k);
 	static const char*		getdescription(building_s v, kind_s k);
@@ -681,7 +681,7 @@ public:
 	kind_s					getkind() const { return kind; }
 	static monster_s		getmonster(building_s building, kind_s kind);
 	playeri*				getplayer() const { return bsmeta<playeri>::elements + player; }
-	static cflags<building_s> getprereqisit(building_s v, kind_s k);
+	static buildingf		getprereqisit(building_s v, kind_s k);
 	static int				getstatueincome() { return 250; }
 	static int				gettavernmorale() { return 1; }
 	static int				getwellgrow() { return 2; }
@@ -689,10 +689,10 @@ public:
 	static building_s		getupgrade(building_s v);
 	static building_s		getupgrade(building_s v, kind_s k);
 	static void				initialize();
-	void					input(const playeri* player) const;
-	constexpr int			is(building_s v) const { return buildings.is(v); }
+	constexpr int			is(building_s v) const { return buildingf::is(v); }
 	bool					is(monster_s v) const { return armyi::is(v); }
 	bool					is(object_flag_s v) const { return flags.is(v); }
+	constexpr bool			is(spell_s v) const { return spellbooki::is(v); }
 	bool					isallow(monster_s v) const;
 	bool					iscoastal() const;
 	static bool				isdwelling(building_s v) { return (v >= Dwelving1 && v <= Dwelving6) || (v >= Dwelving1u && v <= Dwelving6u2); }
@@ -700,17 +700,19 @@ public:
 	void					paint() const;
 	static void				paint(int x, int y, landscape_s tile, kind_s race, bool castle, bool shadow);
 	void					random(bool castle);
+	void					remove(spell_s v) { spellbooki::remove(v); }
+	void					remove(building_s v) { buildingf::remove(v); }
+	void					remove(object_flag_s v) { flags.remove(v); }
 	void					recruit(building_s building);
 	void					refresh();
 	void					set(object_flag_s v) { flags.add(v); }
 	void					set(const playeri* v) { player = (v ? v->getid() : RandomPlayer); }
 	void					set(player_s v) { player = v; }
-	void					set(building_s v) { buildings.add(v); }
+	void					set(building_s v) { buildingf::add(v); }
 	void					set(kind_s v) { kind = v; }
+	void					set(spell_s v) { spellbooki::set(v); }
 	void					show();
 	void					well();
-	void					remove(building_s v) { buildings.remove(v); }
-	void					remove(object_flag_s v) { flags.remove(v); }
 	void					growth();
 };
 struct spelli {

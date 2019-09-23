@@ -48,7 +48,7 @@ spelli bsmeta<spelli>::elements[] = {{"Огненный шар", 9, 3, 8, 1, {Hostile, Area
 {"Вызов элементаля воздуха", 30, 5, 57, 3, {Friendly, Summon, Lighting}, CombatSpell, "Summons Air Elementals to fight for your army."},
 {"Вызов элементаля огня", 30, 5, 58, 3, {Friendly, Summon, Fire}, CombatSpell, "Summons Fire Elementals to fight for your army."},
 {"Вызов элементаля воды", 30, 5, 59, 3, {Friendly, Summon, Cold}, CombatSpell, "Summons Water Elementals to fight for your army."},
-{"Землятресение", 15, 4, 33, 0, {Hostile, Mass}, CombatSpell, "Damages castle walls."},
+{"Землятресение", 15, 4, 33, 0, {Hostile, Mass}, CombatSpell, "Наносит повреждения стенам замка."},
 // Adventure spells
 {"Показать шахты", 1, 1, 39, 0, {}, AdventureSpell, "Causes all mines across the land to become visible."},
 {"Показать ресурсы", 1, 2, 40, 0, {}, AdventureSpell, "Causes all res::tokens across the land to become visible."},

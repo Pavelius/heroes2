@@ -460,10 +460,11 @@ void gamei::update_monsters() {
 }
 
 void gamei::update_castle_spells() {
-	for(unsigned i = 0; i < bsmeta<castlei>::count; i++) {
-		auto& e = bsmeta<castlei>::elements[i];
+	generator gen;
+	for(auto& e : bsmeta<castlei>()) {
 		if(!e)
 			continue;
+		e.genspells(gen);
 	}
 }
 

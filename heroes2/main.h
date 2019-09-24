@@ -237,7 +237,7 @@ enum object_use_s : unsigned char {
 	LearnUse, SpecialUse,
 };
 enum battle_s : unsigned char {
-	Moved, CounterAttacked, TotalDefence,
+	Moved, CounterAttacked, MoraleBoosted, TotalDefence,
 };
 typedef cflags<player_s, unsigned char> playerf;
 typedef cflags<object_flag_s, unsigned char> objectf;
@@ -888,6 +888,7 @@ struct uniti : positioni, squadi, battlef {
 	short unsigned			shoots;
 	short unsigned			hits;
 	constexpr explicit operator bool() const { return index != Blocked; }
+	void					attack(uniti& enemy, direction_s dir);
 	bool					canshoot() const;
 	void					damage(unsigned v);
 	void					dispell();
@@ -923,10 +924,12 @@ struct uniti : positioni, squadi, battlef {
 	unsigned				shoot(uniti& enemy);
 	void					show_attack(const uniti& enemy, direction_s d) const;
 	void					show_damage() const;
-	void					show_effect(variant v) const;
+	void					show_effect(spell_s v) const;
 	void					show_fly(short unsigned index) const;
+	void					show_morale(bool good) const;
 	void					show_move(short unsigned index) const;
 	void					show_shoot(uniti& enemy) const;
+	int						testmorale() const;
 	static short unsigned	to(short unsigned i, direction_s d);
 	static direction_s		to(direction_s d, direction_s d1);
 	void					refresh();

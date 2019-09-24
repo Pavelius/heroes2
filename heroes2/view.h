@@ -98,7 +98,6 @@ struct battleimage : animation, variant, uniti {
 	constexpr explicit operator bool() const { return uniti::operator bool(); }
 	void					animate(point pos, int velocity);
 	void					animate(int frames = -1);
-	void					animatex();
 	void					clear();
 	int						getbarframe() const;
 	int						getz() const;

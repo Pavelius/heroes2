@@ -35,8 +35,6 @@ int	squadi::get(ability_s v, const heroi* hero) const {
 		if(n > IrishLuck)
 			n = IrishLuck;
 		break;
-	default:
-		break;
 	}
 	return n;
 }

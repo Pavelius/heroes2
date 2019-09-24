@@ -233,25 +233,27 @@ void uniti::move(short unsigned index) {
 	setpos(index);
 }
 
-void uniti::melee(uniti& enemy, direction_s dir) {
+void uniti::attack(uniti& enemy, direction_s dir) {
 	auto d = getdamage(enemy);
-	if(dir == Up)
-		dir = getdirection(getpos(), enemy.getpos());
 	show_attack(enemy, to(dir, Down));
 	enemy.damage(d);
 	enemy.show_damage();
-	if(!is(Stealth) && !is(CounterAttacked)) {
-		d = enemy.getdamage(*this);
-		enemy.show_attack(*this, dir);
-		damage(d);
-		show_damage();
+}
+
+void uniti::melee(uniti& enemy, direction_s dir) {
+	if(dir == Up)
+		dir = getdirection(getpos(), enemy.getpos());
+	attack(enemy, dir);
+	if(!is(Stealth) && !is(CounterAttacked) && enemy.isalive()) {
+		enemy.attack(*this, to(dir, Down));
 		add(CounterAttacked);
 	}
-	if(is(Twice) && !isarcher()) {
-		d = getdamage(enemy);
-		show_attack(enemy, to(dir, Down));
-		enemy.damage(d);
-		enemy.show_damage();
+	if(is(Twice) && isalive() && !isarcher())
+		attack(enemy, dir);
+	if(isalive() && enemy.isalive() && !is(MoraleBoosted) && testmorale() > 0) {
+		add(MoraleBoosted);
+		show_morale(true);
+		melee(enemy, dir);
 	}
 }
 
@@ -475,11 +477,21 @@ spell_s uniti::getbattlemagic(int chance) const {
 }
 
 void uniti::dispell() {
-	for(unsigned i = 0; i < bsmeta<enchantmenti>::count; i++) {
-		auto& e = bsmeta<enchantmenti>::elements[i];
+	for(auto& e : bsmeta<enchantmenti>()) {
 		if(!e)
 			continue;
 		if(e.object == this)
 			e.count = 0;
 	}
+}
+
+int	uniti::testmorale() const {
+	auto m = get(MoraleStat) - 3;
+	if(m==0)
+		return 0;
+	auto r = rand() % 10;
+	if(m > 0)
+		return (r < m) ? 1 : 0;
+	else
+		return (r < -m) ? -1 : 0;
 }

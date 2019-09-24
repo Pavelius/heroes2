@@ -662,29 +662,12 @@ uniti* uniti::find(short unsigned index) {
 }
 
 void battleimage::animate(int frames) {
-	if(start == 0 && animation::count == 0)
+	if(iswait())
 		return;
-	if(!isalive() || iswait())
+	if(start == 0 && animation::count == 0)
 		return;
 	if(frames == -1)
 		frames = animation::count;
-	frames += start;
-	if(frame >= frames)
-		return;
-	auto speed = getanimationspeed();
-	while(frame < frames) {
-		paint_screen(0);
-		updatescreen();
-		sleep(speed);
-		if(update_drawables(this, false))
-			break;
-	}
-}
-
-void battleimage::animatex() {
-	if(start == 0 && animation::count == 0)
-		return;
-	auto frames = animation::count;
 	frames += start;
 	if(frame >= frames)
 		return;
@@ -828,18 +811,30 @@ void heroi::show_cast(bool mass) const {
 	pa->freezy(4);
 }
 
-void uniti::show_effect(variant v) const {
+void uniti::show_morale(bool good) const {
 	auto pa = (battleimage*)this;
 	battleimage e; e.clear();
-	switch(v.type) {
-	case Spell:
-		e.animation::set(animation::getspell(v.spell), 0, pa->gethead());
+	e.animation::set(MORALEG, 0, pa->pos);
+	e.pos.y -= 32;
+	e.animation::count = getframecount(e.res);
+	drawables.add(&e);
+	e.animate();
+	prepare_drawables();
+}
+
+void uniti::show_effect(spell_s v) const {
+	auto pa = (battleimage*)this;
+	battleimage e; e.clear();
+	switch(v) {
+	case Bless:
+	case Curse:
+		e.animation::set(animation::getspell(v), 0, pa->gethead());
 		e.animation::count = getframecount(e.res);
 		break;
 	}
-	if(e.res!=NoRes)
+	if(e.res != NoRes)
 		drawables.add(&e);
-	e.animatex();
+	e.animate();
 	prepare_drawables();
 }
 
@@ -856,7 +851,7 @@ void uniti::show_attack(const uniti& enemy, direction_s d) const {
 
 void uniti::show_damage() const {
 	auto pa = (battleimage*)this;
-	if(count<=0)
+	if(count <= 0)
 		pa->set(Killed);
 	else
 		pa->set(Damaged);

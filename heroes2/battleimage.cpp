@@ -341,10 +341,13 @@ bool battleimage::iskilled() const {
 }
 
 bool battleimage::iswait() const {
-	if(type != Monster)
+	switch(type) {
+	case Monster:
+		return frame >= monsters[unit].idle[0]
+			&& frame < monsters[unit].idle[0] + monsters[unit].idle[1];
+	default:
 		return false;
-	return frame >= monsters[unit].idle[0]
-		&& frame < monsters[unit].idle[0] + monsters[unit].idle[1];
+	}
 }
 
 bool battleimage::ismoved() const {

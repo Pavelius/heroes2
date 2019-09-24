@@ -34,15 +34,15 @@ template<typename T, unsigned N> struct adat {
 	static constexpr unsigned maximum = N;
 	unsigned				count;
 	T						data[N];
-	constexpr adat() :count(0), data() {}
+	constexpr adat() : count(0), data() {}
 	constexpr T& operator[](unsigned index) { return data[index]; }
 	constexpr const T& operator[](unsigned index) const { return data[index]; }
-	explicit operator bool() const { return count != 0; }
+	constexpr explicit operator bool() const { return count != 0; }
 	T*						add() { return (count < N) ? (data + (count++)) : 0; }
-	void					add(const T& e) { if(count<N) data[count++] = e; }
+	void					add(const T& e) { if(count < N) data[count++] = e; }
 	constexpr T*			begin() { return data; }
 	constexpr const T*		begin() const { return data; }
-	constexpr bool			cangrow() const { return ; }
+	constexpr bool			cangrow() const { return; }
 	void					clear() { count = 0; }
 	constexpr const T*		end() const { return data + count; }
 	int						getcount() const { return count; }
@@ -53,12 +53,12 @@ template<typename T, unsigned N> struct adat {
 template<typename T> struct aref {
 	unsigned				count;
 	T*						data;
-	constexpr aref() :count(0), data(0) {}
+	constexpr aref() : count(0), data(0) {}
 	constexpr aref(T& data) : data(&data), count(1) {}
 	template<unsigned N> constexpr aref(T(&data)[N]) : data(data), count(N) {}
 	constexpr T& operator[](unsigned index) { return data[index]; }
 	constexpr const T& operator[](unsigned index) const { return data[index]; }
-	explicit operator bool() const { return count != 0; }
+	constexpr explicit operator bool() const { return count != 0; }
 	constexpr T*			begin() { return data; }
 	constexpr const T*		begin() const { return data; }
 	constexpr const T*		end() const { return data + count; }
@@ -69,6 +69,7 @@ template<typename T> struct aref {
 };
 // Common access data types
 template<typename T> struct bsmeta {
+	static constexpr const unsigned size = sizeof(T);
 	typedef T				data_type;
 	static T				elements[];
 	static unsigned			count;
@@ -83,6 +84,8 @@ template<typename T> const char* getstr(const T v) { return bsmeta<T>::elements[
 #define DECLBASE(t, n) t bsmeta<t>::elements[n]; unsigned bsmeta<t>::count;\
 const unsigned bsmeta<t>::count_maximum = sizeof(bsmeta<t>::elements) / sizeof(bsmeta<t>::elements[0])
 #define SH(v) (1<<v)
-#define assert_enum(e, last) static_assert(sizeof(bsmeta<e##i>::elements) / sizeof(bsmeta<e##i>::elements[0]) == last + 1, "Invalid count of " #e " elements");
+#define assert_enum(e, last) static_assert(sizeof(bsmeta<e##i>::elements) / sizeof(bsmeta<e##i>::elements[0]) == last + 1, "Invalid count of " #e " elements");\
+unsigned bsmeta<e##i>::count = sizeof(bsmeta<e##i>::elements) / sizeof(bsmeta<e##i>::elements[0]);\
+const unsigned bsmeta<e##i>::count_maximum = sizeof(bsmeta<e##i>::elements) / sizeof(bsmeta<e##i>::elements[0]);
 #define maptbl(t,i) t[(i>(sizeof(t)/sizeof(t[0])-1)) ? sizeof(t)/sizeof(t[0])-1: i]
 #define zendof(e) (e+sizeof(e)/sizeof(e[0]))

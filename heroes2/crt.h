@@ -10,6 +10,7 @@ bool								saveb(const char* url, const void* p, unsigned size);
 const char*							szdup(const char* text);
 char*								szprint(char* result, const char* result_maximum, const char* format, ...);
 char*								szprintv(char* result, const char* result_maximum, const char* format, const char* format_param);
+template<unsigned N> inline char*	zprint(char(&result)[N], const char* format, ...) { return szprintv(result, result + N - 1, format, (const char*)&format + sizeof(format)); }
 // Inline strings functions
 template<class T> inline void		zcpy(T* p1, const T* p2) { while(*p2) *p1++ = *p2++; *p1 = 0; }
 template<class T> inline void		zcpy(T* p1, const T* p2, int max_count) { while(*p2 && max_count-- > 0) *p1++ = *p2++; *p1 = 0; }
@@ -17,7 +18,6 @@ template<class T> inline T*			zend(T* p) { while(*p) p++; return p; }
 template<class T> inline void		zcat(T* p1, const T e) { p1 = zend(p1); p1[0] = e; p1[1] = 0; }
 template<class T> inline void		zcat(T* p1, const T* p2) { zcpy(zend(p1), p2); }
 template<class T> inline int		zlen(T* p) { return zend(p) - p; }
-template<unsigned N> inline char*	zprint(char(&result)[N], const char* format, ...) { return szprintv(result, result + N - 1, format, (const char*)&format + sizeof(format)); }
 //
 extern "C" void						abort();
 extern "C" int						atexit(void(*func)(void));

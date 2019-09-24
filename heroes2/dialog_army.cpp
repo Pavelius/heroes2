@@ -132,55 +132,48 @@ void armyi::paint(int x, int y, const heroi* hero, bool allow_change, bool clean
 		army_input_update();
 }
 
-static int field(int x, int y, const char* name, const char* v1) {
-	char temp[260]; zprint(temp, "%1:", name);
-	text(x - textw(temp), y, temp);
-	zprint(temp, "%1", v1);
-	text(x + ox, y, temp);
-	return oy;
+static void field(string& str, const char* name, const char* v1) {
+	str.addn("%1: %2", name, v1);
 }
 
-static int field(int x, int y, const char* name, int v1, int v2) {
-	char temp[260]; zprint(temp, "%1:", name);
-	text(x - textw(temp), y, temp);
+static void field(string& str, const char* name, int v1, int v2) {
+	str.addn("%1:", name, v1);
 	if(v1==v2)
-		zprint(temp, "%1i", v1);
+		str.adds("%1i", v1);
 	else
-		zprint(temp, "%2i (%1i)", v1, v2);
-	text(x + ox, y, temp);
-	return oy;
+		str.adds("%2i (%1i)", v1, v2);
 }
 
-static int fiedm(int x, int y, const char* name, int v1, int v2) {
-	if(v1 == v2)
-		return field(x, y, name, v1, v1);
-	char temp[260]; zprint(temp, "%1:", name);
-	text(x - textw(temp), y, temp);
-	zprint(temp, "%1i-%2i", v1, v2);
-	text(x + ox, y, temp);
-	return oy;
-}
+//static int fiedm(int x, int y, const char* name, int v1, int v2) {
+//	if(v1 == v2)
+//		return field(x, y, name, v1, v1);
+//	char temp[260]; zprint(temp, "%1:", name);
+//	text(x - textw(temp), y, temp);
+//	zprint(temp, "%1i-%2i", v1, v2);
+//	text(x + ox, y, temp);
+//	return oy;
+//}
 
 static int status(int x, int y, const squadi* squad, const heroi* hero) {
-	auto y1 = y;
+	string str;
 	// Главные статусы
-	y += field(x, y, getstr(Attack), squad->get(Attack), squad->get(Attack, hero));
-	y += field(x, y, getstr(Defence), squad->get(Defence), squad->get(Defence, hero));
+	field(str, getstr(Attack), squad->get(Attack), squad->get(Attack, hero));
+	field(str, getstr(Defence), squad->get(Defence), squad->get(Defence, hero));
 	// shoots
 	//if(bsget(rec, Shoots))
 	//	y += field(x, y, Shoots, rec, side, szt("Shoots Left", "Выстрелов"));
 	// damage
-	y += fiedm(x, y, "Урон", squad->get(DamageMin), squad->get(DamageMax));
+	//y += fiedm(x, y, "Урон", squad->get(DamageMin), squad->get(DamageMax));
 	// hits
-	y += field(x, y, "Жизнь", squad->get(HitPointsMax), squad->get(HitPointsMax, hero));
+	field(str, "Жизнь", squad->get(HitPointsMax), squad->get(HitPointsMax, hero));
 	//y += field(x, y, HitPoints, rec, side, szt("Hits Left", "Жизнь ост."));
 	// speed
-	y += field(x, y, "Скорость", getstr((speed_s)squad->get(Speed, hero)));
+	field(str, "Скорость", getstr((speed_s)squad->get(Speed, hero)));
 	if(hero) {
-		y += field(x, y, "Мораль", getstr((morale_s)squad->get(MoraleStat, hero)));
-		y += field(x, y, "Удача", getstr((luck_s)squad->get(LuckStat, hero)));
+		field(str, "Мораль", getstr((morale_s)squad->get(MoraleStat, hero)));
+		field(str, "Удача", getstr((luck_s)squad->get(LuckStat, hero)));
 	}
-	return y - y1;
+	return textf(x, y, 200, str);
 }
 
 static void effects(int x, int y, const squadi* p) {

@@ -76,7 +76,7 @@ int main() {
 	draw::initialize();
 	drawobji::initialize();
 	before_open();
-	return 0;
+	//return 0;
 	if(!draw::create("test", 190, false))
 		return -1;
 	srand(21837);

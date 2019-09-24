@@ -1,14 +1,15 @@
 #include "main.h"
 
 int	squadi::get(ability_s v) const {
+	auto& e = getmonster();
 	switch(v) {
-	case Attack: return bsmeta<monsteri>::elements[unit].attack;
-	case Defence: return bsmeta<monsteri>::elements[unit].defence;
-	case DamageMax: return bsmeta<monsteri>::elements[unit].damageMax;
-	case DamageMin: return bsmeta<monsteri>::elements[unit].damageMin;
-	case HitPoints: return bsmeta<monsteri>::elements[unit].hp;
-	case HitPointsMax: return bsmeta<monsteri>::elements[unit].hp;
-	case Speed: return bsmeta<monsteri>::elements[unit].speed;
+	case Attack: return e.attack;
+	case Defence: return e.defence;
+	case DamageMax: return e.damageMax;
+	case DamageMin: return e.damageMin;
+	case HitPoints: return e.hp;
+	case Shoots: return e.shoots;
+	case Speed: return e.speed;
 	case MoraleStat: return 3;
 	case LuckStat: return 3;
 	default: return 0;

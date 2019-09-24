@@ -75,6 +75,7 @@ void uniti::refresh() {
 int	uniti::get(ability_s v) const {
 	switch(v) {
 	case Shoots: return shoots;
+	case HitPoints: return hits;
 	default: return squadi::get(v, leader); break;
 	}
 }
@@ -220,6 +221,7 @@ unsigned uniti::shoot(uniti& enemy) {
 		enemy.damage(d);
 		enemy.show_damage();
 	}
+	shoots--;
 	return d;
 }
 

@@ -136,77 +136,88 @@ static void field(string& str, const char* name, const char* v1) {
 	str.addn("%1: %2", name, v1);
 }
 
-static void field(string& str, const char* name, int v1, int v2) {
-	str.addn("%1:", name, v1);
-	if(v1==v2)
-		str.adds("%1i", v1);
-	else
-		str.adds("%2i (%1i)", v1, v2);
+static void field(string& str, const char* name, int v1) {
+	str.addn("%1: %2i", name, v1);
 }
 
-//static int fiedm(int x, int y, const char* name, int v1, int v2) {
-//	if(v1 == v2)
-//		return field(x, y, name, v1, v1);
-//	char temp[260]; zprint(temp, "%1:", name);
-//	text(x - textw(temp), y, temp);
-//	zprint(temp, "%1i-%2i", v1, v2);
-//	text(x + ox, y, temp);
-//	return oy;
-//}
+static void field(string& str, const char* name, int v1, int v2, const char* format = "%1: %3i (%2i)") {
+	if(v1 == v2)
+		field(str, name, v1);
+	else
+		str.addn(format, name, v1, v2);
+}
 
-static int status(int x, int y, const squadi* squad, const heroi* hero) {
+static void field(string& str, const char* name, ability_s e, const squadi* ps, const heroi* ph, const uniti* pu, const char* format = "%1: %3i (%2i)") {
+	auto v1 = ps->get(e);
+	if(v1<=0)
+		return;
+	auto v2 = v1;
+	if(pu)
+		v2 = pu->get(e);
+	else if(ph)
+		v2 = ps->get(e, ph);
+	field(str, name, v1, v2, format);
+}
+
+static int status(int x, int y, int width, const squadi* squad, const heroi* hero, const uniti* pu) {
 	string str;
-	// Главные статусы
-	field(str, getstr(Attack), squad->get(Attack), squad->get(Attack, hero));
-	field(str, getstr(Defence), squad->get(Defence), squad->get(Defence, hero));
-	// shoots
-	//if(bsget(rec, Shoots))
-	//	y += field(x, y, Shoots, rec, side, szt("Shoots Left", "Выстрелов"));
-	// damage
-	//y += fiedm(x, y, "Урон", squad->get(DamageMin), squad->get(DamageMax));
-	// hits
-	field(str, "Жизнь", squad->get(HitPointsMax), squad->get(HitPointsMax, hero));
-	//y += field(x, y, HitPoints, rec, side, szt("Hits Left", "Жизнь ост."));
-	// speed
+	field(str, getstr(Attack), Attack, squad, hero, pu);
+	field(str, getstr(Defence), Defence, squad, hero, pu);
+	field(str, "Урон", squad->get(DamageMin), squad->get(DamageMax), "%1: %2i-%3i");
+	field(str, "Выстрелов", Shoots, squad, hero, pu, "%1: %3i из %2i");
+	field(str, "Жизнь", HitPoints, squad, hero, pu, "%1: %3i из %2i");
 	field(str, "Скорость", getstr((speed_s)squad->get(Speed, hero)));
 	if(hero) {
 		field(str, "Мораль", getstr((morale_s)squad->get(MoraleStat, hero)));
 		field(str, "Удача", getstr((luck_s)squad->get(LuckStat, hero)));
 	}
-	return textf(x, y, 200, str);
+	return textf(x, y, width, str);
 }
 
-static void effects(int x, int y, const squadi* p) {
-	static const int modes[] = {
-		BloodLust, Bless, Haste, Shield, StoneSkin,
-		DragonSlayer, SteelSkin, Antimagic, Curse, Slow,
-		Berserker, Hypnotize, Blind, Paralyze, Stone
-	};
+static int geteffectframe(spell_s v) {
+	switch(v) {
+	case Haste: return 0;
+	case Slow: case MassSlow: return 1;
+	case Blind: return 2;
+	case Bless: case MassBless: return 3;
+	case Curse: case MassCurse: return 4;
+	case Berserker: return 5;
+	case Paralyze: return 6;
+	case Hypnotize: return 7;
+	default: return -1;
+	}
+}
+
+static void effects(int x, int y, const uniti* p) {
+	if(!p)
+		return;
+	char temp[32];
 	draw::state push;
 	draw::font = SMALFONT;
 	int dx = 0;
-	for(auto sid : modes) {
-//		if(!bsget(rec, sid))
-//			continue;
-//		int f = bsget(sid, Frame);
-//		dx += getwidth(SPELLINF, f);
+	for(auto& e : bsmeta<enchantmenti>()) {
+		if(e.object != p)
+			continue;
+		int f = geteffectframe(e.id);
+		if(f==-1)
+			continue;
+		dx += getwidth(SPELLINF, f);
 	}
 	x = x - dx / 2;
-	for(auto sid : modes) {
-//		int value = bsget(rec, sid);
-//		if(!value)
-//			continue;
-//		sznum(temp, value);
-//		int f = bsget(sid, Frame);
-//		draw::image(x, y, res::SPELLINF, f, AFNoOffset);
-//		draw::text(x + (res::width(res::SPELLINF, f) - draw::textw(temp)) / 2,
-//			y + res::height(res::SPELLINF, f) + 2,
-//			temp);
-//		x += res::width(res::SPELLINF, f);
+	for(auto& e : bsmeta<enchantmenti>()) {
+		if(e.object != p)
+			continue;
+		int f = geteffectframe(e.id);
+		if(f == -1)
+			continue;
+		zprint(temp, "%1i", e.count);
+		image(x, y, SPELLINF, f, AFNoOffset);
+		text(x + (getwidth(SPELLINF, f) - textw(temp)) / 2, y + getheight(SPELLINF, f) + 2, temp);
+		x += getwidth(SPELLINF, f);
 	}
 }
 
-void squadi::show(const heroi* hero, bool info_mode, bool allow_dismiss, bool allow_upgrade) {
+void squadi::show(const heroi* hero, bool info_mode, bool allow_dismiss, bool allow_upgrade, const uniti* pu) {
 	draw::screenshoot surface;
 	auto back = isevil(VIEWARME, VIEWARMY);
 	int w1 = getwidth(back, 0);
@@ -231,8 +242,8 @@ void squadi::show(const heroi* hero, bool info_mode, bool allow_dismiss, bool al
 		image(x, y, back, 0);
 		int x1 = x + 24;
 		int y1 = y;
-		status(x1 + 386, y1 + 40, this, hero);
-		effects(x1 + 140, y1 + 188, this);
+		status(x1 + 286, y1 + 40, 220, this, hero, pu);
+		effects(x1 + 140, y1 + 188, pu);
 		// name
 		const char* p = getstr(unit);
 		draw::text(x1 + 140 - draw::textw(p) / 2, y1 + 40, p);

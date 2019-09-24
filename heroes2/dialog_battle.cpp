@@ -329,7 +329,7 @@ static void command_attack() {
 
 static void show_info() {
 	auto p = (uniti*)hot::param;
-	p->show(p->leader, false, false, false);
+	p->show(p->leader, false, false, false, p);
 }
 
 static void hittest_grid() {

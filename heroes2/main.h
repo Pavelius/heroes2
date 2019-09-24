@@ -18,8 +18,7 @@ enum ability_s : unsigned char {
 	MovePoints, SpellPoints,
 	LuckStat, MoraleStat, Speed,
 	DamageMin, DamageMax,
-	HitPoints, HitPointsMax,
-	Shoots, ShootsMax,
+	HitPoints, Shoots,
 	Experience,
 	AllAbilities, AttackDefence, SpellPowerKnowledge,
 };
@@ -384,7 +383,7 @@ struct squadi {
 	bool					isdragon() const;
 	void					information(const heroi* hero) { show(hero, true, false, false); }
 	void					paint(int x, int y, const heroi* hero = 0, bool allow_change = true) const;
-	void					show(const heroi* hero, bool info_mode, bool allow_dismiss, bool allow_upgrade);
+	void					show(const heroi* hero, bool info_mode, bool allow_dismiss, bool allow_upgrade, const uniti* unit = 0);
 };
 struct armyi {
 	squadi					units[5];

@@ -1100,7 +1100,6 @@ int draw::textf(int x, int y, int width, const char* p) {
 	auto y4 = y;
 	p = zskipspcr(p);
 	auto start = p;
-	//rectb({x, y, x + width, y + texth() * 2}, 219);
 	while(*p) {
 		if(p[0] == '#' && p[1] == '#' && (p == start || p[-1] == '\n')) {
 			p += 2;
@@ -1121,6 +1120,7 @@ int draw::textf(int x, int y, int width, const char* p) {
 			font_color = 0;
 		p = zskipspcr(p);
 	}
+	//rectb({x, y, x + width, y4}, 219);
 	return y - y4;
 }
 

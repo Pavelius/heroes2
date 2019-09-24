@@ -75,7 +75,7 @@ void castlei::paint_monster(int x, int y, int height, int width, int level) {
 	y += field(x + 210, y, sq, Attack);
 	y += field(x + 210, y, sq, Defence);
 	y += field(x + 210, y, sq, DamageMin, DamageMax, "Урон", "%1i-%2i");
-	y += field(x + 210, y, sq, HitPointsMax);
+	y += field(x + 210, y, sq, HitPoints);
 	y += draw::texth();
 	y += field(x + 210, y, 0, getstr(speed_s(sq.get(Speed))));
 	if(allow) {

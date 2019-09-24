@@ -364,12 +364,12 @@ int	uniti::getresist(spell_s id, int spell_power) const {
 		return 100;
 	switch(unit) {
 	case ArchMage:
-		if(spell.is(Damage) || (spell.is(Enchantment) && spell.is(Hostile)))
+		if(spell.is(Hostile))
 			return 20;
 		break;
 	case Dwarf:
 	case BattleDwarf:
-		if(spell.is(Damage) || (spell.is(Enchantment) && spell.is(Hostile)))
+		if(spell.is(Hostile))
 			return 25;
 		break;
 	case GreenDragon:

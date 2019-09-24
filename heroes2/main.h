@@ -174,7 +174,7 @@ enum tag_s : unsigned char {
 	Cold, Fire, Lighting, Elemental, Undead, Alive, MindInfluence,
 	Friendly, Hostile,
 	Area, LargeArea, Mass, SafeCenter,
-	Damage, Enchantment, Summon,
+	Enchantment, Summon,
 	Fly, Twice, Stealth, MeleeArcher, Wide, AlwaysResponse,
 };
 enum action_s : unsigned char {

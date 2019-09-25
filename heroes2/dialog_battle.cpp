@@ -296,7 +296,6 @@ void heroi::setup_battle(heroi* enemy) {
 }
 
 static void end_turn() {
-	current_unit->add(Moved);
 	breakmodal(0);
 }
 
@@ -628,7 +627,11 @@ static void makebattle() {
 					continue;
 				if(e.get(Speed) < s)
 					continue;
-				battlemove(e);
+				if(e.testmorale() == -1)
+					e.show_morale(false);
+				else
+					battlemove(e);
+				e.set(Moved);
 				if(isend())
 					return;
 			}
@@ -820,7 +823,7 @@ void heroi::show_cast(bool mass) const {
 void uniti::show_morale(bool good) const {
 	auto pa = (battleimage*)this;
 	battleimage e; e.clear();
-	e.animation::set(MORALEG, 0, pa->pos);
+	e.animation::set(good ? MORALEG : MORALEB, 0, pa->pos);
 	e.pos.y -= 32;
 	e.animation::count = getframecount(e.res);
 	drawables.add(&e);
@@ -1031,5 +1034,14 @@ void heroi::castcombatspell() {
 			cast(spell, target, true);
 			set(Moved);
 		}
+	}
+}
+
+void uniti::addmorale(const heroi* leader, int value) {
+	for(auto& e : units) {
+		if(!e)
+			continue;
+		if(e.leader == leader)
+			e.morale += value;
 	}
 }

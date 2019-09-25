@@ -70,12 +70,28 @@ void uniti::refresh() {
 	remove(Moved);
 	remove(CounterAttacked);
 	remove(TotalDefence);
+	// Normalize morale
+	if(morale < 0)
+		morale++;
+	else if(morale > 0)
+		morale--;
+	// Normalize luck
+	if(luck < 0)
+		luck++;
+	else if(luck > 0)
+		luck--;
 }
 
 int	uniti::get(ability_s v) const {
 	switch(v) {
 	case Shoots: return shoots;
 	case HitPoints: return hits;
+	case MoraleStat:
+		if(is(Undead))
+			return 3;
+		return morale + squadi::get(v, leader);
+	case LuckStat:
+		return luck + squadi::get(v, leader);
 	default: return squadi::get(v, leader); break;
 	}
 }
@@ -258,7 +274,12 @@ void uniti::melee(uniti& enemy, direction_s dir) {
 }
 
 void uniti::damage(unsigned v) {
+	auto origin_count = count;
 	sethits(gethits() - v);
+	if(count == 0 && origin_count!=0) {
+		// Unit is killed
+		addmorale(leader, -1);
+	}
 }
 
 int uniti::gethits() const {

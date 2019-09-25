@@ -107,6 +107,7 @@ struct battleimage : animation, variant, uniti {
 	bool					iswait() const;
 	void					set(action_s action, int param = 0);
 	void					set(direction_s dir);
+	void					set(battle_s v) { battlef::add(v); }
 	void					setdefault();
 	void					setpos(short unsigned v);
 	void					stroke() const;

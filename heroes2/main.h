@@ -877,7 +877,10 @@ struct uniti : positioni, squadi, battlef {
 	squadi*					source;
 	short unsigned			shoots;
 	short unsigned			hits;
+	char					morale;
+	char					luck;
 	constexpr explicit operator bool() const { return index != Blocked; }
+	static void				addmorale(const heroi* leader, int value);
 	void					attack(uniti& enemy, direction_s dir);
 	bool					canshoot() const;
 	void					damage(unsigned v);

@@ -159,6 +159,19 @@ static void field(string& str, const char* name, ability_s e, const squadi* ps, 
 	field(str, name, v1, v2, format);
 }
 
+static int getstat(ability_s a, int min, int max, const uniti* pu, const heroi* ph, const squadi* sq) {
+	int m;
+	if(pu)
+		m = pu->get(a);
+	else
+		m = sq->get(a, ph);
+	if(m < min)
+		m = min;
+	else if(m > max)
+		m = max;
+	return m;
+}
+
 static int status(int x, int y, int width, const squadi* squad, const heroi* hero, const uniti* pu) {
 	string str;
 	field(str, getstr(Attack), Attack, squad, hero, pu);
@@ -168,8 +181,8 @@ static int status(int x, int y, int width, const squadi* squad, const heroi* her
 	field(str, "Жизнь", HitPoints, squad, hero, pu, "%1: %3i из %2i");
 	field(str, "Скорость", getstr((speed_s)squad->get(Speed, hero)));
 	if(hero) {
-		field(str, "Мораль", getstr((morale_s)squad->get(MoraleStat, hero)));
-		field(str, "Удача", getstr((luck_s)squad->get(LuckStat, hero)));
+		field(str, "Мораль", getstr((morale_s)getstat(MoraleStat, 0, 7, pu, hero, squad)));
+		field(str, "Удача", getstr((luck_s)getstat(LuckStat, 0, 7, pu, hero, squad)));
 	}
 	return textf(x, y, width, str);
 }

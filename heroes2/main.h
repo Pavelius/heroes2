@@ -169,11 +169,11 @@ enum object_s : unsigned char {
 	EmpthyObject,
 };
 enum tag_s : unsigned char {
-	Cold, Fire, Lighting, Elemental, Undead, Alive, MindInfluence,
+	Cold, Fire, Lighting, Dragon, Elemental, Undead, Alive, MindInfluence,
 	Friendly, Hostile,
 	Area, LargeArea, Mass, SafeCenter,
 	Enchantment, Summon,
-	Fly, Twice, Stealth, MeleeArcher, Wide, AlwaysResponse,
+	AlwaysResponse, Fly, Twice, Stealth, MeleeArcher, Wide,
 };
 enum action_s : unsigned char {
 	Wait, Move, PalmFace, AttackAction, FlyAction, Shoot, Damaged, Dead, Killed, Throw, Cast,
@@ -231,7 +231,7 @@ enum object_use_s : unsigned char {
 	LearnUse, SpecialUse,
 };
 enum battle_s : unsigned char {
-	Moved, CounterAttacked, MoraleBoosted, TotalDefence,
+	CounterAttacked, HalfStrenght, MoraleBoosted, Moved, TotalDefence,
 };
 enum variant_s : unsigned char {
 	NoVariant,
@@ -389,7 +389,6 @@ struct squadi {
 	monster_s				getupgrade() const;
 	bool					is(tag_s v) const;
 	bool					isdrainlife() const;
-	bool					isdragon() const;
 	void					information(const heroi* hero) { show(hero, true, false, false); }
 	void					paint(int x, int y, const heroi* hero = 0, bool allow_change = true) const;
 	void					show(const heroi* hero, bool info_mode, bool allow_dismiss, bool allow_upgrade, const uniti* unit = 0);
@@ -909,6 +908,7 @@ struct uniti : positioni, squadi, battlef {
 	constexpr bool			isenemy(const uniti* p) { return p->leader != leader; }
 	constexpr bool			isenemy(const heroi* p) { return p != leader; }
 	bool					iskill(int d) const { return gethits() <= d; }
+	bool					isparalized() const { return is(Blind) || is(Paralyze) || is(Stone); }
 	void					melee(uniti& enemy, direction_s d = Up);
 	void					move(short unsigned index);
 	void					sethits(int value);
@@ -922,7 +922,9 @@ struct uniti : positioni, squadi, battlef {
 	void					show_morale(bool good) const;
 	void					show_move(short unsigned index) const;
 	void					show_shoot(uniti& enemy) const;
-	int						testmorale() const;
+	int						teststat(ability_s a) const;
+	int						testluck() const { return teststat(LuckStat); }
+	int						testmorale() const { return teststat(MoraleStat); }
 	static short unsigned	to(short unsigned i, direction_s d);
 	static direction_s		to(direction_s d, direction_s d1);
 	void					refresh();

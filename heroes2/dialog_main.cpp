@@ -30,8 +30,15 @@ static void test_battle() {
 	pd->armyi::clear();
 	pd->add(Skeleton, 30);
 	pd->add(Zombie, 4);
+	ph->set(Blind);
+	ph->set(BloodLust);
+	ph->set(DragonSlayer);
+	ph->set(Haste);
 	ph->set(MagicArrow);
+	ph->set(Paralyze);
 	ph->set(PlayerBlue);
+	ph->set(StoneSkin);
+	ph->set(SteelSkin);
 	ph->add(Dwarf, 6);
 	ph->setup_battle(pd);
 	ph->battlestart();

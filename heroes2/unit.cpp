@@ -70,6 +70,7 @@ void uniti::refresh() {
 	remove(Moved);
 	remove(CounterAttacked);
 	remove(TotalDefence);
+	remove(HalfStrenght);
 	// Normalize morale
 	if(morale < 0)
 		morale++;
@@ -83,15 +84,33 @@ void uniti::refresh() {
 }
 
 int	uniti::get(ability_s v) const {
+	int i;
 	switch(v) {
 	case Shoots: return shoots;
 	case HitPoints: return hits;
 	case MoraleStat:
 		if(is(Undead))
-			return 3;
+			return NormalMorale;
 		return morale + squadi::get(v, leader);
 	case LuckStat:
 		return luck + squadi::get(v, leader);
+	case Attack:
+		i = squadi::get(v, leader);
+		if(is(BloodLust))
+			i += getpower(BloodLust);
+		return i;
+	case Defence:
+		i = squadi::get(v, leader);
+		if(is(StoneSkin))
+			i += getpower(StoneSkin);
+		if(is(SteelSkin))
+			i += getpower(SteelSkin);
+		return i;
+	case Speed:
+		i = squadi::get(v, leader);
+		if(is(Haste))
+			i += getpower(Haste);
+		return i;
 	default: return squadi::get(v, leader); break;
 	}
 }
@@ -190,10 +209,10 @@ unsigned uniti::getdamage(const uniti& enemy) {
 		return 0;
 	auto d = getdamage();
 	auto at = get(Attack);
-	if(is(DragonSlayer) && enemy.isdragon())
+	if(is(DragonSlayer) && enemy.is(Dragon))
 		at += 6;
 	auto df = enemy.get(Defence);
-	if(is(DragonSlayer) && isdragon())
+	if(is(Dragon) && enemy.is(DragonSlayer))
 		df += 6;
 	if(at > df) {
 		auto m = at - df;
@@ -251,6 +270,10 @@ void uniti::move(short unsigned index) {
 
 void uniti::attack(uniti& enemy, direction_s dir) {
 	auto d = getdamage(enemy);
+	if(is(HalfStrenght)) {
+		remove(HalfStrenght);
+		d = d / 2;
+	}
 	show_attack(enemy, to(dir, Down));
 	enemy.damage(d);
 	enemy.show_damage();
@@ -274,9 +297,18 @@ void uniti::melee(uniti& enemy, direction_s dir) {
 }
 
 void uniti::damage(unsigned v) {
-	auto origin_count = count;
+	if(!count)
+		return;
 	sethits(gethits() - v);
-	if(count == 0 && origin_count!=0) {
+	if(is(Blind)) {
+		add(HalfStrenght);
+		setspell(Blind, 0);
+	}
+	if(is(Paralyze)) {
+		add(CounterAttacked);
+		setspell(Paralyze, 0);
+	}
+	if(!count) {
 		// Unit is killed
 		addmorale(leader, -1);
 	}
@@ -368,12 +400,6 @@ unsigned uniti::getscore(const uniti& defender) const {
 	if(!attacker.isarcher()) {
 		if(defender.is(CounterAttacked))
 			res += res * 0.3;
-		else {
-			//if(defender.Modes(LUCK_BAD))
-			//	res += res * 0.3;
-			//else
-			//	if(defender.Modes(LUCK_GOOD)) res -= res * 0.3;
-		}
 	}
 	return (res > 1) ? (unsigned)res : 1;
 }
@@ -506,9 +532,9 @@ void uniti::dispell() {
 	}
 }
 
-int	uniti::testmorale() const {
-	auto m = get(MoraleStat) - 3;
-	if(m==0)
+int	uniti::teststat(ability_s a) const {
+	auto m = get(a) - 3;
+	if(m == 0)
 		return 0;
 	auto r = rand() % 10;
 	if(m > 0)

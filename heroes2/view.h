@@ -88,10 +88,11 @@ struct animation {
 	static res_s			getmissile(monster_s id);
 	static int				getmissiledy(monster_s id, int param);
 	static int				getparam(direction_s d);
-	static res_s			getspell(spell_s id);
+	point					gettorso() const;
 	int						getwidth() const;
 	void					paint(int x, int y) const;
 	void					set(res_s id, unsigned char frame, point pos = point());
+	void					set(res_s id, point pos);
 	void					update();
 };
 struct battleimage : animation, variant, uniti {
@@ -108,6 +109,7 @@ struct battleimage : animation, variant, uniti {
 	void					set(action_s action, int param = 0);
 	void					set(direction_s dir);
 	void					set(battle_s v) { battlef::add(v); }
+	void					set(res_s id, point pos) { animation::set(id, pos); }
 	void					setdefault();
 	void					setpos(short unsigned v);
 	void					stroke() const;
@@ -221,6 +223,7 @@ const void*					get(res_s id);
 const icn::record*			get(res_s id, int n);
 rect						get(res_s id, int n, int x, int y, unsigned flags);
 res_s						getbuildings(kind_s v);
+point						getbottom(res_s id, int frame);
 int							getframecount(res_s id);
 int							getheight(res_s id, int n);
 const char*					getname(res_s id);

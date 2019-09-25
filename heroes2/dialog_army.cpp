@@ -179,7 +179,7 @@ static int status(int x, int y, int width, const squadi* squad, const heroi* her
 	field(str, "Урон", squad->get(DamageMin), squad->get(DamageMax), "%1: %2i-%3i");
 	field(str, "Выстрелов", Shoots, squad, hero, pu, "%1: %3i из %2i");
 	field(str, "Жизнь", HitPoints, squad, hero, pu, "%1: %3i из %2i");
-	field(str, "Скорость", getstr((speed_s)squad->get(Speed, hero)));
+	field(str, "Скорость", getstr((speed_s)getstat(Speed, 0, UltraFastSpeed, pu, hero, squad)));
 	if(hero) {
 		field(str, "Мораль", getstr((morale_s)getstat(MoraleStat, 0, 7, pu, hero, squad)));
 		field(str, "Удача", getstr((luck_s)getstat(LuckStat, 0, 7, pu, hero, squad)));
@@ -197,6 +197,13 @@ static int geteffectframe(spell_s v) {
 	case Berserker: return 5;
 	case Paralyze: return 6;
 	case Hypnotize: return 7;
+	case DragonSlayer: return 8;
+	case BloodLust: return 9;
+	case Shield: return 10;
+	case MirrorImage: return 11;
+	case Antimagic: return 12;
+	case StoneSkin: return 13;
+	case SteelSkin: return 14;
 	default: return -1;
 	}
 }

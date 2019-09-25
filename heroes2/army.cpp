@@ -134,19 +134,6 @@ bool squadi::isdrainlife() const {
 	}
 }
 
-bool squadi::isdragon() const {
-	switch(unit) {
-	case GreenDragon:
-	case RedDragon:
-	case BlackDragon:
-	case BoneDragon:
-	case Phoenix:
-		return true;
-	default:
-		return false;
-	}
-}
-
 //unsigned squadi::getstrenght() const {
 //	unsigned res = ((getmonster().damageMin + getmonster().damageMax) >> 1)*count;
 //	// increase strength

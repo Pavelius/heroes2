@@ -116,9 +116,6 @@
     <ClCompile Include="screenshot.cpp">
       <Filter>Графика</Filter>
     </ClCompile>
-    <ClCompile Include="animation.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
     <ClCompile Include="speed.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
@@ -256,6 +253,9 @@
     </ClCompile>
     <ClCompile Include="dialog_battle_options.cpp">
       <Filter>Диалоги</Filter>
+    </ClCompile>
+    <ClCompile Include="animation.cpp">
+      <Filter>Графика</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

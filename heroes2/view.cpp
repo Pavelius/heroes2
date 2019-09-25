@@ -84,6 +84,14 @@ const icn::record* draw::get(res_s res, int n) {
 	return p->records + (n % p->count);
 }
 
+point draw::getbottom(res_s res, int n) {
+	auto p = (icn*)get(res);
+	if(!p || !p->count)
+		return {0, 0};
+	auto pf = p->records + (n % p->count);
+	return {-pf->width / 2, -pf->height / 2};
+}
+
 int	draw::getframecount(res_s id) {
 	auto p = (icn*)get(id);
 	if(!p)

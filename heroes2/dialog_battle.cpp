@@ -623,6 +623,8 @@ static void makebattle() {
 			for(auto& e : units) {
 				if(!e.isalive())
 					continue;
+				if(e.isparalized())
+					continue;
 				if(e.is(Moved))
 					continue;
 				if(e.get(Speed) < s)
@@ -834,12 +836,16 @@ void uniti::show_morale(bool good) const {
 void uniti::show_effect(spell_s v) const {
 	auto pa = (battleimage*)this;
 	battleimage e; e.clear();
+	e.type = Spell; e.spell = v;
 	switch(v) {
-	case Bless:
-	case Curse:
-		e.animation::set(animation::getspell(v), 0, pa->gethead());
-		e.animation::count = getframecount(e.res);
-		break;
+	case Bless: e.set(BLESS, pa->gethead()); break;
+	case Blind: e.set(BLIND, pa->gethead()); break;
+	case Curse: e.set(CURSE, pa->gethead()); break;
+	case DragonSlayer: e.set(DRAGSLAY, pa->gethead()); break;
+	case Haste: e.set(HASTE, pa->pos + getbottom(HASTE, 0)); break;
+	case Paralyze: e.set(PARALYZE, pa->gethead()); break;
+	case SteelSkin: e.set(STELSKIN, pa->pos); break;
+	case StoneSkin: e.set(STONSKIN, pa->pos); break;
 	}
 	if(e.res != NoRes)
 		drawables.add(&e);

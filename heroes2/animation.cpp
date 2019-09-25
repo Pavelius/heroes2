@@ -2,6 +2,15 @@
 
 using namespace draw;
 
+void animation::set(res_s res, point pos) {
+	this->res = res;
+	this->frame = 0;
+	this->pos = pos;
+	start = frame; count = getframecount(res);
+	wait = 0;
+	flags = 0;
+}
+
 void animation::set(res_s res, unsigned char frame, point pos) {
 	this->res = res;
 	this->frame = frame;
@@ -173,6 +182,12 @@ point animation::getbreast() const {
 	return pt;
 }
 
+point animation::gettorso() const {
+	point pt = pos;
+	pt.y -= 35;
+	return pt;
+}
+
 point animation::gethead() const {
 	point pt = pos;
 	pt.y -= 70;
@@ -196,12 +211,4 @@ point animation::getlaunch(monster_s id, direction_s d) const {
 void animation::freezy(int duration) {
 	frame = start + count - 1;
 	wait = duration;
-}
-
-res_s animation::getspell(spell_s id) {
-	switch(id) {
-	case Bless: return BLESS;
-	case Curse: return CURSE;
-	default: return NoRes;
-	}
 }

@@ -530,9 +530,11 @@ spell_s uniti::getbattlemagic(int chance) const {
 	return ViewMines;
 }
 
-void uniti::dispell() {
+void uniti::dispell(bool only_hostile) {
 	for(auto& e : bsmeta<enchantmenti>()) {
 		if(!e)
+			continue;
+		if(only_hostile && !bsmeta<spelli>::elements[e.id].tags.is(Hostile))
 			continue;
 		if(e.object == this)
 			e.count = 0;

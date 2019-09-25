@@ -537,6 +537,7 @@ bool heroi::cast(spell_s id, const variant& target, bool run) const {
 				switch(id) {
 				case Cure:
 					e.heal(d);
+					e.dispell(true);
 					e.show_effect(id);
 					break;
 				}

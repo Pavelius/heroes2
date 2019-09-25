@@ -883,7 +883,7 @@ struct uniti : positioni, squadi, battlef {
 	void					attack(uniti& enemy, direction_s dir);
 	bool					canshoot() const;
 	void					damage(unsigned v);
-	void					dispell();
+	void					dispell(bool only_hostile = false);
 	static void				exhausespells();
 	static uniti*			find(short unsigned index);
 	int						get(ability_s v) const;

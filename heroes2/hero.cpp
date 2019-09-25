@@ -482,7 +482,7 @@ unsigned heroi::getdamage(spell_s id, uniti& enemy) const {
 	return value;
 }
 
-bool heroi::cast(spell_s id, const pvar& target, bool run) const {
+bool heroi::cast(spell_s id, const variant& target, bool run) const {
 	auto& spell = bsmeta<spelli>::elements[id].tags;
 	auto power = get(SpellPower);
 	auto cost = getcost(id);
@@ -500,37 +500,38 @@ bool heroi::cast(spell_s id, const pvar& target, bool run) const {
 			power *= 2;
 	}
 	if(target.type == Unit) {
-		if(spell.is(Friendly) && target.unit->isenemy(this))
+		auto& e = *target.getunit();
+		if(spell.is(Friendly) && e.isenemy(this))
 			return false;
-		if(spell.is(Hostile) && !target.unit->isenemy(this))
+		if(spell.is(Hostile) && !e.isenemy(this))
 			return false;
-		auto resist = target.unit->getresist(id, power);
+		auto resist = e.getresist(id, power);
 		if(resist >= 100)
 			return false;
 		if(run) {
 			show_cast(true);
 			if(spell.is(Enchantment)) {
-				target.unit->show_effect(id);
-				target.unit->setspell(id, power);
+				e.show_effect(id);
+				e.setspell(id, power);
 				switch(id) {
 				case Antimagic:
-					target.unit->dispell();
-					target.unit->setspell(id, power);
+					e.dispell();
+					e.setspell(id, power);
 					break;
-				case Bless: target.unit->setspell(Curse, 0); break;
-				case Curse: target.unit->setspell(Bless, 0); break;
-				case Haste: target.unit->setspell(Slow, 0); break;
-				case Slow: target.unit->setspell(Haste, 0); break;
-				case StoneSkin: target.unit->setspell(SteelSkin, 0); break;
-				case SteelSkin: target.unit->setspell(StoneSkin, 0); break;
-				case Dispel: target.unit->dispell(); break;
+				case Bless: e.setspell(Curse, 0); break;
+				case Curse: e.setspell(Bless, 0); break;
+				case Haste: e.setspell(Slow, 0); break;
+				case Slow: e.setspell(Haste, 0); break;
+				case StoneSkin: e.setspell(SteelSkin, 0); break;
+				case SteelSkin: e.setspell(StoneSkin, 0); break;
+				case Dispel: e.dispell(); break;
 				}
 			} else if(spell.is(Summon)) {
 
 			} else {
 				auto d = power * getpower(id);
-				target.unit->damage(d);
-				target.unit->show_damage();
+				e.damage(d);
+				e.show_damage();
 			}
 		}
 	}

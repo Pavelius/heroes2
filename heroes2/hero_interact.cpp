@@ -361,14 +361,14 @@ bool heroi::battle(moveablei& enemy) {
 	return true;
 }
 
-bool heroi::interact(short unsigned index, const pvar& object) {
+bool heroi::interact(short unsigned index, const variant& object) {
 	switch(object.type) {
 	case Hero: break;
 	case CastleVar: break;
 	case Moveable:
-		if(object.moveable->is(MonsterObject))
-			return battle(*object.moveable);
-		return interact(*object.moveable);
+		if(object.getmoveable()->is(MonsterObject))
+			return battle(*object.getmoveable());
+		return interact(*object.getmoveable());
 	}
 	return true;
 }

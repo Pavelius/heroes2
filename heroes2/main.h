@@ -243,8 +243,9 @@ typedef cflags<player_s, unsigned char> playerf;
 typedef cflags<object_flag_s, unsigned char> objectf;
 typedef cflags<battle_s, unsigned char> battlef;
 typedef cflags<building_s, unsigned char> buildingf;
+class castlei;
 class heroi;
-struct pvar;
+class moveablei;
 struct shapei;
 struct variantcol;
 struct uniti;
@@ -263,7 +264,7 @@ struct variant {
 		tag_s				tag;
 		object_s			object;
 		monster_s			monster;
-		unsigned char		value;
+		unsigned short		value;
 	};
 	constexpr variant() : type(NoVariant), value(0) {}
 	constexpr variant(variant_s t, unsigned char v) : type(t), value(v) {}
@@ -279,10 +280,19 @@ struct variant {
 	constexpr variant(skill_s v) : type(Skill), skill(v) {}
 	constexpr variant(spell_s v) : type(Spell), spell(v) {}
 	constexpr variant(tag_s v) : type(Tag), tag(v) {}
+	constexpr variant(short unsigned v) : type(Index), value(v) {}
+	variant(const castlei* v);
+	variant(const heroi* v);
+	variant(const moveablei* v);
+	variant(const uniti* v);
 	constexpr bool operator==(const variant& e) const { return type == e.type && value == e.value; }
 	constexpr explicit operator bool() const { return type != NoVariant; }
-	const char*				getname() const;
+	void					clear() { type = NoVariant; value = 0; }
+	castlei*				getcastle() const;
 	heroi*					gethero() const;
+	moveablei*				getmoveable() const;
+	const char*				getname() const;
+	uniti*					getunit() const;
 };
 struct resourcei {
 	const char*				name;
@@ -480,7 +490,7 @@ struct artifacti {
 };
 class spellbooki {
 	typedef unsigned type;
-	static constexpr unsigned size = sizeof(type)*8;
+	static constexpr unsigned size = sizeof(type) * 8;
 	type					data[3];
 public:
 	constexpr bool			is(spell_s v) const { return (data[v / size] & (1 << (v % size))) != 0; }
@@ -590,11 +600,11 @@ public:
 	void					battlemenu(bool can_escape);
 	void					battlestart();
 	bool					buymagicbook();
-	bool					cast(spell_s id, const pvar& target, bool run) const;
+	bool					cast(spell_s id, const variant& target, bool run) const;
 	void					castcombatspell();
 	void					clear();
 	void					choose();
-	bool					choose(spell_s id, pvar& result) const;
+	bool					choose(spell_s id, variant& result) const;
 	static const costi		cost;
 	void					disappear() const;
 	static heroi*			find(short unsigned index);
@@ -624,7 +634,7 @@ public:
 	void					input(const playeri* player) const;
 	bool					interact(moveablei& object);
 	bool					interact(moveablei& object, interact_s type, variantcol v1, variantcol v2, const char* text, const char* fail);
-	bool					interact(short unsigned index, const pvar& object);
+	bool					interact(short unsigned index, const variant& object);
 	bool					is(artifact_s v) const;
 	bool					is(spell_s v) const { return spellbook.is(v); }
 	bool					is(skill_s v) const { return get(v) > 0; }
@@ -779,25 +789,6 @@ struct variantcol : variant {
 	constexpr variantcol(const variant& element) : variant(element), count(0), format(0) {}
 	constexpr variantcol(const variant& element, int c1) : variant(element), count(c1), format(0) {}
 };
-struct pvar : variant {
-	union {
-		castlei*			castle;
-		heroi*				hero;
-		playeri*			player;
-		uniti*				unit;
-		moveablei*			moveable;
-		int					value;
-	};
-	constexpr pvar() : variant(), value(0) {}
-	template<class T> constexpr pvar(const T v) : variant(v) {}
-	constexpr pvar(castlei* v) : variant(CastleVar, 0), castle(v) {}
-	constexpr pvar(heroi* v) : variant(Hero, 0), hero(v) {}
-	constexpr pvar(uniti* v) : variant(Unit, 0), unit(v) {}
-	constexpr pvar(moveablei* v) : variant(Moveable, 0), moveable(v) {}
-	constexpr bool operator==(const pvar& e) const { return type == e.type && value == e.value; }
-	constexpr explicit operator bool() const { return type != NoVariant; }
-	void					clear() { type = NoVariant; variant::value = 0; value = 0; }
-};
 struct casei {
 	typedef void(*caseproc)(moveablei& m, casei& e);
 	unsigned short			chance;
@@ -909,7 +900,7 @@ struct uniti : positioni, squadi, battlef {
 	bool					is(spell_s v) const { return getspell(v) > 0; }
 	bool					is(tag_s v) const { return squadi::is(v); }
 	bool					isalive() const { return index != Blocked && count > 0; }
-	bool					isarcher() const { return getmonster().shoots!=0; }
+	bool					isarcher() const { return getmonster().shoots != 0; }
 	static bool				isattacker(const heroi* leader);
 	bool					isattacker() const { return isattacker(leader); }
 	bool					isdamaged() const;
@@ -952,7 +943,7 @@ extern unsigned char		width;
 //
 void						clear();
 void						clearpath();
-pvar						find(short unsigned index, bool rich_find = false);
+variant						find(short unsigned index, bool rich_find = false);
 unsigned					getcost(short unsigned index);
 unsigned					getcost(short unsigned index, direction_s direct, unsigned pathfinding);
 unsigned					getcost(short unsigned from, short unsigned to, unsigned pathfinding);

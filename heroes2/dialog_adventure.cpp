@@ -7,7 +7,7 @@ enum infotype_s : unsigned char {
 	LastInfo = ObjectInfo,
 };
 
-static pvar				hilite_var, current_var;
+static variant			hilite_var, current_var;
 static short unsigned	hilite_index, current_index;
 const unsigned			delay_information = 8;
 const int				map_sx = 14;
@@ -20,7 +20,7 @@ static infotype_s		info_type = ObjectInfo;
 static playeri*			current_player;
 
 namespace {
-struct drawable : point, pvar {
+struct drawable : point, variant {
 	static int getmode(monster_s m) {
 		switch(m) {
 		case Zombie:
@@ -32,7 +32,7 @@ struct drawable : point, pvar {
 	}
 	int	getlevel() const {
 		if(type == Moveable) {
-			switch(moveable->gettype()) {
+			switch(getmoveable()->gettype()) {
 			case Road: return 3;
 			case Lake: case Cliff: case Hole: return 2;
 			case Stream: case StreamDelta: return 1;
@@ -43,7 +43,7 @@ struct drawable : point, pvar {
 	}
 	int	getzpos() const {
 		if(type == Moveable) {
-			if(moveable->is(TreeKnowledge))
+			if(getmoveable()->is(TreeKnowledge))
 				return y + 1;
 		}
 		return y;
@@ -65,7 +65,7 @@ struct drawable : point, pvar {
 		rc.x1 = x;
 		rc.y1 = y;
 		if(type == Moveable) {
-			auto& sh = moveable->getshape();
+			auto& sh = getmoveable()->getshape();
 			rc.x1 += sh.offset.x * 32;
 			rc.y1 += sh.offset.y * 32;
 			rc.x2 += rc.x1 + sh.size.x * 32;
@@ -177,17 +177,17 @@ struct drawable : point, pvar {
 		int i;
 		switch(type) {
 		case Moveable:
-			switch(moveable->gettype()) {
+			switch(getmoveable()->gettype()) {
 			case MonsterObject:
-				image(x + 16, y + 30, moveable->getmonster(), moveable->index, 0, getmode(moveable->getmonster()));
+				image(x + 16, y + 30, getmoveable()->getmonster(), getmoveable()->index, 0, getmode(getmoveable()->getmonster()));
 				break;
 			case ResourceObject:
-				i = decode_resource[moveable->getresource()];
+				i = decode_resource[getmoveable()->getresource()];
 				image(x - 32, y, OBJNRSRC, i);
 				image(x, y, OBJNRSRC, i + 1);
 				break;
 			case ArtifactObject:
-				i = moveable->getartifact() * 2;
+				i = getmoveable()->getartifact() * 2;
 				image(x - 32, y, OBJNARTI, i);
 				image(x, y, OBJNARTI, i + 1);
 				break;
@@ -200,37 +200,37 @@ struct drawable : point, pvar {
 				image(x, y, OBJNRSRC, 15);
 				break;
 			case Road:
-				image(x, y, ROAD, moveable->getframe());
+				image(x, y, ROAD, getmoveable()->getframe());
 				break;
 			case Stream:
-				image(x, y, STREAM, moveable->getframe());
+				image(x, y, STREAM, getmoveable()->getframe());
 				break;
 			case Mines:
-				imags(x, y, moveable->getdraw(), moveable->index);
-				if(moveable->isplayer())
-					image(x + 6, y - 26, FLAG32, moveable->getplayer() * 2);
-				image(x, y, EXTRAOVR, decode_extraovr[moveable->getresource()]);
+				imags(x, y, getmoveable()->getdraw(), getmoveable()->index);
+				if(getmoveable()->isplayer())
+					image(x + 6, y - 26, FLAG32, getmoveable()->getplayer() * 2);
+				image(x, y, EXTRAOVR, decode_extraovr[getmoveable()->getresource()]);
 				break;
 			case SawMill:
 			case AlchemyLab:
-				imags(x, y, moveable->getdraw(), moveable->index);
-				if(moveable->isplayer())
-					image(x + 12, y - 48, FLAG32, moveable->getplayer() * 2);
+				imags(x, y, getmoveable()->getdraw(), getmoveable()->index);
+				if(getmoveable()->isplayer())
+					image(x + 12, y - 48, FLAG32, getmoveable()->getplayer() * 2);
 				break;
 			default:
-				imags(x, y, moveable->getdraw(), moveable->index);
+				imags(x, y, getmoveable()->getdraw(), getmoveable()->index);
 				break;
 			}
 			break;
 		case Hero:
-			paint_hero(x, y, hero->getkind(), hero->getdirection(), false);
-			paint_flag(x, y, hero->getplayer()->getid(), hero->getdirection(), draw::counter, true);
-			paint_shad(x, y, hero->getdirection(), 0);
+			paint_hero(x, y, gethero()->getkind(), gethero()->getdirection(), false);
+			paint_flag(x, y, gethero()->getplayer()->getid(), gethero()->getdirection(), draw::counter, true);
+			paint_shad(x, y, gethero()->getdirection(), 0);
 			break;
 		case CastleVar:
 			castlei::paint(x - 32 * 2, y - 32 * 3,
-				map::gettile(castle->getpos()),
-				castle->getkind(), !castle->is(Castle), true);
+				map::gettile(getcastle()->getpos()),
+				getcastle()->getkind(), !getcastle()->is(Castle), true);
 			break;
 		default:
 			break;
@@ -241,7 +241,7 @@ struct drawable : point, pvar {
 		auto p = source;
 		auto pe = p + count;
 		for(auto& e : bsmeta<moveablei>()) {
-			*(static_cast<pvar*>(p)) = &e;
+			*(static_cast<variant*>(p)) = &e;
 			p->x = map::i2x(e.index) * 32 - camera.x + rcmap.x1;
 			p->y = map::i2y(e.index) * 32 - camera.y + rcmap.y1;
 			if(!p->in(rc))
@@ -252,7 +252,7 @@ struct drawable : point, pvar {
 		for(unsigned i = 0; i < bsmeta<castlei>::count; i++) {
 			auto& e = bsmeta<castlei>::elements[i];
 			auto index = e.getpos();
-			*(static_cast<pvar*>(p)) = &e;
+			*(static_cast<variant*>(p)) = &e;
 			p->x = map::i2x(index) * 32 - camera.x + rcmap.x1;
 			p->y = map::i2y(index) * 32 - camera.y + rcmap.y1;
 			if(!p->in(rc))
@@ -264,7 +264,7 @@ struct drawable : point, pvar {
 			auto& e = bsmeta<heroi>::elements[i];
 			if(e.getpos() == Blocked)
 				continue;
-			*(static_cast<pvar*>(p)) = &e;
+			*(static_cast<variant*>(p)) = &e;
 			auto index = e.getpos();
 			p->x = map::i2x(index) * 32 - camera.x + rcmap.x1;
 			p->y = map::i2y(index) * 32 + 27 - camera.y + rcmap.y1;
@@ -306,7 +306,7 @@ static void next_hero() {}
 
 static void move_hero() {
 	if(current_var.type == Hero)
-		current_var.hero->moveto();
+		current_var.gethero()->moveto();
 }
 
 static void choose_castle() {
@@ -314,11 +314,11 @@ static void choose_castle() {
 	if(!current_var)
 		return;
 	info_type = ObjectInfo;
-	map::setcamera(current_var.castle->getpos());
+	map::setcamera(current_var.getcastle()->getpos());
 }
 
 static void route_path() {
-	auto hero = current_var.hero;
+	auto hero = current_var.gethero();
 	auto move = hero->getmove();
 	short unsigned index = hot::param;
 	if(index == Blocked)
@@ -344,20 +344,20 @@ static void standart_input() {
 	switch(hilite_var.type) {
 	case CastleVar:
 		if(hot::key == MouseLeft && hot::pressed) {
-			if(current_var.type == Hero && hilite_index == hilite_var.castle->getpos()) {
+			if(current_var.type == Hero && hilite_index == hilite_var.getcastle()->getpos()) {
 				execute(route_path, hilite_index);
 			} else
-				execute(choose_castle, (int)hilite_var.castle);
+				execute(choose_castle, (int)hilite_var.getcastle());
 		} else if(hot::key == MouseLeftDBL && hot::pressed) {
-			if(!current_player || hilite_var.castle->getplayer() == current_player)
-				execute(open_dialog, (int)hilite_var.castle);
+			if(!current_player || hilite_var.getcastle()->getplayer() == current_player)
+				execute(open_dialog, (int)hilite_var.getcastle());
 		}
 		break;
 	case Hero:
 		if(hot::key == MouseLeft && hot::pressed)
 			draw::execute(choose_hero, (int)hilite_var.hero);
 		else
-			hilite_var.hero->input(current_player);
+			hilite_var.gethero()->input(current_player);
 		break;
 	}
 	if(hilite_index != Blocked && hot::key == MouseLeft && hot::pressed) {
@@ -398,7 +398,7 @@ static struct castlec : public list {
 			image(x - 1, y, icn, index_sprite);
 			if(p->is(Used))
 				draw::image(x - 1, y + 1, icn, 24);
-			if(current_var.castle == p)
+			if(current_var.getcastle() == p)
 				rectb({x - 1, y, x + 54, y + 31}, 214);
 			if(mousein({x, y, x + 54, y + 31}))
 				hilite_var = data[index];
@@ -425,7 +425,7 @@ static struct heroc : public list {
 			image(x - 1, y, MINIPORT, p->getportrait());
 			image(x + 4, y + 5, MOBILITY, imin(p->get(MovePoints) / 100, 25));
 			image(x + 43, y + 5, MANA, imin(p->get(SpellPoints) / 5, 25));
-			if(current_var.hero == p)
+			if(current_var.gethero() == p)
 				rectb({x - 1, y, x + 54, y + 31}, 214);
 			if(mousein({x, y, x + 54, y + 31}))
 				hilite_var = data[index];
@@ -620,7 +620,7 @@ static void paint_information(int x, int y, const playeri* player) {
 		switch(info_type) {
 		case ObjectInfo:
 			if(current_var.type == Hero)
-				paint_army(x, y, *current_var.hero);
+				paint_army(x, y, *current_var.gethero());
 			else
 				paint_kindom(x, y, player);
 			break;
@@ -721,37 +721,37 @@ static void tips_info(bool show_resource_count, bool show_monster_count, bool sh
 	sb.add("%1i (%2i, %3i)", hilite_index, map::i2x(hilite_index), map::i2y(hilite_index));
 	switch(hilite_var.type) {
 	case Moveable:
-		switch(hilite_var.moveable->gettype()) {
+		switch(hilite_var.getmoveable()->gettype()) {
 		case MonsterObject:
 			if(show_monster_count)
 				sb.addn("%1i %2",
-					hilite_var.moveable->getcount(),
-					bsmeta<monsteri>::elements[hilite_var.moveable->getmonster()].multiname);
+					hilite_var.getmoveable()->getcount(),
+					bsmeta<monsteri>::elements[hilite_var.getmoveable()->getmonster()].multiname);
 			else
 				sb.addn("%1 %-2",
-					armysizei::find(hilite_var.moveable->getcount())->name,
-					bsmeta<monsteri>::elements[hilite_var.moveable->getmonster()].multiname);
+					armysizei::find(hilite_var.getmoveable()->getcount())->name,
+					bsmeta<monsteri>::elements[hilite_var.getmoveable()->getmonster()].multiname);
 			break;
 		case ArtifactObject:
 			if(show_artifact_name)
-				sb.addn(getstr(hilite_var.moveable->getartifact()));
+				sb.addn(getstr(hilite_var.getmoveable()->getartifact()));
 			else
 				sb.addn("Артефакт");
 			break;
 		case ResourceObject:
 			if(show_resource_count)
-				sb.addn("%1i %-2", hilite_var.moveable->getcount(),
-					bsmeta<resourcei>::elements[hilite_var.moveable->getresource()].nameof);
+				sb.addn("%1i %-2", hilite_var.getmoveable()->getcount(),
+					bsmeta<resourcei>::elements[hilite_var.getmoveable()->getresource()].nameof);
 			else
-				sb.addn(getstr(hilite_var.moveable->getresource()));
+				sb.addn(getstr(hilite_var.getmoveable()->getresource()));
 			break;
 		default:
-			sb.addn(getstr(hilite_var.moveable->gettype()));
+			sb.addn(getstr(hilite_var.getmoveable()->gettype()));
 			break;
 		}
 		break;
-	case CastleVar: sb.addn("%1", hilite_var.castle->getname()); break;
-	case Hero: sb.addn("Герой %1", hilite_var.hero->getname()); break;
+	case CastleVar: sb.addn("%1", hilite_var.getcastle()->getname()); break;
+	case Hero: sb.addn("Герой %1", hilite_var.gethero()->getname()); break;
 	case Landscape: sb.addn(getstr(hilite_var.landscape)); break;
 	}
 	quicktips(hot::mouse.x, hot::mouse.y, temp);
@@ -930,7 +930,7 @@ static void paint_route() {
 	auto count = map::getpathcount();
 	if(!count)
 		return;
-	auto hero = current_var.hero;
+	auto hero = current_var.gethero();
 	auto from = path[count - 1];
 	auto mp = hero->get(MovePoints);
 	for(int i = count - 2; i >= 0; i--) {
@@ -1039,7 +1039,7 @@ void heroi::moveto() {
 			setmove(Blocked);
 			map::clearpath();
 			focusing();
-			pvar object;
+			variant object;
 			if(map::is(to, AttackTile)) {
 				auto m = moveablei::findnear(to, MonsterObject);
 				if(m)
@@ -1047,7 +1047,7 @@ void heroi::moveto() {
 			} else
 				object = map::find(to);
 			if(object) {
-				auto onetime = (object.type == Moveable && object.moveable->issingleuse());
+				auto onetime = (object.type == Moveable && object.getmoveable()->issingleuse());
 				if(!onetime || (map::is(to, AttackTile) && !map::is(to, BlockedTile))) {
 					setpos(to);
 					focusing();
@@ -1055,7 +1055,7 @@ void heroi::moveto() {
 				auto action_result = interact(to, object);
 				if(onetime && action_result) {
 					if(object.type == Moveable) {
-						object.moveable->clear();
+						object.getmoveable()->clear();
 						disappear();
 					}
 				}

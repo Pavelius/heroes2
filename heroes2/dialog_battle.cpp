@@ -28,11 +28,17 @@ static adat<battleimage*, 32>	drawables;
 static battleimage		attacker_image, defender_image;
 static short unsigned	position_wide[2][5] = {{0, 22, 44, 66, 88}, {10, 32, 54, 76, 98}};
 
+variant::variant(const uniti* v) : type(Unit), value((battleimage*)v - units.data) {}
+
+uniti* variant::getunit() const {
+	return units.data + value;
+}
+
 static unsigned getanimationspeed() {
 	switch(battle.speed) {
 	case 1: return 70;
 	case 2: return 30;
-	default: return 160;
+	default: return 140;
 	}
 }
 
@@ -984,7 +990,7 @@ static int getframe(spell_s id) {
 	}
 }
 
-bool heroi::choose(spell_s id, pvar& result) const {
+bool heroi::choose(spell_s id, variant& result) const {
 	result.clear();
 	prepare_drawables();
 	while(ismodal()) {
@@ -1020,7 +1026,7 @@ void heroi::castcombatspell() {
 	}
 	spell_s spell;
 	if(showbook(CombatSpell, &spell)) {
-		pvar target;
+		variant target;
 		if(choose(spell, target)) {
 			cast(spell, target, true);
 			set(Moved);

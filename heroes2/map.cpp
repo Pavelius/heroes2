@@ -135,9 +135,9 @@ short unsigned map::getvisit(short unsigned index) {
 	return Blocked;
 }
 
-pvar map::find(short unsigned index, bool rich_find) {
+variant map::find(short unsigned index, bool rich_find) {
 	if(index == Blocked)
-		return pvar();
+		return variant();
 	// Heroes
 	auto hero = heroi::find(index);
 	if(hero)

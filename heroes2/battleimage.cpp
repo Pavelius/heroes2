@@ -341,10 +341,19 @@ bool battleimage::iskilled() const {
 }
 
 bool battleimage::iswait() const {
+	heroi* h;
+	kind_s k;
 	switch(type) {
 	case Monster:
 		return frame >= monsters[unit].idle[0]
 			&& frame < monsters[unit].idle[0] + monsters[unit].idle[1];
+	case Hero:
+		h = gethero();
+		if(!h)
+			return false;
+		k = h->getkind();
+		return frame >= heroes[k].idle[0]
+			&& frame < heroes[k].idle[0] + heroes[k].idle[1];
 	default:
 		return false;
 	}

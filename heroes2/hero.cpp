@@ -509,7 +509,11 @@ bool heroi::cast(spell_s id, const variant& target, bool run) const {
 		if(resist >= 100)
 			return false;
 		if(run) {
-			show_cast(true);
+			show_cast(false);
+			if(resist) {
+				if(d100() < resist)
+					return true;
+			}
 			if(spell.is(Enchantment)) {
 				e.show_effect(id);
 				e.setspell(id, power);

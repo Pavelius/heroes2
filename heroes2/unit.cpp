@@ -388,7 +388,7 @@ int	uniti::getresist(spell_s id, int spell_power) const {
 		case FireBlast:
 		case LightingBolt:
 		case ChainLighting:
-		case Armagedon:
+		case ElementalStorm:
 			return 100;
 		}
 		break;

@@ -4,7 +4,10 @@ const char* variant::getname() const {
 	switch(type) {
 	case Ability: return getstr(ability);
 	case Artifact: return getstr(artifact);
+	case Castle: return getcastle()->getname();
+	case Hero: return gethero()->getname();
 	case Landscape: return getstr(landscape);
+	//case Moveable: return getmoveable()->getname();
 	case Skill: return getstr(skill);
 	case Spell: return getstr(spell);
 	case Monster: return getstr(monster);

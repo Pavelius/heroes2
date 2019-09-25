@@ -185,11 +185,6 @@ enum spell_type_s : unsigned char {
 	AnySpell,
 	CombatSpell, AdventureSpell
 };
-enum variant_s : unsigned char {
-	NoVariant,
-	Ability, Artifact, Building, CastleVar, Hero, Index, Landscape, Object, Monster, Moveable,
-	Player, Resource, Skill, Spell, Stat, Tag, Unit, Variant,
-};
 enum activity_s : unsigned char {
 	NotAllowed,
 	Human, Computer, ComputerOnly
@@ -237,6 +232,11 @@ enum object_use_s : unsigned char {
 };
 enum battle_s : unsigned char {
 	Moved, CounterAttacked, MoraleBoosted, TotalDefence,
+};
+enum variant_s : unsigned char {
+	NoVariant,
+	Ability, Artifact, Building, CastleVar, Hero, Index, Landscape, Object, Monster, Moveable,
+	Player, Resource, Skill, Spell, Stat, Tag, Unit, Variant,
 };
 typedef cflags<player_s, unsigned char> playerf;
 typedef cflags<object_flag_s, unsigned char> objectf;

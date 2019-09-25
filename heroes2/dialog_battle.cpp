@@ -488,6 +488,14 @@ static void cast_spells() {
 	p->castcombatspell();
 }
 
+static void creature_info(uniti* p) {
+	auto fev = (hot::key == MouseLeft && hot::pressed);
+	setcursor(CMSECO, 5, {-7, -7});
+	status("%1i %2", p->count, bsmeta<monsteri>::elements[p->unit].multiname);
+	if(fev)
+		execute(show_info, (int)p);
+}
+
 static void standart_input() {
 	auto fev = (hot::key == MouseLeft && hot::pressed);
 	int m = current_unit->get(Speed) + 1;
@@ -524,13 +532,9 @@ static void standart_input() {
 						execute(command_attack, (int)p);
 					}
 				} else
-					setcursor(CMSECO, 0, {-7, -7});
-			} else {
-				setcursor(CMSECO, 5, {-7, -7});
-				status("%1i %2", p->count, bsmeta<monsteri>::elements[p->unit].multiname);
-				if(fev)
-					execute(show_info, (int)p);
-			}
+					creature_info(p);
+			} else
+				creature_info(p);
 		}
 	} else if(hilite_index != Blocked && current_unit) {
 		int a = getcost(hilite_index) - 1;
@@ -840,9 +844,10 @@ void uniti::show_effect(spell_s v) const {
 	switch(v) {
 	case Bless: e.set(BLESS, pa->gethead()); break;
 	case Blind: e.set(BLIND, pa->gethead()); break;
-	case Curse: e.set(CURSE, pa->gethead()); break;
+	case Cure: e.set(MAGIC01, pa->pos + point{0, -getheight(MAGIC01, 0) / 3}); break;
+	case Curse: e.set(CURSE, pa->pos); break;
 	case DragonSlayer: e.set(DRAGSLAY, pa->gethead()); break;
-	case Haste: e.set(HASTE, pa->pos + getbottom(HASTE, 0)); break;
+	case Haste: e.set(HASTE, pa->pos + getcenter(HASTE, 0)); break;
 	case Paralyze: e.set(PARALYZE, pa->gethead()); break;
 	case SteelSkin: e.set(STELSKIN, pa->pos); break;
 	case StoneSkin: e.set(STONSKIN, pa->pos); break;

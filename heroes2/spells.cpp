@@ -13,7 +13,6 @@ spelli bsmeta<spelli>::elements[] = {{"Огненный шар", 9, 3, 8, 1, {Hostile, Area
 {"Общее ускорение", 10, 3, 14, 2, {Friendly, Mass, Enchantment}, CombatSpell, "Увеличивет скорость всех ваших существа на %1i."},
 {"Замедление", 3, 1, 1, 0, {Hostile, Enchantment}, CombatSpell, "Замедляет цель до половины ее скорости."},
 {"Общее замедление", 15, 4, 1, 0, {Hostile, Mass, Enchantment}, CombatSpell, "Замедляет всех врагов до половины их скорости."},
-//
 {"Ослепление", 6, 2, 21, 0, {Hostile, Enchantment}, CombatSpell, "Дым, поражающий глаза противника лишает возможности их ходить."},
 {"Благословение", 3, 1, 7, 0, {Friendly, Enchantment}, CombatSpell, "Выбранный отряд наносит максимальные повреждения."},
 {"Общее благословение", 12, 3, 7, 0, {Friendly, Mass, Enchantment}, CombatSpell, "Все ваши сущетва будут наносить максимальный урон."},

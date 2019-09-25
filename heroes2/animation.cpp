@@ -175,9 +175,6 @@ point animation::getcenter() const {
 
 point animation::getbreast() const {
 	point pt = pos;
-	//auto rc = draw::get(res, frame, pos.x, pos.y, flags);
-	//pt.x = rc.x1 + rc.width() / 2;
-	//pt.y = rc.y1 + rc.height() / 3;
 	pt.y -= 50;
 	return pt;
 }

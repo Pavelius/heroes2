@@ -84,7 +84,7 @@ const icn::record* draw::get(res_s res, int n) {
 	return p->records + (n % p->count);
 }
 
-point draw::getbottom(res_s res, int n) {
+point draw::getcenter(res_s res, int n) {
 	auto p = (icn*)get(res);
 	if(!p || !p->count)
 		return {0, 0};
@@ -99,14 +99,14 @@ int	draw::getframecount(res_s id) {
 	return p->count;
 }
 
-int	draw::getwidth(res_s id, int n) {
+short draw::getwidth(res_s id, int n) {
 	auto p = get(id, n);
 	if(!p)
 		return 0;
 	return p->width;
 }
 
-int	draw::getheight(res_s id, int n) {
+short draw::getheight(res_s id, int n) {
 	auto p = get(id, n);
 	if(!p)
 		return 0;

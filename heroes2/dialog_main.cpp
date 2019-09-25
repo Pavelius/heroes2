@@ -32,6 +32,7 @@ static void test_battle() {
 	pd->add(Zombie, 4);
 	ph->set(Blind);
 	ph->set(BloodLust);
+	ph->set(Cure);
 	ph->set(DragonSlayer);
 	ph->set(Haste);
 	ph->set(MagicArrow);

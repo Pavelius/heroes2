@@ -296,6 +296,13 @@ void uniti::melee(uniti& enemy, direction_s dir) {
 	}
 }
 
+void uniti::heal(unsigned v) {
+	auto mhp = getmonster().hp;
+	hits += v;
+	if(hits > mhp)
+		hits = mhp;
+}
+
 void uniti::damage(unsigned v) {
 	if(!count)
 		return;
@@ -347,7 +354,7 @@ void uniti::sethits(int value) {
 		count = (value + mhp - 1) / mhp;
 		hits = value % mhp;
 		if(hits == 0)
-			hits = 4;
+			hits = mhp;
 	}
 }
 

@@ -532,7 +532,15 @@ bool heroi::cast(spell_s id, const variant& target, bool run) const {
 				}
 			} else if(spell.is(Summon)) {
 
-			} else {
+			} else if(spell.is(Friendly)) {
+				auto d = power * getpower(id);
+				switch(id) {
+				case Cure:
+					e.heal(d);
+					e.show_effect(id);
+					break;
+				}
+			} else if(spell.is(Hostile)) {
 				auto d = power * getpower(id);
 				e.damage(d);
 				e.show_damage();

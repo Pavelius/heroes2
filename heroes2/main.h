@@ -897,6 +897,7 @@ struct uniti : positioni, squadi, battlef {
 	int						getresist(spell_s id, int spell_power) const;
 	unsigned				getscore(const uniti& defender) const;
 	int						getspell(spell_s v) const;
+	void					heal(unsigned v);
 	constexpr bool			is(battle_s v) const { return battlef::is(v); }
 	bool					is(spell_s v) const { return getspell(v) > 0; }
 	bool					is(tag_s v) const { return squadi::is(v); }

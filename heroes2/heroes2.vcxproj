@@ -118,7 +118,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="collection.h" />
     <ClInclude Include="crt.h" />
     <ClInclude Include="io.h" />
     <ClInclude Include="main.h" />

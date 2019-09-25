@@ -4,9 +4,6 @@
     <ClInclude Include="main.h">
       <Filter>Логика</Filter>
     </ClInclude>
-    <ClInclude Include="collection.h">
-      <Filter>Утилиты</Filter>
-    </ClInclude>
     <ClInclude Include="win.h">
       <Filter>Платформа</Filter>
     </ClInclude>

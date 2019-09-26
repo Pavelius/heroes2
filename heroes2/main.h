@@ -598,7 +598,7 @@ public:
 	void					battlemenu(bool can_escape);
 	void					battlestart();
 	bool					buymagicbook();
-	bool					cast(spell_s id, const variant& target, bool run) const;
+	bool					cast(spell_s id, const variant& target, bool run, bool test_cost = true) const;
 	void					castcombatspell();
 	void					clear();
 	void					choose();
@@ -615,7 +615,7 @@ public:
 	unsigned				get(artifact_s* source, unsigned count_maximum);
 	int						getcost(spell_s v) const;
 	unsigned				getcost(short unsigned from, short unsigned to) const;
-	unsigned				getdamage(spell_s id, uniti& enemy) const;
+	unsigned				getdamage(spell_s id, const uniti& enemy) const;
 	direction_s				getdirection() const { return direction; }
 	hero_s					getid() const { return hero_s(this - bsmeta<heroi>::elements); }
 	short unsigned			getmove() const { return index_move; }

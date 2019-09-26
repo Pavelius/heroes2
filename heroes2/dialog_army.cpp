@@ -244,7 +244,7 @@ void squadi::show(const heroi* hero, bool info_mode, bool allow_dismiss, bool al
 	int h1 = getheight(back, 0);
 	int x = (width - w1) / 2 - 16;
 	int y = (height - h1) / 2;
-	battleimage mon;
+	unitai mon;
 	mon.clear();
 	mon.type = Monster;
 	mon.monster = this->unit;

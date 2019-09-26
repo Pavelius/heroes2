@@ -6,9 +6,9 @@ const int				awd = 11, ahd = 9;
 static heroi*			attacker;
 static heroi*			defender;
 static bool				defender_can_escape;
-static battleimage*		current_unit;
+static unitai*		current_unit;
 static unsigned short	hilite_index;
-static battleimage*		hilite_unit;
+static unitai*		hilite_unit;
 battlei					battle;
 
 static unsigned short	attack_index;
@@ -23,15 +23,14 @@ static unsigned short	path_goal;
 static unsigned short	path_start;
 static const direction_s all_around[] = {Left, Right, LeftUp, LeftDown, RightUp, RightDown};
 
-static adat<battleimage, 20>	units;
-static adat<battleimage*, 32>	drawables;
-static battleimage		attacker_image, defender_image;
+static adat<unitai*, 32>	drawables;
+static unitai			attacker_image, defender_image;
 static short unsigned	position_wide[2][5] = {{0, 22, 44, 66, 88}, {10, 32, 54, 76, 98}};
 
-variant::variant(const uniti* v) : type(Unit), value((battleimage*)v - units.data) {}
+variant::variant(const uniti* v) : type(Unit), value((unitai*)v - bsmeta<unitai>::elements) {}
 
 uniti* variant::getunit() const {
-	return units.data + value;
+	return bsmeta<unitai>::elements + value;
 }
 
 static unsigned getanimationspeed() {
@@ -48,7 +47,7 @@ static point i2h(short unsigned index) {
 	return{(short)x, (short)y};
 }
 
-void battleimage::setpos(short unsigned v) {
+void unitai::setpos(short unsigned v) {
 	positioni::setpos(v);
 	pos = i2h(v);
 }
@@ -101,15 +100,15 @@ static int getside(const heroi* leader) {
 }
 
 static void add_squad(short unsigned index, squadi& squad, heroi* leader) {
-	battleimage* p = 0;
-	for(auto& e : units) {
+	unitai* p = 0;
+	for(auto& e : bsmeta<unitai>()) {
 		if(e)
 			continue;
 		p = &e;
 		break;
 	}
 	if(!p)
-		p = units.add();
+		p = bsmeta<unitai>::add();
 	if(!p)
 		return;
 	p->clear();
@@ -138,7 +137,7 @@ static void add_squad(armyi& army, heroi* leader) {
 
 static void prepare_drawables() {
 	drawables.clear();
-	for(auto& e : units) {
+	for(auto& e : bsmeta<unitai>()) {
 		if(!e)
 			continue;
 		drawables.add(&e);
@@ -149,7 +148,7 @@ static void prepare_drawables() {
 
 static bool isend() {
 	heroi* leader = 0;
-	for(auto& e : units) {
+	for(auto& e : bsmeta<unitai>()) {
 		if(!e.isalive())
 			continue;
 		if(!leader)
@@ -219,7 +218,7 @@ static void prepare_background(landscape_s area, bool trees) {
 	hexagon_color = light ? 0xE0 : 0xE5;
 }
 
-static void prepare_leader(battleimage& e, heroi* hero, bool defender) {
+static void prepare_leader(unitai& e, heroi* hero, bool defender) {
 	e.clear();
 	e.type = Hero;
 	e.hero = hero->getid();
@@ -234,7 +233,7 @@ static void prepare_leader(battleimage& e, heroi* hero, bool defender) {
 	}
 }
 
-static void paint_grid(const battleimage* current_unit) {
+static void paint_grid(const unitai* current_unit) {
 	// Shadow movement indecies
 	if(battle.movement && current_unit) {
 		state push;
@@ -280,7 +279,7 @@ static void paint_grid(const battleimage* current_unit) {
 }
 
 static void clear_board() {
-	units.clear();
+	bsmeta<unitai>::count = 0;
 	drawables.clear();
 }
 
@@ -410,8 +409,8 @@ static void paint_field() {
 }
 
 static int drawable_compare(const void* v1, const void* v2) {
-	auto p1 = *((battleimage**)v1);
-	auto p2 = *((battleimage**)v2);
+	auto p1 = *((unitai**)v1);
+	auto p2 = *((unitai**)v2);
 	auto y1 = p1->getz();
 	auto y2 = p2->getz();
 	if(y1 != y2)
@@ -425,7 +424,7 @@ static void normalize_drawables() {
 	qsort(drawables.data, drawables.count, sizeof(drawables.data[0]), drawable_compare);
 }
 
-static bool update_drawables(battleimage* p, bool update_wait) {
+static bool update_drawables(unitai* p, bool update_wait) {
 	for(auto pe : drawables) {
 		if(pe != p) {
 			if(!update_wait && pe->iswait())
@@ -438,7 +437,7 @@ static bool update_drawables(battleimage* p, bool update_wait) {
 	return false;
 }
 
-static void paint_drawables(const battleimage* current) {
+static void paint_drawables(const unitai* current) {
 	for(auto pe : drawables) {
 		pe->paint();
 		if(pe == current)
@@ -458,7 +457,7 @@ static void hittest_drawable() {
 	}
 }
 
-static void paint_screen(const battleimage* current) {
+static void paint_screen(const unitai* current) {
 	normalize_drawables();
 	hittest_grid();
 	hittest_drawable();
@@ -574,7 +573,7 @@ static void wave(short unsigned start, bool fly) {
 	// Clear all path map
 	memset(path, 0, sizeof(path));
 	// Block units
-	for(auto& e : units) {
+	for(auto& e : bsmeta<unitai>()) {
 		if(!e.isalive())
 			continue;
 		auto i = e.getpos();
@@ -607,7 +606,7 @@ static void wave(short unsigned start, bool fly) {
 	path_start = start;
 }
 
-static void battlemove(battleimage& e) {
+static void battlemove(unitai& e) {
 	current_unit = &e;
 	prepare_drawables();
 	wave(e.getpos(), e.is(Fly));
@@ -624,7 +623,7 @@ static void makebattle() {
 	static speed_s speeds[] = {UltraFastSpeed, VeryFastSpeed, FastSpeed, AverageSpeed, SlowSpeed, VerySlowSpeed, CrawlingSpeed};
 	while(!isend()) {
 		for(auto s : speeds) {
-			for(auto& e : units) {
+			for(auto& e : bsmeta<unitai>()) {
 				if(!e.isalive())
 					continue;
 				if(e.isparalized())
@@ -642,7 +641,7 @@ static void makebattle() {
 					return;
 			}
 		}
-		for(auto& e : units) {
+		for(auto& e : bsmeta<unitai>()) {
 			if(!e.isalive())
 				continue;
 			e.refresh();
@@ -667,7 +666,7 @@ void heroi::battlestart() {
 }
 
 uniti* uniti::find(short unsigned index) {
-	for(auto& e : units) {
+	for(auto& e : bsmeta<unitai>()) {
 		if(!e.isalive())
 			continue;
 		if(e.getpos() == index)
@@ -676,7 +675,7 @@ uniti* uniti::find(short unsigned index) {
 	return 0;
 }
 
-void battleimage::animate(int frames) {
+void unitai::animate(int frames) {
 	if(iswait())
 		return;
 	if(start == 0 && animation::count == 0)
@@ -719,7 +718,7 @@ static int getdistance(point p1, point p2) {
 	return isqrt(dx*dx + dy * dy);
 }
 
-void battleimage::animate(point goal, int velocity) {
+void unitai::animate(point goal, int velocity) {
 	if(type == Monster && (!isalive() || iswait()))
 		return;
 	auto frames = start + animation::count;
@@ -781,8 +780,8 @@ static int get_missile_index(res_s icn, int dx, int dy) {
 void uniti::show_shoot(uniti& enemy) const {
 	if(!enemy.isalive() || !isalive())
 		return;
-	auto pa = (battleimage*)this;
-	auto pe = (battleimage*)&enemy;
+	auto pa = (unitai*)this;
+	auto pe = (unitai*)&enemy;
 	const auto d = getdirection(getpos(), enemy.getpos());
 	pa->set(d);
 	pa->set(Shoot, pa->getparam(d));
@@ -804,7 +803,7 @@ void uniti::show_shoot(uniti& enemy) const {
 	}
 	// Выпускание снаряда
 	const int shoot_height = 50;
-	battleimage arrow; arrow.clear();
+	unitai arrow; arrow.clear();
 	arrow.pos = pa->getbreast();//pa->getlaunch(pa->monster, d);
 	point target = pe->getbreast();
 	arrow.res = pa->getmissile(pa->monster);
@@ -827,8 +826,8 @@ void heroi::show_cast(bool mass) const {
 }
 
 void uniti::show_morale(bool good) const {
-	auto pa = (battleimage*)this;
-	battleimage e; e.clear();
+	auto pa = (unitai*)this;
+	unitai e; e.clear();
 	e.animation::set(good ? MORALEG : MORALEB, 0, pa->pos);
 	e.pos.y -= 32;
 	e.animation::count = getframecount(e.res);
@@ -838,8 +837,8 @@ void uniti::show_morale(bool good) const {
 }
 
 void uniti::show_effect(spell_s v) const {
-	auto pa = (battleimage*)this;
-	battleimage e; e.clear();
+	auto pa = (unitai*)this;
+	unitai e; e.clear();
 	e.type = Spell; e.spell = v;
 	switch(v) {
 	case Bless: e.set(BLESS, pa->gethead()); break;
@@ -861,7 +860,7 @@ void uniti::show_effect(spell_s v) const {
 void uniti::show_attack(const uniti& enemy, direction_s d) const {
 	if(!enemy.isalive() || !isalive())
 		return;
-	auto pa = (battleimage*)this;
+	auto pa = (unitai*)this;
 	pa->set(d);
 	pa->set(AttackAction);
 	pa->animate();
@@ -870,7 +869,7 @@ void uniti::show_attack(const uniti& enemy, direction_s d) const {
 }
 
 void uniti::show_damage() const {
-	auto pa = (battleimage*)this;
+	auto pa = (unitai*)this;
 	if(count <= 0)
 		pa->set(Killed);
 	else
@@ -882,7 +881,7 @@ void uniti::show_move(short unsigned index) const {
 	route_path(index);
 	if(!path_push)
 		return;
-	auto pa = (battleimage*)this;
+	auto pa = (unitai*)this;
 	auto i = getpos();
 	pa->set(Move);
 	path_push--;
@@ -930,7 +929,7 @@ void uniti::show_move(short unsigned index) const {
 }
 
 void uniti::show_fly(short unsigned goal) const {
-	auto pa = (battleimage*)this;
+	auto pa = (unitai*)this;
 	auto p2 = i2h(goal);
 	pa->set(getdirection(index, goal));
 	pa->flags |= AFMoving;
@@ -1042,14 +1041,15 @@ void heroi::castcombatspell() {
 	if(showbook(CombatSpell, &spell)) {
 		variant target;
 		if(choose(spell, target)) {
-			cast(spell, target, true);
+			if(cast(spell, target, true))
+				set(SpellPoints, get(SpellPoints) - getcost(spell));
 			set(Moved);
 		}
 	}
 }
 
 void uniti::addmorale(const heroi* leader, int value) {
-	for(auto& e : units) {
+	for(auto& e : bsmeta<unitai>()) {
 		if(!e)
 			continue;
 		if(e.leader == leader)

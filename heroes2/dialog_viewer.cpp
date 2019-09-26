@@ -81,7 +81,7 @@ void object_view() {
 void animation_view() {
 	auto speed = 6;
 	int x = 0;
-	battleimage pic;
+	unitai pic;
 	pic.type = Monster;
 	pic.monster = Peasant;
 	pic.unit = pic.monster;

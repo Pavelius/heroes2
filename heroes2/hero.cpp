@@ -400,7 +400,7 @@ void heroi::setvisit(unsigned short index) {
 	visited[i / 8] |= (1 << (i & 7));
 }
 
-unsigned heroi::getdamage(spell_s id, uniti& enemy) const {
+unsigned heroi::getdamage(spell_s id, const uniti& enemy) const {
 	auto value = bsmeta<spelli>::elements[id].power * get(SpellPower);
 	auto leader = enemy.leader;
 	switch(enemy.unit) {
@@ -482,12 +482,14 @@ unsigned heroi::getdamage(spell_s id, uniti& enemy) const {
 	return value;
 }
 
-bool heroi::cast(spell_s id, const variant& target, bool run) const {
+bool heroi::cast(spell_s id, const variant& target, bool run, bool test_cost) const {
 	auto& spell = bsmeta<spelli>::elements[id].tags;
 	auto power = get(SpellPower);
-	auto cost = getcost(id);
-	if(cost > get(SpellPoints))
-		return false;
+	if(test_cost) {
+		auto cost = getcost(id);
+		if(cost > get(SpellPoints))
+			return false;
+	}
 	if(spell.is(Enchantment)) {
 		if(is(WizardHat))
 			power += getpower(WizardHat);
@@ -542,7 +544,7 @@ bool heroi::cast(spell_s id, const variant& target, bool run) const {
 					break;
 				}
 			} else if(spell.is(Hostile)) {
-				auto d = power * getpower(id);
+				auto d = getdamage(id, e);
 				e.damage(d);
 				e.show_damage();
 			}

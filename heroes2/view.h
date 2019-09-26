@@ -36,7 +36,7 @@ enum event_s {
 };
 enum image_flags {
 	AFMirror = 1, AFNoOffset = 2, AFCenter = 4, AFCenterV = 8,
-	AFMoving = 16,
+	AFMoving = 16, AFFreezy = 32,
 };
 enum align_s : unsigned char {
 	AlignLeft, AlignCenter, AlignRight,
@@ -95,7 +95,7 @@ struct animation {
 	void					set(res_s id, point pos);
 	void					update();
 };
-struct battleimage : animation, variant, uniti {
+struct unitai : animation, variant, uniti {
 	constexpr explicit operator bool() const { return uniti::operator bool(); }
 	void					animate(point pos, int velocity);
 	void					animate(int frames = -1);

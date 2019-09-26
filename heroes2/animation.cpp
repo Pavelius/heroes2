@@ -43,8 +43,12 @@ bool animation::increment() {
 }
 
 void animation::update() {
-	if(increment())
-		frame = start;
+	if(increment()) {
+		if(flags&AFFreezy)
+			wait = 32;
+		else
+			frame = start;
+	}
 }
 
 void animation::paint(int x, int y) const {

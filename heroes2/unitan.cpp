@@ -120,12 +120,14 @@ static heroai heroes[] = {{CMBTHROB, {1, 5}, {6, 4}, {10, 2}, {12, 3}, {15, 4}},
 {NoRes},
 };
 
-void battleimage::clear() {
+DECLBASE(unitai, 32);
+
+void unitai::clear() {
 	memset(this, 0, sizeof(*this));
 	index = Blocked;
 }
 
-int battleimage::getbarframe() const {
+int unitai::getbarframe() const {
 	auto isboosted = false;
 	auto ispenalized = false;
 	for(unsigned i = 0; i < bsmeta<enchantmenti>::count; i++) {
@@ -146,11 +148,11 @@ int battleimage::getbarframe() const {
 	return 10;
 }
 
-void battleimage::stroke() const {
+void unitai::stroke() const {
 	draw::stroke(pos.x, pos.y, res, frame, flags, 1, 219);
 }
 
-void battleimage::paint() const {
+void unitai::paint() const {
 	image(pos.x, pos.y, res, frame, flags);
 	if(type == Hero && hero != RandomHero) {
 		auto player = bsmeta<heroi>::elements[hero].getplayer()->getid();
@@ -179,7 +181,7 @@ void battleimage::paint() const {
 	}
 }
 
-void battleimage::set(action_s action, int param) {
+void unitai::set(action_s action, int param) {
 	start = 0;
 	animation::count = 0;
 	wait = 0;
@@ -317,7 +319,7 @@ void battleimage::set(action_s action, int param) {
 	frame = start;
 }
 
-void battleimage::setdefault() {
+void unitai::setdefault() {
 	if(iskilled())
 		set(Dead);
 	else
@@ -326,21 +328,21 @@ void battleimage::setdefault() {
 		flags = isattacker(leader) ? 0 : AFMirror;
 }
 
-void battleimage::set(direction_s d) {
+void unitai::set(direction_s d) {
 	if(d == Left || d == LeftDown || d == LeftUp)
 		flags = AFMirror;
 	else
 		flags = 0;
 }
 
-bool battleimage::iskilled() const {
+bool unitai::iskilled() const {
 	if(type != Monster)
 		return false;
 	return frame >= monsters[unit].kill[0]
 		&& frame < monsters[unit].kill[0] + monsters[unit].kill[1];
 }
 
-bool battleimage::iswait() const {
+bool unitai::iswait() const {
 	heroi* h;
 	kind_s k;
 	switch(type) {
@@ -359,14 +361,14 @@ bool battleimage::iswait() const {
 	}
 }
 
-bool battleimage::ismoved() const {
+bool unitai::ismoved() const {
 	if(type != Monster)
 		return false;
 	return frame >= monsters[unit].move[0]
 		&& frame < monsters[unit].move[0] + monsters[unit].move[1];
 }
 
-int	battleimage::getz() const {
+int	unitai::getz() const {
 	if(type == Monster) {
 		if(frame == (monsters[unit].kill[0] + monsters[unit].kill[1] - 1))
 			return pos.y - 480;
@@ -374,7 +376,7 @@ int	battleimage::getz() const {
 	return pos.y;
 }
 
-void battleimage::update() {
+void unitai::update() {
 	if(increment())
 		setdefault();
 }

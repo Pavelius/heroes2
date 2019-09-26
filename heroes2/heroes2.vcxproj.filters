@@ -242,9 +242,6 @@
     <ClCompile Include="dialog_battle.cpp">
       <Filter>Диалоги</Filter>
     </ClCompile>
-    <ClCompile Include="battleimage.cpp">
-      <Filter>Графика</Filter>
-    </ClCompile>
     <ClCompile Include="unit.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
@@ -255,6 +252,9 @@
       <Filter>Диалоги</Filter>
     </ClCompile>
     <ClCompile Include="animation.cpp">
+      <Filter>Графика</Filter>
+    </ClCompile>
+    <ClCompile Include="unitan.cpp">
       <Filter>Графика</Filter>
     </ClCompile>
   </ItemGroup>

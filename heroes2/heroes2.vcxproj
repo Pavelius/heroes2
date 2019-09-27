@@ -135,6 +135,7 @@
     <ClCompile Include="army.cpp" />
     <ClCompile Include="armysize.cpp" />
     <ClCompile Include="artifacts.cpp" />
+    <ClCompile Include="unit_ai.cpp" />
     <ClCompile Include="unita.cpp" />
     <ClCompile Include="castle.cpp" />
     <ClCompile Include="castle_names.cpp" />

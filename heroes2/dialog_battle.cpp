@@ -634,8 +634,12 @@ static void makebattle() {
 					continue;
 				if(e.testmorale() == -1)
 					e.show_morale(false);
-				else
-					battlemove(e);
+				else {
+					if(e.ishuman())
+						battlemove(e);
+					else
+						e.automove();
+				}
 				e.set(Moved);
 				if(isend())
 					return;

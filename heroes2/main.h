@@ -881,6 +881,7 @@ struct uniti : positioni, squadi, battlef {
 	constexpr explicit operator bool() const { return index != Blocked; }
 	static void				addmorale(const heroi* leader, int value);
 	void					attack(uniti& enemy, direction_s dir);
+	void					automove();
 	bool					canshoot() const;
 	void					damage(unsigned v);
 	void					dispell(bool only_hostile = false);
@@ -888,6 +889,7 @@ struct uniti : positioni, squadi, battlef {
 	static uniti*			find(short unsigned index);
 	int						get(ability_s v) const;
 	spell_s					getbattlemagic(int chance) const;
+	uniti*					getbestenemy() const;
 	int						getcount(int hits) const;
 	unsigned				getdamage() const;
 	unsigned				getdamage(const uniti& enemy);
@@ -908,6 +910,7 @@ struct uniti : positioni, squadi, battlef {
 	bool					isdamaged() const;
 	constexpr bool			isenemy(const uniti* p) { return p->leader != leader; }
 	constexpr bool			isenemy(const heroi* p) { return p != leader; }
+	bool					ishuman() const;
 	bool					iskill(int d) const { return gethits() <= d; }
 	bool					isparalized() const { return is(Blind) || is(Paralyze) || is(Stone); }
 	void					melee(uniti& enemy, direction_s d = Up);

@@ -257,5 +257,8 @@
     <ClCompile Include="unita.cpp">
       <Filter>Графика</Filter>
     </ClCompile>
+    <ClCompile Include="unit_ai.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -28,8 +28,7 @@ static void test_battle() {
 	pd->clear();
 	pd->setpos(4640);
 	pd->armyi::clear();
-	pd->add(Skeleton, 30);
-	pd->add(Zombie, 4);
+	pd->add(Archer, 10);
 	ph->set(Blind);
 	ph->set(BloodLust);
 	ph->set(Cure);
@@ -84,7 +83,7 @@ int main() {
 	draw::initialize();
 	drawobji::initialize();
 	before_open();
-	return 0;
+	//return 0;
 	if(!draw::create("test", 190, false))
 		return -1;
 	srand(21837);

@@ -555,3 +555,12 @@ int	uniti::teststat(ability_s a) const {
 	else
 		return (r < -m) ? -1 : 0;
 }
+
+bool uniti::ishuman() const {
+	if(!leader)
+		return false;
+	auto player = leader->getplayer();
+	if(!player)
+		return false;
+	return true;
+}

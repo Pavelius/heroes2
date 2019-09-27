@@ -36,7 +36,7 @@ enum event_s {
 };
 enum image_flags {
 	AFMirror = 1, AFNoOffset = 2, AFCenter = 4, AFCenterV = 8,
-	AFMoving = 16, AFFreezy = 32,
+	AFMoving = 16, AFFreezy = 32, AFStill = 64
 };
 enum align_s : unsigned char {
 	AlignLeft, AlignCenter, AlignRight,
@@ -73,11 +73,12 @@ struct picture {
 	void					setsize() { setsize(res, frame); }
 };
 struct animation {
-	point					pos;
 	res_s					res;
-	unsigned				flags;
-	unsigned char			frame, start, count, wait;
-	constexpr animation() : pos{0, 0}, res(NoRes), wait(0), frame(0), start(0), count(0), flags(0) {}
+	unsigned char			start, count, frame, wait;
+	unsigned short			flags;
+	short					zorder;
+	point					pos;
+	constexpr animation() : pos{0, 0}, res(NoRes), wait(0), frame(0), start(0), count(0), flags(0), zorder(0) {}
 	bool					increment();
 	void					freezy(int duration);
 	static int				getanimate(res_s id, int start, int ticket, bool quantity);

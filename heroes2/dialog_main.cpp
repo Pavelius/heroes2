@@ -69,7 +69,7 @@ static void main_menu() {
 		latern.paint(0, 0);
 		domodal();
 		if(hot::key == InputTimer)
-			latern.update();
+			latern.increment();
 	}
 }
 

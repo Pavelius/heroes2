@@ -545,6 +545,10 @@ int	uniti::teststat(ability_s a) const {
 	auto m = get(a) - 3;
 	if(m == 0)
 		return 0;
+	if(m > 6)
+		m = 6;
+	else if(m < -6)
+		m = -6;
 	auto r = rand() % 10;
 	if(m > 0)
 		return (r < m) ? 1 : 0;

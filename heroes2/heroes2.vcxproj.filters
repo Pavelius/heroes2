@@ -164,9 +164,6 @@
     <ClCompile Include="dialog_game.cpp">
       <Filter>Диалоги</Filter>
     </ClCompile>
-    <ClCompile Include="draw_list.cpp">
-      <Filter>Графика</Filter>
-    </ClCompile>
     <ClCompile Include="level.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
@@ -254,7 +251,10 @@
     <ClCompile Include="animation.cpp">
       <Filter>Графика</Filter>
     </ClCompile>
-    <ClCompile Include="unitan.cpp">
+    <ClCompile Include="list.cpp">
+      <Filter>Графика</Filter>
+    </ClCompile>
+    <ClCompile Include="unita.cpp">
       <Filter>Графика</Filter>
     </ClCompile>
   </ItemGroup>

@@ -24,8 +24,8 @@ static unsigned short	path_start;
 static const direction_s all_around[] = {Left, Right, LeftUp, LeftDown, RightUp, RightDown};
 
 static adat<unitai*, 32>	drawables;
-static unitai			attacker_image, defender_image;
-static short unsigned	position_wide[2][5] = {{0, 22, 44, 66, 88}, {10, 32, 54, 76, 98}};
+static unitai				attacker_image, defender_image;
+static short unsigned		position_wide[2][5] = {{0, 22, 44, 66, 88}, {10, 32, 54, 76, 98}};
 
 variant::variant(const uniti* v) : type(Unit), value((unitai*)v - bsmeta<unitai>::elements) {}
 
@@ -886,6 +886,8 @@ void uniti::show_move(short unsigned index) const {
 	pa->set(Move);
 	path_push--;
 	int distance = 0;
+	auto speed = getanimationspeed();
+	speed = speed * 2 / 3;
 	while(path_push != 0) {
 		path_push--;
 		auto i1 = path_stack[path_push];
@@ -916,7 +918,7 @@ void uniti::show_move(short unsigned index) const {
 			}
 			paint_screen(0);
 			updatescreen();
-			sleep(getanimationspeed());
+			sleep(speed);
 			if(pa->increment()) {
 				pa->frame = pa->start + 1;
 				break;

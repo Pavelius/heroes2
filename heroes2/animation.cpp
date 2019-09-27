@@ -42,15 +42,6 @@ bool animation::increment() {
 	return false;
 }
 
-void animation::update() {
-	if(increment()) {
-		if(flags&AFFreezy)
-			wait = 32;
-		else
-			frame = start;
-	}
-}
-
 void animation::paint(int x, int y) const {
 	image(x + pos.x, y + pos.y, res, frame, flags);
 }
@@ -210,6 +201,15 @@ point animation::getlaunch(monster_s id, direction_s d) const {
 }
 
 void animation::freezy(int duration) {
-	frame = start + count - 1;
+	//frame = start + count - 1;
 	wait = duration;
+}
+
+void animation::update() {
+	if(increment()) {
+		if(flags&AFFreezy)
+			wait = 8 + rand() % 8;
+		if((flags&AFStill) == 0)
+			frame = start;
+	}
 }

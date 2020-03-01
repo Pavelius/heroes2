@@ -76,12 +76,12 @@ static void route_path(short unsigned goal) {
 	path_stack[path_push++] = goal;
 	while(pos != path_start) {
 		auto n = pos;
-		gnext(uniti::to(pos, Left), level, n);
-		gnext(uniti::to(pos, Right), level, n);
 		gnext(uniti::to(pos, LeftDown), level, n);
 		gnext(uniti::to(pos, LeftUp), level, n);
 		gnext(uniti::to(pos, RightDown), level, n);
 		gnext(uniti::to(pos, RightUp), level, n);
+		gnext(uniti::to(pos, Left), level, n);
+		gnext(uniti::to(pos, Right), level, n);
 		if(pos == n)
 			return;
 		pos = n;
@@ -608,8 +608,6 @@ static void wave(short unsigned start, bool fly) {
 
 static void battlemove(unitai& e) {
 	current_unit = &e;
-	prepare_drawables();
-	wave(e.getpos(), e.is(Fly));
 	while(ismodal()) {
 		paint_screen(current_unit);
 		standart_input();
@@ -632,6 +630,8 @@ static void makebattle() {
 					continue;
 				if(e.get(Speed) < s)
 					continue;
+				prepare_drawables();
+				wave(e.getpos(), e.is(Fly));
 				if(e.testmorale() == -1)
 					e.show_morale(false);
 				else {
@@ -881,6 +881,25 @@ void uniti::show_damage() const {
 	pa->animate();
 }
 
+short unsigned uniti::getnextmove(short unsigned index, short unsigned points) const {
+	route_path(index);
+	if(!path_push)
+		return Blocked;
+	auto i = getpos();
+	path_push--;
+	while(path_push != 0) {
+		path_push--;
+		auto i1 = path_stack[path_push];
+		if(i1 == Blocked)
+			break;
+		auto cost = getcost(i1);
+		if(cost > points)
+			break;
+		i = i1;
+	}
+	return i;
+}
+
 void uniti::show_move(short unsigned index) const {
 	route_path(index);
 	if(!path_push)
@@ -1062,3 +1081,60 @@ void uniti::addmorale(const heroi* leader, int value) {
 			e.morale += value;
 	}
 }
+
+unsigned uniti::getscore(short unsigned index) {
+	if(index == Blocked)
+		return 0;
+	if(getcost(index) == Blocked)
+		return 0;
+	unsigned cs = 0;
+	for(auto d : all_around) {
+		auto i1 = to(index, d);
+		auto pu = find(i1);
+		if(!pu)
+			continue;
+		if(pu->isarcher())
+			cs++;
+	}
+	return cs;
+}
+
+direction_s uniti::getattackpos(short unsigned index) {
+	short unsigned i1 = Blocked;
+	unsigned s1 = 0;
+	direction_s d1 = Up;
+	for(auto e : all_around) {
+		auto i = to(index, e);
+		if(i == Blocked)
+			continue;
+		auto s = getscore(i);
+		if(!s)
+			continue;
+		if(i1 == Blocked || s1 < s) {
+			i1 = i;
+			s1 = s;
+			d1 = e;
+		}
+	}
+	return d1;
+}
+
+bool uniti::isclose(short unsigned index) const {
+	auto i = getpos();
+	for(auto d : all_around) {
+		auto i1 = to(i, d);
+		if(i1 == index)
+			return true;
+	}
+	return false;
+}
+
+//direction_s uniti::getdirection(short unsigned index) const {
+//	auto i = getpos();
+//	for(auto d : all_around) {
+//		auto i1 = to(i, d);
+//		if(i1 == index)
+//			return true;
+//	}
+//	return false;
+//}

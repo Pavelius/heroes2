@@ -878,26 +878,29 @@ struct uniti : positioni, squadi, battlef {
 	short unsigned			hits;
 	char					morale;
 	char					luck;
-	constexpr explicit operator bool() const { return index != Blocked; }
+	explicit operator bool() const { return index != Blocked; }
 	static void				addmorale(const heroi* leader, int value);
 	void					attack(uniti& enemy, direction_s dir);
 	void					automove();
-	bool					canshoot() const;
+	bool					canshoot() const { return isarcher() && shoots && !ishandfight(); }
 	void					damage(unsigned v);
 	void					dispell(bool only_hostile = false);
 	static void				exhausespells();
 	static uniti*			find(short unsigned index);
 	int						get(ability_s v) const;
+	static direction_s		getattackpos(short unsigned index);
 	spell_s					getbattlemagic(int chance) const;
-	uniti*					getbestenemy() const;
+	uniti*					getbestenemy(bool close_only) const;
 	int						getcount(int hits) const;
 	unsigned				getdamage() const;
 	unsigned				getdamage(const uniti& enemy);
 	static direction_s		getdirection(short unsigned from, short unsigned to);
 	int						gethits() const;
 	int						getkilled(int d) const;
+	short unsigned			getnextmove(short unsigned index, short unsigned points) const;
 	int						getresist(spell_s id, int spell_power) const;
 	unsigned				getscore(const uniti& defender) const;
+	static unsigned			getscore(short unsigned index);
 	int						getspell(spell_s v) const;
 	void					heal(unsigned v);
 	constexpr bool			is(battle_s v) const { return battlef::is(v); }
@@ -907,9 +910,11 @@ struct uniti : positioni, squadi, battlef {
 	bool					isarcher() const { return getmonster().shoots != 0; }
 	static bool				isattacker(const heroi* leader);
 	bool					isattacker() const { return isattacker(leader); }
+	bool					isclose(short unsigned index) const;
 	bool					isdamaged() const;
 	constexpr bool			isenemy(const uniti* p) { return p->leader != leader; }
 	constexpr bool			isenemy(const heroi* p) { return p != leader; }
+	bool					ishandfight() const;
 	bool					ishuman() const;
 	bool					iskill(int d) const { return gethits() <= d; }
 	bool					isparalized() const { return is(Blind) || is(Paralyze) || is(Stone); }

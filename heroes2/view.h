@@ -96,7 +96,7 @@ struct animation {
 	void					set(res_s id, point pos);
 };
 struct unitai : animation, variant, uniti {
-	constexpr explicit operator bool() const { return uniti::operator bool(); }
+	explicit operator bool() const { return uniti::operator bool(); }
 	void					animate(point pos, int velocity);
 	void					animate(int frames = -1);
 	void					clear();

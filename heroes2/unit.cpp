@@ -126,15 +126,13 @@ static bool isvalidindex(short unsigned i, const heroi* leader) {
 	return false;
 }
 
-bool uniti::canshoot() const {
-	if(!shoots)
-		return false;
+bool uniti::ishandfight() const {
 	auto i = getpos();
 	for(auto d : all_around) {
 		if(!isvalidindex(to(i, d), leader))
-			return false;
+			return true;
 	}
-	return true;
+	return false;
 }
 
 direction_s uniti::to(direction_s d, direction_s d1) {

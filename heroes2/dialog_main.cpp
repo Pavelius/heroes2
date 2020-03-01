@@ -28,7 +28,8 @@ static void test_battle() {
 	pd->clear();
 	pd->setpos(4640);
 	pd->armyi::clear();
-	pd->add(Archer, 10);
+	pd->add(Swordsman, 3);
+	pd->add(Rogue, 10);
 	ph->set(Blind);
 	ph->set(BloodLust);
 	ph->set(Cure);

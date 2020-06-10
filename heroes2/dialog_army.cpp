@@ -247,7 +247,7 @@ void squadi::show(const heroi* hero, bool info_mode, bool allow_dismiss, bool al
 	unitai mon;
 	mon.clear();
 	mon.type = Monster;
-	mon.monster = this->unit;
+	mon.value = this->unit;
 	mon.unit = this->unit;
 	mon.uniti::count = 0;
 	if(is(Fly))

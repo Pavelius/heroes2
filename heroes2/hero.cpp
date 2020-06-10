@@ -138,13 +138,13 @@ int heroi::getbonus(ability_s v) const {
 		auto i = getpower(e);
 		auto t = bsmeta<artifacti>::elements[e].type;
 		if(t.type == Ability) {
-			if(t.ability == v)
+			if(t.value == v)
 				r += i;
-			else if(t.ability == SpellPowerKnowledge && (v == SpellPower || v == Knowledge))
+			else if(t.value == SpellPowerKnowledge && (v == SpellPower || v == Knowledge))
 				r += i;
-			else if(t.ability == AttackDefence && (v == Attack || v == Defence))
+			else if(t.value == AttackDefence && (v == Attack || v == Defence))
 				r += i;
-			else if(t.ability == AllAbilities && (v == Attack || v == Defence || v == SpellPower || v == Knowledge))
+			else if(t.value == AllAbilities && (v == Attack || v == Defence || v == SpellPower || v == Knowledge))
 				r += i;
 		}
 	}
@@ -310,8 +310,8 @@ unsigned heroi::getlearn(variantcol* result, unsigned count) const {
 		if(!v)
 			break;
 		*((variant*)(result + n)) = v;
-		result[n].count = skills[v.skill] + 1;
-		exclude.add(v.skill);
+		result[n].count = skills[v.value] + 1;
+		exclude.add((skill_s)v.value);
 		n++;
 	}
 	return n;
@@ -330,11 +330,11 @@ void heroi::levelup(bool interactive) {
 		str.add("\n\n%1 +1\n", getstr(raise));
 		if(raise_count >= 1) {
 			str.addn("\nВы также можете выучить %-1 %2",
-				skill_level_name[raise_skills[0].count], getstr(raise_skills[0].skill));
+				skill_level_name[raise_skills[0].count], raise_skills[0].getname());
 		}
 		if(raise_count >= 2) {
 			str.adds("или %-1 %2",
-				skill_level_name[raise_skills[1].count], getstr(raise_skills[1].skill));
+				skill_level_name[raise_skills[1].count], raise_skills[1].getname());
 		}
 		str.add(".");
 		choose = learn(str, raise_skills, raise_count);
@@ -344,7 +344,7 @@ void heroi::levelup(bool interactive) {
 	}
 	abilities[raise]++;
 	if(choose != -1)
-		skills[raise_skills[choose].skill]++;
+		skills[raise_skills[choose].value]++;
 	level++;
 }
 

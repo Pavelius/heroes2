@@ -115,7 +115,6 @@ template<typename T> struct aref {
 // Common access to data types
 template<typename T> struct bsmeta {
 	static constexpr const unsigned size = sizeof(T);
-	typedef T				data_type;
 	static T				elements[];
 	static unsigned			count;
 	static const unsigned	count_maximum;

@@ -30,7 +30,9 @@ static short unsigned		position_wide[2][5] = {{0, 22, 44, 66, 88}, {10, 32, 54, 
 variant::variant(const uniti* v) : type(Unit), value((unitai*)v - bsmeta<unitai>::elements) {}
 
 uniti* variant::getunit() const {
-	return bsmeta<unitai>::elements + value;
+	if(type==Unit)
+		return bsmeta<unitai>::elements + value;
+	return 0;
 }
 
 static unsigned getanimationspeed() {
@@ -114,7 +116,7 @@ static void add_squad(short unsigned index, squadi& squad, heroi* leader) {
 	p->clear();
 	p->setup(squad, leader);
 	p->type = Monster;
-	p->monster = p->unit;
+	p->value = p->unit;
 	p->flags = uniti::isattacker(leader) ? 0 : AFMirror;
 	p->source = &squad;
 	p->leader = leader;
@@ -221,7 +223,7 @@ static void prepare_background(landscape_s area, bool trees) {
 static void prepare_leader(unitai& e, heroi* hero, bool defender) {
 	e.clear();
 	e.type = Hero;
-	e.hero = hero->getid();
+	e.value = hero->getid();
 	e.set(Wait);
 	if(defender) {
 		e.pos.x = 606;
@@ -810,7 +812,7 @@ void uniti::show_shoot(uniti& enemy) const {
 	unitai arrow; arrow.clear();
 	arrow.pos = pa->getbreast();//pa->getlaunch(pa->monster, d);
 	point target = pe->getbreast();
-	arrow.res = pa->getmissile(pa->monster);
+	arrow.res = pa->getmissile((monster_s)pa->value);
 	arrow.frame = get_missile_index(arrow.res, arrow.pos.x - target.x, arrow.pos.y - target.y);
 	arrow.start = arrow.frame;
 	arrow.flags = pa->flags;
@@ -842,8 +844,10 @@ void uniti::show_morale(bool good) const {
 
 void uniti::show_effect(spell_s v) const {
 	auto pa = (unitai*)this;
-	unitai e; e.clear();
-	e.type = Spell; e.spell = v;
+	unitai e;
+	e.clear();
+	e.type = Spell;
+	e.value = v;
 	switch(v) {
 	case Bless: e.set(BLESS, pa->gethead()); break;
 	case Blind: e.set(BLIND, pa->gethead()); break;

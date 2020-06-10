@@ -355,7 +355,7 @@ static void standart_input() {
 		break;
 	case Hero:
 		if(hot::key == MouseLeft && hot::pressed)
-			draw::execute(choose_hero, (int)hilite_var.hero);
+			draw::execute(choose_hero, (int)hilite_var.value);
 		else
 			hilite_var.gethero()->input(current_player);
 		break;
@@ -752,7 +752,7 @@ static void tips_info(bool show_resource_count, bool show_monster_count, bool sh
 		break;
 	case CastleVar: sb.addn("%1", hilite_var.getcastle()->getname()); break;
 	case Hero: sb.addn("Герой %1", hilite_var.gethero()->getname()); break;
-	case Landscape: sb.addn(getstr(hilite_var.landscape)); break;
+	case Landscape: sb.addn(hilite_var.getname()); break;
 	}
 	quicktips(hot::mouse.x, hot::mouse.y, temp);
 }
@@ -772,7 +772,7 @@ static void update_cursor() {
 			setcursor(ADVMCO, 5);
 		else if(map::is(hilite_index, ActionTile)) {
 			if(hilite_var.type == Hero) {
-				if(hilite_var.hero == current_var.hero)
+				if(hilite_var.value == current_var.value)
 					setcursor(ADVMCO, 2);
 				else
 					setcursor(ADVMCO, 8);

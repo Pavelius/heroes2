@@ -154,8 +154,8 @@ void unitai::stroke() const {
 
 void unitai::paint() const {
 	image(pos.x, pos.y, res, frame, flags);
-	if(type == Hero && hero != RandomHero) {
-		auto player = bsmeta<heroi>::elements[hero].getplayer()->getid();
+	if(type == Hero && value != RandomHero) {
+		auto player = bsmeta<heroi>::elements[value].getplayer()->getid();
 		auto icn = res_s(HEROFL00 + player - PlayerBlue);
 		draw::image(pos.x, pos.y, icn, draw::counter % 5, flags);
 	} else if(type == Monster) {
@@ -186,11 +186,11 @@ void unitai::set(action_s action, int param) {
 	animation::count = 0;
 	wait = 0;
 	if(type == Monster) {
-		auto& e = monsters[monster];
+		auto& e = monsters[value];
 		res = e.icn;
 		switch(action) {
 		case Wait:
-			switch(monster) {
+			switch(value) {
 			case Zombie:
 			case MutantZombie:
 				start = e.idle[0] + 7;
@@ -284,7 +284,7 @@ void unitai::set(action_s action, int param) {
 			break;
 		}
 	} else if(type == Hero) {
-		auto& ed = heroes[bsmeta<heroi>::elements[hero].getkind()];
+		auto& ed = heroes[bsmeta<heroi>::elements[value].getkind()];
 		res = ed.icn;
 		switch(action) {
 		case Wait:

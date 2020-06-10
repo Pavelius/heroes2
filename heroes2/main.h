@@ -250,35 +250,21 @@ struct variantcol;
 struct uniti;
 struct variant {
 	variant_s				type;
-	union {
-		ability_s			ability;
-		artifact_s			artifact;
-		building_s			building;
-		hero_s				hero;
-		landscape_s			landscape;
-		player_s			player;
-		skill_s				skill;
-		spell_s				spell;
-		resource_s			resource;
-		tag_s				tag;
-		object_s			object;
-		monster_s			monster;
-		unsigned short		value;
-	};
+	unsigned short			value;
 	constexpr variant() : type(NoVariant), value(0) {}
 	constexpr variant(variant_s t, unsigned char v) : type(t), value(v) {}
-	constexpr variant(ability_s v) : type(Ability), ability(v) {}
-	constexpr variant(artifact_s v) : type(Artifact), artifact(v) {}
-	constexpr variant(building_s v) : type(Building), building(v) {}
-	constexpr variant(hero_s v) : type(Hero), hero(v) {}
-	constexpr variant(landscape_s v) : type(Landscape), landscape(v) {}
-	constexpr variant(object_s v) : type(Object), object(v) {}
-	constexpr variant(player_s v) : type(Player), player(v) {}
-	constexpr variant(monster_s v) : type(Monster), monster(v) {}
-	constexpr variant(resource_s v) : type(Resource), resource(v) {}
-	constexpr variant(skill_s v) : type(Skill), skill(v) {}
-	constexpr variant(spell_s v) : type(Spell), spell(v) {}
-	constexpr variant(tag_s v) : type(Tag), tag(v) {}
+	constexpr variant(ability_s v) : type(Ability), value(v) {}
+	constexpr variant(artifact_s v) : type(Artifact), value(v) {}
+	constexpr variant(building_s v) : type(Building), value(v) {}
+	constexpr variant(hero_s v) : type(Hero), value(v) {}
+	constexpr variant(landscape_s v) : type(Landscape), value(v) {}
+	constexpr variant(object_s v) : type(Object), value(v) {}
+	constexpr variant(player_s v) : type(Player), value(v) {}
+	constexpr variant(monster_s v) : type(Monster), value(v) {}
+	constexpr variant(resource_s v) : type(Resource), value(v) {}
+	constexpr variant(skill_s v) : type(Skill), value(v) {}
+	constexpr variant(spell_s v) : type(Spell), value(v) {}
+	constexpr variant(tag_s v) : type(Tag), value(v) {}
 	constexpr variant(short unsigned v) : type(Index), value(v) {}
 	variant(const castlei* v);
 	variant(const heroi* v);

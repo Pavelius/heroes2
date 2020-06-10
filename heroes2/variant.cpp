@@ -2,15 +2,15 @@
 
 const char* variant::getname() const {
 	switch(type) {
-	case Ability: return getstr(ability);
-	case Artifact: return getstr(artifact);
-	case Castle: return getcastle()->getname();
-	case Hero: return gethero()->getname();
-	case Landscape: return getstr(landscape);
+	case Ability: return bsmeta<abilityi>::elements[value].name;
+	case Artifact: return bsmeta<artifacti>::elements[value].name;
+	case Castle: return bsmeta<castlei>::elements[value].getname();
+	case Hero: return bsmeta<heroi>::elements[value].getname();
+	case Landscape: return bsmeta<landscapei>::elements[value].name;
 	//case Moveable: return getmoveable()->getname();
-	case Skill: return getstr(skill);
-	case Spell: return getstr(spell);
-	case Monster: return getstr(monster);
+	case Skill: return bsmeta<skilli>::elements[value].name;
+	case Spell: return bsmeta<spelli>::elements[value].name;
+	case Monster: return bsmeta<monsteri>::elements[value].name;
 	default: return "";
 	}
 }
@@ -26,9 +26,9 @@ castlei* variant::getcastle() const {
 }
 
 heroi* variant::gethero() const {
-	if(hero == RandomHero)
+	if(value == RandomHero)
 		return 0;
-	return bsmeta<heroi>::elements + hero;
+	return bsmeta<heroi>::elements + value;
 }
 
 moveablei* variant::getmoveable() const {

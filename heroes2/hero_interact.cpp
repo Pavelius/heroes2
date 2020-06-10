@@ -54,22 +54,22 @@ void heroi::add(const variantcol& v) {
 	switch(v.type) {
 	case Resource:
 		cost.clear();
-		cost.add(v.resource, v.count);
+		cost.add((resource_s)v.value, v.count);
 		add(cost);
 		break;
 	case Artifact:
-		add(v.artifact);
+		add((artifact_s)v.value);
 		break;
 	case Monster:
-		armyi::add(v.monster, v.count);
+		armyi::add((monster_s)v.value, v.count);
 		break;
 	case Ability:
-		switch(v.ability) {
+		switch(v.value) {
 		case Attack:
 		case Defence:
 		case Wisdow:
 		case Knowledge:
-			abilities[v.ability]++;
+			abilities[v.value]++;
 			break;
 		case Experience:
 			addexperience(v.count);
@@ -77,10 +77,10 @@ void heroi::add(const variantcol& v) {
 		}
 		break;
 	case Spell:
-		set(v.spell);
+		set((spell_s)v.value);
 		break;
 	case Skill:
-		set(v.skill, v.count);
+		set((skill_s)v.value, v.count);
 		break;
 	}
 }
@@ -147,8 +147,8 @@ bool heroi::interact(moveablei& object, interact_s type, variantcol v1, variantc
 		break;
 	case QuestArtifact:
 		v1 = variantcol(object.getartifact());
-		if(bsmeta<artifacti>::elements[v1.artifact].text)
-			text = bsmeta<artifacti>::elements[v1.artifact].text;
+		if(bsmeta<artifacti>::elements[v1.value].text)
+			text = bsmeta<artifacti>::elements[v1.value].text;
 		str.add(text, v1.getname());
 		str.addsep();
 		str.addi(v1);
@@ -173,10 +173,10 @@ bool heroi::interact(moveablei& object, interact_s type, variantcol v1, variantc
 		break;
 	case JoinDwelling:
 		if(!object.getcount()) {
-			str.add(fail, bsmeta<monsteri>::elements[v1.monster].multiname);
+			str.add(fail, bsmeta<monsteri>::elements[v1.value].multiname);
 			message(str);
 		} else {
-			str.add(text, bsmeta<monsteri>::elements[v1.monster].multiname);
+			str.add(text, bsmeta<monsteri>::elements[v1.value].multiname);
 			if(ask(str)) {
 				variantcol e(v1);
 				e.count = object.getcount();
@@ -186,10 +186,10 @@ bool heroi::interact(moveablei& object, interact_s type, variantcol v1, variantc
 		}
 		break;
 	case CaptureObject:
-		if(v1.type == Object && v1.object == ResourceObject)
+		if(v1.type == Object && v1.value == ResourceObject)
 			gainmine(text, object.getresource());
 		else if(v1.type == Resource)
-			gainmine(text, v1.resource);
+			gainmine(text, (resource_s)v1.value);
 		else {
 			str.add(text);
 			message(str);
@@ -216,10 +216,10 @@ bool heroi::interact(moveablei& object, interact_s type, variantcol v1, variantc
 	case LearnAbility:
 		switch(v1.type) {
 		case Spell:
-			v1.spell = object.getspell();
+			v1.value = object.getspell();
 			break;
 		case Skill:
-			v1.skill = object.getskill();
+			v1.value = object.getskill();
 			v1.count = 1;
 			break;
 		}
@@ -248,8 +248,8 @@ bool heroi::interact(moveablei& object, interact_s type, variantcol v1, variantc
 			auto a = object.getartifact();
 			costi cost;
 			cost.clear();
-			cost.add(v1.resource, v1.count);
-			cost.add(v2.resource, v2.count);
+			cost.add((resource_s)v1.value, v1.count);
+			cost.add((resource_s)v2.value, v2.count);
 			string rstr; rstr.addt(cost);
 			str.add(text, getstr(a), rstr.begin());
 			str.addsep();

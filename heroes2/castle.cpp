@@ -618,7 +618,7 @@ void castlei::refresh() {
 }
 
 void castlei::genspells(generator& gen) {
-	static int count_by_level[5] = {3, 3, 2, 2, 1};
+	static int count_by_level[] = {0, 3, 3, 2, 2, 1};
 	for(auto level = 1; level <= 5; level++) {
 		for(auto i = 0; i<count_by_level[level]; i++)
 			set(gen.spell(level));

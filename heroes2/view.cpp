@@ -1237,36 +1237,36 @@ void picture::set(const variant e, int value) {
 	format = 0;
 	switch(e.type) {
 	case Artifact:
-		res = ARTIFACT; frame = e.artifact;
+		res = ARTIFACT; frame = (unsigned char)e.value;
 		setsize(RESOURCE, 7);
 		break;
 	case Building:
 		res = getbuildings(kind_s(value));
-		frame = castlei::getframe(e.building);
+		frame = castlei::getframe((building_s)e.value);
 		setsize();
 		size.y = getheight(BLDGXTRA, 0);
 		break;
 	case Monster:
-		res = res_s(MONH0000 + e.monster - FirstMonster); frame = 0;
+		res = res_s(MONH0000 + e.value - FirstMonster); frame = 0;
 		setsize(STRIP, 12);
 		break;
 	case Resource:
-		res = RESOURCE; frame = resources_frame[e.resource];
+		res = RESOURCE; frame = resources_frame[e.value];
 		setsize();
 		size.y += getheight(SMALFONT, 'I' - 0x20) + 4;
 		format = "%1i";
 		break;
 	case Hero:
-		res = res_s(PORT0000 + e.hero); frame = 0;
+		res = res_s(PORT0000 + e.value); frame = 0;
 		setsize(TOWNWIND, 18);
 		break;
 	case Ability:
-		if(e.ability <= Knowledge) {
-			res = PRIMSKIL; frame = e.ability;
+		if(e.value <= Knowledge) {
+			res = PRIMSKIL; frame = (unsigned char)e.value;
 			setsize(PRIMSKIL, 4);
 		} else {
 			res = EXPMRL;
-			switch(e.ability) {
+			switch(e.value) {
 			case MoraleStat: frame = (value >= 0) ? 2 : 3; break;
 			case Experience: frame = 4; format = "%1i"; break;
 			default: frame = (value >= 0) ? 0 : 1; break;
@@ -1276,15 +1276,15 @@ void picture::set(const variant e, int value) {
 		}
 		break;
 	case Skill:
-		res = SECSKILL; frame = e.skill + 1;
+		res = SECSKILL; frame = (unsigned char)e.value + 1;
 		setsize(SECSKILL, 15);
 		break;
 	case Player:
-		res = BRCREST; frame = e.player;
+		res = BRCREST; frame = (unsigned char)e.value;
 		setsize(res, 6);
 		break;
 	case Spell:
-		res = SPELLS; frame = bsmeta<spelli>::elements[e.spell].portrait;
+		res = SPELLS; frame = bsmeta<spelli>::elements[e.value].portrait;
 		setsize();
 		break;
 	default:
@@ -1374,10 +1374,10 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 		render(x, z + 6, res, frame + 1);
 		break;
 	case Ability:
-		if(element.ability <= Knowledge) {
+		if(element.value <= Knowledge) {
 			render(x, z, PRIMSKIL, 4);
 			render(x, z + 6, res, frame);
-			auto p = getstr(element.ability);
+			auto p = getstr((ability_s)element.value);
 			text(x + (size.x - textw(p)) / 2, z + 14, p);
 			zprint(temp, "+1");
 			draw::state push;
@@ -1387,7 +1387,7 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 			render(x, z, res, frame);
 		break;
 	case Monster:
-		render(x, z + 6, STRIP, index_by_type(bsmeta<monsteri>::elements[element.monster].type));
+		render(x, z + 6, STRIP, index_by_type(bsmeta<monsteri>::elements[element.value].type));
 		render(x, y + h1 - getheight(res, frame) - 10, res, frame);
 		render(x, z, STRIP, 12);
 		if(count) {
@@ -1403,7 +1403,7 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 		render(x, z, BLDGXTRA, 0);
 		render(x, z + 2, res, frame);
 		if(true) {
-			auto p = getstr(element.building, kind_s(count));
+			auto p = getstr((building_s)element.value, kind_s(count));
 			text(x + (size.x - textw(p)) / 2, y + 61, p);
 			font = pf;
 		}
@@ -1412,7 +1412,7 @@ void picture::paint(int x, int y, int h1, variant element, int count) const {
 		render(x, z, SECSKILL, 15);
 		render(x, z + 2, res, frame);
 		if(count) {
-			const char* p = getstr(element.skill);
+			const char* p = getstr((skill_s)element.value);
 			text(x + (size.x - textw(p)) / 2, z + 6, p);
 			p = skill_level_name[count];
 			text(x + (size.x - textw(p)) / 2, z + 57, p);

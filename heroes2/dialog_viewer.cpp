@@ -83,8 +83,8 @@ void animation_view() {
 	int x = 0;
 	unitai pic;
 	pic.type = Monster;
-	pic.monster = Peasant;
-	pic.unit = pic.monster;
+	pic.value = Peasant;
+	pic.unit = (monster_s)pic.value;
 	pic.uniti::count = 13;
 	pic.set(Move);
 	pic.set(Right);
@@ -108,15 +108,15 @@ void animation_view() {
 			buttoncancel();
 			break;
 		case KeyRight:
-			if(pic.monster < WaterElement)
+			if(pic.value < WaterElement)
 				pic.value++;
-			pic.unit = pic.monster;
+			pic.unit = (monster_s)pic.value;
 			pic.set(Move);
 			break;
 		case KeyLeft:
 			if(pic.value)
 				pic.value--;
-			pic.unit = pic.monster;
+			pic.unit = (monster_s)pic.value;
 			pic.set(Move);
 			break;
 		case KeyUp: speed++; break;

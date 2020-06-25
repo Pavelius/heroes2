@@ -9,11 +9,11 @@ static void previous_hero() {}
 static void next_hero() {}
 
 static void dismiss_hero() {
-	//	if(dlgask(0, szt("", "Вы действительно хотите уволить этого героя со всей армией?"))) {
+	//if(dlgask(0, szt("", "Вы действительно хотите уволить этого героя со всей армией?"))) {
 	//		bsset(rec, Player, 0);
 	//		bsset(rec, Index, -1);
 	//		breakmodal(0);
-	//	}
+	//}
 }
 
 void heroi::open_artifact() {
@@ -95,6 +95,7 @@ void heroi::show(bool allow_change) const {
 				}
 			}
 		}
+		// Morale/Luck
 		if(true) {
 			auto x = 512;
 			auto y = 36;

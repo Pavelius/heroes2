@@ -355,7 +355,7 @@ static void standart_input() {
 		break;
 	case Hero:
 		if(hot::key == MouseLeft && hot::pressed)
-			draw::execute(choose_hero, (int)hilite_var.value);
+			draw::execute(choose_hero, (int)hilite_var.gethero());
 		else
 			hilite_var.gethero()->input(current_player);
 		break;

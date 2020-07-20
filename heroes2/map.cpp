@@ -12,11 +12,17 @@ static short unsigned	visited[512];
 static unsigned			visited_count;
 
 void map::clear() {
-	width = height = obelisc_count = 0;
+	width = height = 0;
 	memset(tiles, 0, sizeof(tiles));
 	memset(flags, 0, sizeof(flags));
 	memset(roads, 0, sizeof(roads));
 	visited_count = 0;
+	obelisc_count = 0;
+	bsmeta<moveablei>::count = 0;
+	bsmeta<castlei>::count = 0;
+	bsmeta<rumori>::count = 0;
+	bsmeta<sphinxi>::count = 0;
+	bsmeta<eventi>::count = 0;
 }
 
 landscape_s map::gettile(short unsigned index) {

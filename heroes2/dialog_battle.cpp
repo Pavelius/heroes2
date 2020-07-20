@@ -329,7 +329,7 @@ static void command_attack() {
 	auto& attacker = *current_unit;
 	auto& defender = *hilite_unit;
 	attacker.move(attack_index);
-	attacker.melee(defender, attack_direction);
+	attacker.melee(defender, map::to(attack_direction, Down));
 	end_turn();
 }
 

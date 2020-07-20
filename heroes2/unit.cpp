@@ -272,7 +272,7 @@ void uniti::attack(uniti& enemy, direction_s dir) {
 		remove(HalfStrenght);
 		d = d / 2;
 	}
-	show_attack(enemy, to(dir, Down));
+	show_attack(enemy, dir);
 	enemy.damage(d);
 	enemy.show_damage();
 }

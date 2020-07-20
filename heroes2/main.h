@@ -850,7 +850,7 @@ struct answeri {
 class sphinxi : public namei, public positioni, public answeri {
 	costi					resources;
 public:
-	costi & getresources() { return resources; }
+	costi&					getresources() { return resources; }
 };
 struct battlei {
 	bool					movement, cursor, distance, grid, index, usespells;

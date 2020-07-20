@@ -188,8 +188,8 @@ point animation::gethead() const {
 
 int animation::getparam(direction_s d) {
 	switch(d) {
-	case Left: case Right: return 2;
-	case LeftUp: case RightUp: return 1;
+	case Left: case Right: return 1;
+	case LeftUp: case RightUp: return 2;
 	default: return 3;
 	}
 }
